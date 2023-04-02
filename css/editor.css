@@ -13,6 +13,8 @@ body{
 }
 
 .close {
+    border:0;
+    background:transparent;
     color: #fff;
     opacity: 1;
     float: right;
@@ -260,7 +262,7 @@ select {
     color: #fff;
     border: none;
     line-height: 1;
-    cursor: pointer;
+    cursor: url(images/brush.cur);
     padding: .25em .75em;
     border-radius: 9999em;
     z-index: 2;
@@ -319,7 +321,7 @@ select {
 }
 
 .new-button:hover {
-    cursor: pointer;
+    cursor: url(images/brush.cur);
 
 }
 
