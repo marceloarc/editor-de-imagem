@@ -1,14 +1,16 @@
 $(document).ready(function () {
-    
     $(".close").on('click', function (e) {
         $(this).closest(".widget").hide();
     });
 
-    
+
     $("#models-category").click(function () {
         $("#widget-products").show();
     })
     $("#add-image").click(function () {
+        if(drawMode){
+            $("#draw").click();
+        }
         $("#input-image").click();
     })
 
@@ -35,6 +37,7 @@ $(document).ready(function () {
 
     });
 });
+var drawMode = false;
 var imagem4;
 $('#input-image').on('change', function (e) {
     var posx = $(this).attr("posx");
@@ -226,7 +229,7 @@ function addImage(image, posx, posy, id) {
             layer.draw();
         });
 
-
+        
         image6.on('transformend', (e) => {
 
 
@@ -288,7 +291,7 @@ function addImage(image, posx, posy, id) {
 
 
         image6.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
+            
 
         });
         image6.on('transform', (e) => {
@@ -432,7 +435,7 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
 
     }
     Textpre.on('mouseover', () => {
-        document.body.style.cursor = 'pointer';
+        
     });
     // hide on enter
     Textpre.on('dblclick dbltap', (e) => {
@@ -505,7 +508,7 @@ $("#addText").click(function () {
     })
 
     Text.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
 
 
@@ -867,12 +870,62 @@ $(function () {
     limitGroup = new Konva.Group();
     limitGroup.add(limit);
     rect1.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
+    
+        var isPaint = false;
+        var mode = 'brush';
+        var lastLine;
+    
+        stage.on('mousedown touchstart', function (e) {
+            if(drawMode){
 
+                isPaint = true;
+                var pos = stage.getPointerPosition();
+                lastLine = new Konva.Line({
+                  stroke: color,
+                  strokeWidth: size,
+                  globalCompositeOperation:
+                    mode === 'brush' ? 'source-over' : 'destination-out',
+                  // round cap for smoother lines
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  // add point twice, so we have some drawings even on a simple click
+                  points: [pos.x, pos.y, pos.x, pos.y],
+                });
+                layer.add(lastLine);
+              }
+        });
+    
+        stage.on('mouseup touchend', function () {
+          isPaint = false;
+        });
+    
+        // and core function - drawing
+        stage.on('mousemove touchmove', function (e) {
+            if(drawMode){
+            stage.draw();
+          if (!isPaint) {
+            return;
+          }
+    
+          // prevent scrolling on touch devices
+          e.evt.preventDefault();
+    
+          const pos = stage.getPointerPosition();
+          var newPoints = lastLine.points().concat([pos.x, pos.y]);
+          lastLine.points(newPoints);
+        }
+        });
+    
+        var select = document.getElementById('tool');
+        select.addEventListener('change', function () {
+          mode = select.value;
+        });
+    
     stage.on('click tap', function (e) {
         // if we are selecting with rect, do nothing
-        ;
+        
 
         // if click on empty area - remove all selections
         if ((e.target.name() != 'image0') && (e.target.name() != 'button-up') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'background-text')) {
@@ -885,9 +938,11 @@ $(function () {
         }
 
         if ((e.target.name() === 'image0') || (e.target.name() === 'text') || (e.target.name() === 'background-text')) {
-
+            if(drawMode){
+                $("#draw").click();
+            }
             transformer.nodes([e.target]);
-
+            drawMode = false;
             groupTrans.moveToTop();
             updatePos();
             layer.draw();
@@ -1049,7 +1104,9 @@ $(function () {
     });
 });
 $('#widget-text').on('click', function () {
-
+    if(drawMode){
+        $("#draw").click();
+    }
 
     // so position of textarea will be the sum of positions above:
 
@@ -1118,15 +1175,15 @@ function addTransformer() {
         borderStroke: 'gray',
         centeredScaling: true,
         enabledAnchors: [
-            'bottom-right','middle-right', 'middle-left',
-            'bottom-center','top-center'
+            'bottom-right', 'middle-right', 'middle-left',
+            'bottom-center', 'top-center'
         ],
         keepRatio: true,
         draggable: true,
         nodes: [],
     });
-transformer.borderDash([2, 2]);
-transformer.anchorCornerRadius(5);
+    transformer.borderDash([2, 2]);
+    transformer.anchorCornerRadius(5);
     var deleteButton = new Konva.Image({
 
         image: imageObj1,
@@ -1346,16 +1403,16 @@ transformer.anchorCornerRadius(5);
 
     });
     deleteButton.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     editButton.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     moveUp.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     moveDown.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     sizeButton.listening(false);
 
@@ -1476,6 +1533,33 @@ function addBackground(orientacao, png, texto, product_id, image, circle, fakesh
         }, 2000);
     }
 }
+var color;
+var size;
+$("#draw").on("click",function(){
+    $(this).css('background-color',"#192B49");
+    color = $("#paint-color").val();
+    size = $("#size").val();
+    if(!drawMode){
+        drawMode = true;
+        var editor = $(".editor");
+        document.body.style.cursor = 'url(images/brush.cur)';
+    $("#widget-draw").css("top", editor.offset().top+50);
+    $("#widget-draw").css("left", editor.offset().left);
+    $("#widget-draw").show();
+    }else{
+        $(this).css('background',"transparent");
+        $("#widget-draw").hide();
+        drawMode = false;
+    }
+        
+});
+$("#paint-color,#size").on('input', function(){
+    color = $("#paint-color").val();
+    size = $("#size").val();
+
+ 
+})
+
 
 $('.editor').on("mousemove", function (event) {
     $("#widget-image-zoom").css("pointer-events", 'none');
