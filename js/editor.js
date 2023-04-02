@@ -55,9 +55,7 @@ function addImage(image, posx, posy, id) {
     var imageObj1 = new Image();
     var imageObj2 = new Image();
     var imageObj10 = new Image();
-    imageObj1.crossOrigin = 'Anonymous';
-    imageObj10.crossOrigin = 'Anonymous';
-    imageObj2.crossOrigin = 'Anonymous';
+
     imageObj10.src = URL.createObjectURL(image);
     imageObj10.onload = function () {
         var image6 = new Konva.Image({
