@@ -1,0 +1,324 @@
+.btn-style {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: white;
+    transform: translateY(-5px);
+    margin: 2px;
+}
+.close {
+    color: #fff; 
+    opacity: 1;
+    float:right;
+}
+@font-face {
+    font-family: 'Vacation Planner Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Vacation Planner Regular'), url('../fonts/Vacation Planner.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Amethyst Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Amethyst Regular'), url('../fonts/Amethyst-webfont.ttf') format('truetype');
+}
+
+
+@font-face {
+    font-family: 'Brittney Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Brittney Regular'), url('../fonts/Brittney-MVYae.woff') format('woff');
+}
+
+.btn-add-text {
+    text-transform: uppercase;
+    width: 150px;
+    margin: 10px;
+    background-color: #4CAF50;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-family: Oswald;
+    border-radius: 2px;
+}
+
+.btn-align {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: white;
+    transform: translateY(-5px);
+    margin: 2px;
+}
+
+.btn-decoration {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: white;
+    transform: translateY(-5px);
+    margin: 2px;
+}
+
+.slider {
+    width: 80%;
+}
+
+.selected i {
+
+    color: #4CAF50;
+}
+
+select {
+    height: 30px;
+    padding: 3px;
+    font-size: 12px;
+}
+
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: black;
+    border-radius: 20px;
+}
+
+.widget {
+    border-radius: 2px;
+    width: 300px;
+
+    color: white;
+    display: none;
+    position: absolute;
+    z-index: 100;
+    margin: 0px;
+    padding: 0px;
+    filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
+}
+
+.widget-models {
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 400px;
+    margin: 20px;
+    filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
+}
+
+.widget-white {
+    background-color: white;
+    color: black;
+}
+
+.widget-black {
+    background-color: rgba(0, 0, 0, 0.60);
+    color: white;
+}
+
+.widget-header {
+
+    float: center;
+    width: 100%;
+    height: 40px;
+    background-color: black;
+    margin: 0px;
+    padding: 0px;
+    color: white;
+}
+
+.konvajs-content {
+
+    box-shadow: 0 0 0 px black;
+    background-color:white;
+}
+
+#input-text-edit::selection {
+    color: rgba(0, 0, 0, 0.0);
+    background-color: rgba(51, 144, 255, 0.5)
+}
+
+.bg-hover:hover {
+    background-color: rgba(0, 0, 0, 0.20)
+}
+
+.editor {
+    margin-top: 10px;
+
+    box-shadow: 0 0 0.1em black;
+    height: 580px !important;
+}
+
+.ggwp {
+    margin: 0px 120px;
+}
+
+
+@media (max-width: 768px) {
+    .editor-btn {
+        display: none;
+    }
+
+    .editor-btn:hover {
+        background-color: black;
+        color: white;
+    }
+
+    .desktop {
+        display: none;
+    }
+
+    .mobile {
+        display: block;
+    }
+
+    .widget-hidden {
+        display: none;
+    }
+
+    .text-button {
+        display: none;
+    }
+
+    .parente {
+        width: 90%;
+        height: 90%;
+        display: none;
+    }
+
+}
+
+@media (min-width: 769px) {
+    .editor-btn {
+        box-shadow: 0 0 0.2em black;
+        border: 0;
+        width: 50px;
+        height: 45px;
+        position: absolute;
+    }
+
+    #widget-video {
+        width: 810px !important;
+        height: 400px !important;
+    }
+
+    .desktop {
+        display: block;
+    }
+
+    .mobile {
+        display: none;
+    }
+
+    .widget-hidden {
+        display: flex;
+    }
+
+    .parente {
+        width: 1000px;
+        height: 400px;
+        display: none;
+    }
+}
+
+
+.butao {
+    opacity: 0.9;
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-size: 1.25em;
+    transform: translateX(-50%) translateY(-50%);
+    background: #333;
+    color: #fff;
+    border: none;
+    line-height: 1;
+    cursor: pointer;
+    padding: .25em .75em;
+    border-radius: 9999em;
+    z-index: 2;
+    box-shadow: 5px 10px 10px #333;
+}
+
+.preview {
+    max-width: 413px;
+    max-height: 516px;
+    display: none;
+    position: fixed;
+    z-index: 99999999;
+}
+
+.loading {
+    display: none;
+}
+
+.figure1 {
+
+    box-shadow: 5px 10px 10px #888888;
+
+}
+
+.preview:hover .butao {
+    display: block;
+}
+
+.figure2 {
+    position: relative;
+}
+
+
+.multi-button {
+    border-radius: 2px;
+    text-align: center;
+    box-shadow: 0 0 0.5em black;
+    margin: 0 auto;
+    background-color: black;
+    width: 100%;
+}
+
+.multi-button button {
+    border-radius: 2px;
+    height: 60px;
+    width: 20%;
+    background: transparent;
+
+    color: white;
+    font-size: 1.3rem;
+    font-family: Oswald;
+    border: none;
+    margin: -3px;
+    padding: 0;
+    outline: none;
+}
+
+.new-button:hover {
+    cursor: pointer;
+
+}
+
+.new-button:active {
+    filter: none;
+    transform: scale(.95);
+}
