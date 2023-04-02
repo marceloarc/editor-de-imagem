@@ -468,6 +468,7 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
 }
 var m = 0;
 
+
 var i = 0;
 
 $("#addText").click(function () {
@@ -744,7 +745,6 @@ $('[name2="Em pé"]').click(function () {
     stage.scale({ x: scale, y: scale });
     stage.draw();
     newObj = new Image()
-    newObj.crossOrigin = 'Anonymous';
     newObj.src = 'images/limit.png'
     newObj.onload = function () {
         limit.setAttrs({
@@ -835,12 +835,7 @@ $(function () {
     var buttonObj = new Image();
     var buttonObj2 = new Image();
     var copybtnObj = new Image();
-    imageObj1.crossOrigin = 'Anonymous';
-    imageObj2.crossOrigin = 'Anonymous';
-    imageObj3.crossOrigin = 'Anonymous';
-    buttonObj.crossOrigin = 'Anonymous';
-    buttonObj2.crossOrigin = 'Anonymous';
-    copybtnObj.crossOrigin = 'Anonymous';
+
     $("#parente").show();
 
     stageWidth = 1000;
@@ -1135,12 +1130,6 @@ function addTransformer() {
     var buttonObj = new Image();
     var buttonObj2 = new Image();
     var copybtnObj = new Image();
-    imageObj1.crossOrigin = 'Anonymous';
-    imageObj2.crossOrigin = 'Anonymous';
-    imageObj3.crossOrigin = 'Anonymous';
-    buttonObj.crossOrigin = 'Anonymous';
-    buttonObj2.crossOrigin = 'Anonymous';
-    copybtnObj.crossOrigin = 'Anonymous';
     var transformer = new Konva.Transformer({
         anchorStroke: 'black',
         anchorFill: 'black',
@@ -1192,9 +1181,6 @@ transformer.anchorCornerRadius(5);
     var buttonObj = new Image();
     var buttonObj2 = new Image();
     var copybtnObj = new Image();
-    buttonObj.crossOrigin = 'Anonymous';
-    buttonObj2.crossOrigin = 'Anonymous';
-    copybtnObj.crossOrigin = 'Anonymous';
     var buttonCopy = new Konva.Image({
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
@@ -1436,7 +1422,7 @@ function addBackground(orientacao, png, texto, product_id, image, circle, fakesh
     cleanStage();
     var imageObj = new Image();
     imageObj.src = image;
-    imageObj.crossOrigin = 'Anonymous';
+
     imageObj.onload = function () {
         var image = new Konva.Image({
             x: 0,
