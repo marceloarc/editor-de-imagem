@@ -3,13 +3,14 @@ $(document).ready(function () {
         $(this).closest(".widget").hide();
     });
 
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + 50);
+
     $("#models-category").click(function () {
         $("#widget-products").show();
     })
     $("#add-image").click(function () {
+        if(drawMode){
+            $("#draw").click();
+        }
         $("#input-image").click();
     })
 
@@ -36,6 +37,7 @@ $(document).ready(function () {
 
     });
 });
+var drawMode = false;
 var imagem4;
 $('#input-image').on('change', function (e) {
     var posx = $(this).attr("posx");
@@ -54,6 +56,7 @@ function addImage(image, posx, posy, id) {
     var imageObj1 = new Image();
     var imageObj2 = new Image();
     var imageObj10 = new Image();
+
     imageObj10.src = URL.createObjectURL(image);
     imageObj10.onload = function () {
         var image6 = new Konva.Image({
@@ -226,7 +229,7 @@ function addImage(image, posx, posy, id) {
             layer.draw();
         });
 
-
+        
         image6.on('transformend', (e) => {
 
 
@@ -288,7 +291,7 @@ function addImage(image, posx, posy, id) {
 
 
         image6.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
+            
 
         });
         image6.on('transform', (e) => {
@@ -432,7 +435,7 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
 
     }
     Textpre.on('mouseover', () => {
-        document.body.style.cursor = 'pointer';
+        
     });
     // hide on enter
     Textpre.on('dblclick dbltap', (e) => {
@@ -463,66 +466,7 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
     layer.draw();
 }
 var m = 0;
-function addFakeShape(width, height, posx, posy, scalex, scaley, png, rotation) {
 
-    m++;
-    var cameraObj = new Image();
-    cameraObj.src = "image/catalog/icon camera.png?1237"
-    var shapeGroup = new Konva.Group();
-
-    var fakeShape = new Konva.Rect({
-        width: width,
-        height: height,
-        x: posx,
-        y: posy,
-        scaleX: scalex,
-        rotation: rotation,
-        scaleY: scaley,
-        id: 'fakeShape' + m,
-        name: 'fakeShape',
-        fill: "#BCBCBC",
-        draggable: false
-    })
-
-
-    var camera = new Konva.Image({
-        width: 350,
-        height: 300,
-        x: posx + ((width * scalex) / 2) - 350 * (scaley * scalex + 0.4) / 2,
-        y: posy + ((height * scaley) / 2) - 300 * (scaley * scalex + 0.4) / 2,
-        name: 'camera',
-        camerafakeShapeId: fakeShape.id(),
-        rotation: rotation,
-        scaleX: scaley * scalex + 0.4,
-        scaleY: scaley * scalex + 0.4,
-        listening: false
-    })
-
-    cameraObj.onload = function () {
-        camera.setAttrs({ image: cameraObj });
-
-        layer.draw()
-    }
-
-    fakeShape.on('click tap', function (e) {
-        var x = e.target.position().x;
-        var y = e.target.position().y;
-        var id = e.target.id();
-        $("#input-image").attr("posx", x);
-        $("#input-image").attr("posy", y);
-        $("#input-image").attr("idshape", id);
-        $("#input-image").click();
-    });
-    shapeGroup.add(fakeShape);
-    shapeGroup.add(camera);
-    layer.add(shapeGroup);
-    if (png == 1) {
-        shapeGroup.moveToBottom();
-        rect1.moveToBottom();
-    }
-    layer.draw();
-
-}
 
 var i = 0;
 
@@ -540,13 +484,13 @@ $("#addText").click(function () {
         x: 200,
         y: stageHeight / 2,
         align: "left",
-        fontSize: 300,
+        fontSize: 70,
         id: i.toString() + 'texto',
         draggable: true,
         fill: "black",
         fakeShapeId: 'stage',
         verticalAlign: 'middle',
-        padding: 70,
+        padding: 30,
         name: 'text'
     });
     Text.x((stageWidth / 2) - Text.width() / 2)
@@ -564,7 +508,7 @@ $("#addText").click(function () {
     })
 
     Text.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
 
 
@@ -731,8 +675,8 @@ $("[name2=Deitado]").click(function () {
     deitado = 1;
     var moldura = $('canvas');
     var preview = $('#bosta');
-    stageWidth = 2380;
-    stageHeight = 3218;
+    stageWidth = 1000;
+    stageHeight = 700;
 
     var container = document.querySelector('#parente');
 
@@ -752,19 +696,8 @@ $("[name2=Deitado]").click(function () {
     });
 
     layer.draw();
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + $(".multi-button").height() - 10);
+
 });
-
-$("[name2=Branca]").click(function () {
-    $('.konvajs-content').css("box-shadow", "0 0 0 20px #fdfff5");
-
-})
-$("[name2=Preta]").click(function () {
-    $('.konvajs-content').css("box-shadow", "0 0 0 20px black");
-
-})
 
 $('#bgcolor').on('input',
     function () {
@@ -800,7 +733,7 @@ $('[name2="Em pé"]').click(function () {
     stage.scale({ x: scale, y: scale });
     stage.draw();
     newObj = new Image()
-    newObj.src = 'image/catalog/limit.png'
+    newObj.src = 'images/limit.png'
     newObj.onload = function () {
         limit.setAttrs({
             width: stageWidth,
@@ -816,9 +749,7 @@ $('[name2="Em pé"]').click(function () {
     });
     layer.draw();
 
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + 50);
+
 });
 
 function updatePos() {
@@ -868,8 +799,8 @@ function cleanStage() {
 var transformer;
 var limit;
 var limitGroup;
-var stageWidth = 2380;
-var stageHeight = 3218;
+var stageWidth = 1000;
+var stageHeight = 700;
 var stage;
 var tr;
 var layer;
@@ -893,8 +824,8 @@ $(function () {
 
     $("#parente").show();
 
-    stageWidth = 2380;
-    stageHeight = 3218;
+    stageWidth = 1000;
+    stageHeight = 700;
 
     stage = new Konva.Stage({
         container: 'container',
@@ -939,12 +870,62 @@ $(function () {
     limitGroup = new Konva.Group();
     limitGroup.add(limit);
     rect1.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
+    
+        var isPaint = false;
+        var mode = 'brush';
+        var lastLine;
+    
+        stage.on('mousedown touchstart', function (e) {
+            if(drawMode){
 
+                isPaint = true;
+                var pos = stage.getPointerPosition();
+                lastLine = new Konva.Line({
+                  stroke: color,
+                  strokeWidth: size,
+                  globalCompositeOperation:
+                    mode === 'brush' ? 'source-over' : 'destination-out',
+                  // round cap for smoother lines
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  // add point twice, so we have some drawings even on a simple click
+                  points: [pos.x, pos.y, pos.x, pos.y],
+                });
+                layer.add(lastLine);
+              }
+        });
+    
+        stage.on('mouseup touchend', function () {
+          isPaint = false;
+        });
+    
+        // and core function - drawing
+        stage.on('mousemove touchmove', function (e) {
+            if(drawMode){
+            stage.draw();
+          if (!isPaint) {
+            return;
+          }
+    
+          // prevent scrolling on touch devices
+          e.evt.preventDefault();
+    
+          const pos = stage.getPointerPosition();
+          var newPoints = lastLine.points().concat([pos.x, pos.y]);
+          lastLine.points(newPoints);
+        }
+        });
+    
+        var select = document.getElementById('tool');
+        select.addEventListener('change', function () {
+          mode = select.value;
+        });
+    
     stage.on('click tap', function (e) {
         // if we are selecting with rect, do nothing
-        ;
+        
 
         // if click on empty area - remove all selections
         if ((e.target.name() != 'image0') && (e.target.name() != 'button-up') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'background-text')) {
@@ -957,9 +938,11 @@ $(function () {
         }
 
         if ((e.target.name() === 'image0') || (e.target.name() === 'text') || (e.target.name() === 'background-text')) {
-
+            if(drawMode){
+                $("#draw").click();
+            }
             transformer.nodes([e.target]);
-
+            drawMode = false;
             groupTrans.moveToTop();
             updatePos();
             layer.draw();
@@ -1032,9 +1015,7 @@ $(function () {
     // Show modal on click
 
     stage.draw();
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + $(".multi-button").height() - 10);
+
 });
 
 $(function () {
@@ -1123,14 +1104,16 @@ $(function () {
     });
 });
 $('#widget-text').on('click', function () {
-
+    if(drawMode){
+        $("#draw").click();
+    }
 
     // so position of textarea will be the sum of positions above:
 
     // create textarea and style it
     var position = $(this).position();
     var widget = document.getElementById('add-text-widget');
-    var positionTop = position.top + 50;
+    var positionTop = position.top - 150;
     var positionLeft = position.left - 100;
     widget.style.position = 'absolute';
     widget.style.top = positionTop + 'px';
@@ -1192,15 +1175,15 @@ function addTransformer() {
         borderStroke: 'gray',
         centeredScaling: true,
         enabledAnchors: [
-            'bottom-right','middle-right', 'middle-left',
-            'bottom-center','top-center'
+            'bottom-right', 'middle-right', 'middle-left',
+            'bottom-center', 'top-center'
         ],
         keepRatio: true,
         draggable: true,
         nodes: [],
     });
-transformer.borderDash([2, 2]);
-transformer.anchorCornerRadius(5);
+    transformer.borderDash([2, 2]);
+    transformer.anchorCornerRadius(5);
     var deleteButton = new Konva.Image({
 
         image: imageObj1,
@@ -1420,26 +1403,26 @@ transformer.anchorCornerRadius(5);
 
     });
     deleteButton.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     editButton.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     moveUp.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     moveDown.on('mouseover', function () {
-        document.body.style.cursor = 'pointer';
+        
     });
     sizeButton.listening(false);
 
-    buttonObj.src = "image/catalog/move-up.png";
-    buttonObj2.src = "image/catalog/move-down.png";
+    buttonObj.src = "images/move-up.png";
+    buttonObj2.src = "images/move-down.png";
 
-    imageObj1.src = "image/catalog/x-png-icon-8.png?32";
-    imageObj2.src = "image/catalog/size-icon.png";
-    copybtnObj.src = "image/catalog/btn-copy.png";
-    imageObj3.src = "image/catalog/edit-icon.png";
+    imageObj1.src = "images/x-png-icon-8.png?32";
+    imageObj2.src = "images/size-icon.png";
+    copybtnObj.src = "images/btn-copy.png";
+    imageObj3.src = "images/edit-icon.png";
     transformer.add(deleteButton);
     transformer.add(sizeButton);
     transformer.add(editButton);
@@ -1550,6 +1533,33 @@ function addBackground(orientacao, png, texto, product_id, image, circle, fakesh
         }, 2000);
     }
 }
+var color;
+var size;
+$("#draw").on("click",function(){
+    $(this).css('background-color',"#192B49");
+    color = $("#paint-color").val();
+    size = $("#size").val();
+    if(!drawMode){
+        drawMode = true;
+        var editor = $(".editor");
+        document.body.style.cursor = 'url(images/brush.cur)';
+    $("#widget-draw").css("top", editor.offset().top+50);
+    $("#widget-draw").css("left", editor.offset().left);
+    $("#widget-draw").show();
+    }else{
+        $(this).css('background',"transparent");
+        $("#widget-draw").hide();
+        drawMode = false;
+    }
+        
+});
+$("#paint-color,#size").on('input', function(){
+    color = $("#paint-color").val();
+    size = $("#size").val();
+
+ 
+})
+
 
 $('.editor').on("mousemove", function (event) {
     $("#widget-image-zoom").css("pointer-events", 'none');
