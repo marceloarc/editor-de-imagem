@@ -4,9 +4,7 @@ $(document).ready(function () {
         $(this).closest(".widget").hide();
     });
 
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + 50);
+    
     $("#models-category").click(function () {
         $("#widget-products").show();
     })
@@ -483,7 +481,7 @@ $("#addText").click(function () {
         x: 200,
         y: stageHeight / 2,
         align: "left",
-        fontSize: 300,
+        fontSize: 100,
         id: i.toString() + 'texto',
         draggable: true,
         fill: "black",
@@ -675,7 +673,7 @@ $("[name2=Deitado]").click(function () {
     var moldura = $('canvas');
     var preview = $('#bosta');
     stageWidth = 1000;
-    stageHeight = 400;
+    stageHeight = 700;
 
     var container = document.querySelector('#parente');
 
@@ -695,19 +693,8 @@ $("[name2=Deitado]").click(function () {
     });
 
     layer.draw();
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + $(".multi-button").height() - 10);
+
 });
-
-$("[name2=Branca]").click(function () {
-    $('.konvajs-content').css("box-shadow", "0 0 0 20px #fdfff5");
-
-})
-$("[name2=Preta]").click(function () {
-    $('.konvajs-content').css("box-shadow", "0 0 0 20px black");
-
-})
 
 $('#bgcolor').on('input',
     function () {
@@ -759,9 +746,7 @@ $('[name2="Em pé"]').click(function () {
     });
     layer.draw();
 
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + 50);
+
 });
 
 function updatePos() {
@@ -812,7 +797,7 @@ var transformer;
 var limit;
 var limitGroup;
 var stageWidth = 1000;
-var stageHeight = 400;
+var stageHeight = 700;
 var stage;
 var tr;
 var layer;
@@ -837,7 +822,7 @@ $(function () {
     $("#parente").show();
 
     stageWidth = 1000;
-    stageHeight = 400;
+    stageHeight = 700;
 
     stage = new Konva.Stage({
         container: 'container',
@@ -975,9 +960,7 @@ $(function () {
     // Show modal on click
 
     stage.draw();
-    $('.konvajs-content').css("position", "absolute");
-    $('.konvajs-content').css("left", $(".editor").position().left + ($(".editor").outerWidth() / 2) - ($('.konvajs-content').width() / 2));
-    $('.konvajs-content').css("top", $(".editor").position().top + ($(".editor").outerHeight() / 2) - ($('.konvajs-content').height() / 2) + $(".multi-button").height() - 10);
+
 });
 
 $(function () {
@@ -1073,7 +1056,7 @@ $('#widget-text').on('click', function () {
     // create textarea and style it
     var position = $(this).position();
     var widget = document.getElementById('add-text-widget');
-    var positionTop = position.top + 50;
+    var positionTop = position.top - 100;
     var positionLeft = position.left - 100;
     widget.style.position = 'absolute';
     widget.style.top = positionTop + 'px';
