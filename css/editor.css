@@ -149,7 +149,7 @@ select {
 }
 
 .konvajs-content {
-
+    margin:0 auto;
     box-shadow: 0 0 0 px black;
     background-color:white;
 }
@@ -164,10 +164,11 @@ select {
 }
 
 .editor {
+    margin:0 auto;
     margin-top: 10px;
-
+    width:1000px;
     box-shadow: 0 0 0.1em black;
-    height: 580px !important;
+    height: 700px !important;
 }
 
 .ggwp {
@@ -236,8 +237,7 @@ select {
     }
 
     .parente {
-        width: 1000px;
-        height: 400px;
+ 
         display: none;
     }
 }
@@ -290,22 +290,22 @@ select {
 
 
 .multi-button {
-    border-radius: 2px;
-    text-align: center;
-    box-shadow: 0 0 0.5em black;
+
+    text-align: left;
+
     margin: 0 auto;
-    background-color: black;
+    background-color: #333C4C;
     width: 100%;
 }
 
 .multi-button button {
-    border-radius: 2px;
+
     height: 60px;
     width: 20%;
     background: transparent;
 
     color: white;
-    font-size: 1.3rem;
+    font-size: 0.9rem;
     font-family: Oswald;
     border: none;
     margin: -3px;
