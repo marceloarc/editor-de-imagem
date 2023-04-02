@@ -1,3 +1,6 @@
+body{
+    background-color:black;
+}
 .btn-style {
     width: 20px;
     height: 20px;
@@ -8,11 +11,13 @@
     transform: translateY(-5px);
     margin: 2px;
 }
+
 .close {
-    color: #fff; 
+    color: #fff;
     opacity: 1;
-    float:right;
+    float: right;
 }
+
 @font-face {
     font-family: 'Vacation Planner Regular';
     font-style: normal;
@@ -149,9 +154,9 @@ select {
 }
 
 .konvajs-content {
-    margin:0 auto;
+    margin: 0 auto;
     box-shadow: 0 0 0 px black;
-    background-color:white;
+    background-color: white;
 }
 
 #input-text-edit::selection {
@@ -164,9 +169,9 @@ select {
 }
 
 .editor {
-    margin:0 auto;
-    margin-top: 10px;
-    width:1000px;
+    margin: 0 auto;
+    margin-top: 50px;
+    width: 1000px;
     box-shadow: 0 0 0.1em black;
     height: 700px !important;
 }
@@ -237,7 +242,7 @@ select {
     }
 
     .parente {
- 
+
         display: none;
     }
 }
