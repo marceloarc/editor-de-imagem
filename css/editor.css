@@ -51,6 +51,7 @@ body{
 
 
 .slidecontainer{
+    overflow: scroll;
     display: flex; 
     align-items: center;
     justify-content: center;
@@ -105,7 +106,16 @@ select {
 
 .widget-sm {
     border-radius: 5px;
-
+    line-height: 1;
+    color: white;
+    display: none;
+    position: absolute;
+    z-index: 100;
+    margin: 0px;
+    filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
+}
+.widget-lg{
+    border-radius: 5px;
     line-height: 1;
     color: white;
     display: none;
@@ -185,6 +195,22 @@ textarea:focus {
     height:100%;
 }
 
+.widget-body
+{
+    width: 100%;
+  
+}
+@media (max-width: 450px) {
+    .widget-lg
+    {
+        width:100%;
+    }
+    .widget-body
+    {
+        width: auto;
+      
+    }
+}
 @media (max-width: 768px) {
     .editor-btn {
         display: none;
