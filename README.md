@@ -1,7 +1,7 @@
 # Editor de Imagem Online
 
 Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenvolvido com **HTML**, **CSS**, **jQuery** e o framework **Konva.js**. Com ele, você pode criar e editar imagens diretamente no navegador.
-
+[Demo](https://marceloarc.github.io/editor-de-imagem/)
 ---
 
 ## Recursos
