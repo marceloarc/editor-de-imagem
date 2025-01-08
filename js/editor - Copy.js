@@ -1,6 +1,6 @@
 let isMousePressed = false;
-const alignments = ["left", "center", "right", "justify"];
-let currentIndex = 0; 
+const alignments = ["left", "center", "right", "justify"]; // Ordem dos alinhamentos
+let currentIndex = 0; // Índice atual do alinhamento
 const icons = ["fa-align-left", "fa-align-center", "fa-align-right", "fa-align-justify"];
 const alignmentIcons = {
     left: "fa-align-left",
@@ -8,58 +8,32 @@ const alignmentIcons = {
     right: "fa-align-right",
     justify: "fa-align-justify"
   };
-const zoomElement = document.querySelector(".zoom");
-let zoom = 1;
-const ZOOM_SPEED = 0.1;
-let title = "Sem Título";
-
+// Detecta quando o mouse ou touch é pressionado
 $(document).on('mousedown touchstart', function () {
     isMousePressed = true;
 });
 
-
+// Detecta quando o mouse ou touch é liberado
 $(document).on('mouseup touchend', function () {
     isMousePressed = false;
 });
 $(document).ready(function () {
     $(".close").on('click', function (e) {
         $(this).closest(".widget").hide();
-
     });
-
-    var container = $('.container2');
-    var widgetLayers = $('#widget-layers');
-
-    var containerOffset = container.offset();
-
-    widgetLayers.css({
-        position: 'absolute',
-        top: containerOffset.top,
-        left:containerOffset.left + (container.width() - widgetLayers.width()),
-    });
-
-    $(".minimize").on('click', function (e) {
-        $(this).closest(".widget").hide();
-        var width = $(this).closest(".widget-header").width();
-        $(this).closest(".widget-sm").children("#layers-body").toggle();
-        $(this).closest(".widget-header").width(width);
-        const icon = $(this).find('i'); 
-        icon.toggleClass('fa-minus fa-plus');
-    });
-
-    var movedLayerId = null; 
+    var movedLayerId = null;  // Variável para armazenar o item original
     $('#layers').sortable({
-        items: '.layer', 
-        placeholder: 'ui-sortable-placeholder', 
+        items: '.layer',  // Só permite o arraste dos itens com a classe .layer
+        placeholder: 'ui-sortable-placeholder', // Estilo do espaço reservado
         forcePlaceholderSize: true,
         axis: 'y',
         start: function(event, ui) {
            
             // originalIndexBefore = ui.item.index();
             movedLayerId = ui.item.attr('layer-id');
-            const layersOrder = $('#layers .layer');
+            const layersOrder = $('#layers .layer'); // Captura a nova ordem dos botões
             layersOrder.each(function (index, value) {
-                $(value).removeClass("active"); 
+                $(value).removeClass("active"); // Converte 'value' para um objeto jQuery antes de chamar removeClass
             });
             ui.item.addClass("active");
             $("#currentLayer").val(movedLayerId);
@@ -68,18 +42,17 @@ $(document).ready(function () {
         },
 
         update: function (event, ui) {
-            const layersOrder = $('#layers .layer'); 
+            const layersOrder = $('#layers .layer'); // Captura a nova ordem dos botões
             layersOrder.each(function (index) {
-                const layerId = $(this).attr('layer-id');
-                const layer = stage.findOne(`#${layerId}`); 
+                const layerId = $(this).attr('layer-id'); // Pega o ID da camada associada
+                const layer = stage.findOne(`#${layerId}`); // Encontra a camada no palco do Konva
                 
                 if (layer) {
-                    layer.zIndex(index);
+                    layer.zIndex(index); // Atualiza o zIndex baseado no novo índice
                 }
             });
 
             updateLayerButtons();
- 
             stage.batchDraw();
         }
     });
@@ -290,26 +263,71 @@ function addImage(image, posx, posy, id) {
 
         });
         image.on('mousedown touchstart', (e) => {
-            const parentLayer = e.target.getLayer();
+            const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
             if (parentLayer.id() !== $("#currentLayer").val()) {
                 return;
             }
             transformer.nodes([e.target]);
+            limitGroup.moveToTop();
+            if (e.target.getAttr('fakeShapeId') != "stage") {
+
+                var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
+
+                limit.setAttrs({
+                    width: shape.width(),
+                    height: shape.height(),
+                    scaleX: shape.scaleX(),
+                    scaleY: shape.scaleY(),
+                    rotation: shape.rotation(),
+                    x: shape.x(),
+                    y: shape.y()
+                })
+            }
+            $('#selectedNode').val(e.target.id())
             $("#widget-image").fadeIn(100);
             
-            generateImageWidget(e.target)
+            var imagePosition = image.absolutePosition();
+
+            var stagePosition = $(".konvajs-content").position();
+            var widget = document.getElementById('widget-image');
+            widget.style.display = 'block';
+
+            var positionTop = stagePosition.top + imagePosition.y + ((image.height() *image.getAbsoluteScale().y) + 50);
+            var positionLeft = stagePosition.left + imagePosition.x + ((image.width() / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop + 'px';
+            widget.style.left = positionLeft + 'px';
+            widget.style.display = "inline !important";
+            limit.show();
             updatePos();
             layer.draw();
         });
         image.on('dragstart transformstart', (e) => {
-            const parentLayer = e.target.getLayer();
+            const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
             if (parentLayer.id() !== $("#currentLayer").val()) {
                 return;
             }
             transformer.nodes([e.target]);
+            limitGroup.moveToTop();
+            if (e.target.getAttr('fakeShapeId') != "stage") {
+
+                var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
+
+                limit.setAttrs({
+                    width: shape.width(),
+                    height: shape.height(),
+                    scaleX: shape.scaleX(),
+                    scaleY: shape.scaleY(),
+                    rotation: shape.rotation(),
+                    x: shape.x(),
+                    y: shape.y()
+                })
+            }
+            $('#selectedNode').val(e.target.id())
             $("#widget-image").fadeOut(100);
+            limit.show();
             updatePos();
             layer.draw();
         });
@@ -343,7 +361,7 @@ function addImage(image, posx, posy, id) {
                 $("#" + attr).attr("object-id", e.target.id())
                 $("#" + attr).val(e.target[attr]())
                 const porcentagem = (e.target[attr]() / $("#"+attr).attr("max")) * 100;
-                $("." + attr).text(parseInt(porcentagem)+"%");
+                $("." + attr).text(porcentagem+"%");
                 if (e.target.name() === 'image') {
                     $("#" + attr).prop("disabled", false);
                 } else {
@@ -352,12 +370,24 @@ function addImage(image, posx, posy, id) {
             });
             $("#widget-image").fadeIn(100);
             
-            generateImageWidget(e.target)
+            var imagePosition = image.absolutePosition();
+
+            var stagePosition = $(".konvajs-content").position();
+            var widget = document.getElementById('widget-image');
+            widget.style.display = 'block';
+
+            var positionTop = stagePosition.top + imagePosition.y + ((image.height() *image.getAbsoluteScale().y) + 50);
+            var positionLeft = stagePosition.left + imagePosition.x + ((image.width() / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop + 'px';
+            widget.style.left = positionLeft + 'px';
+            widget.style.display = "inline !important";
+
             layer.draw();
         });
 
         image.on('dragend', (e) => {
-            const parentLayer = e.target.getLayer();
+            const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
             if (parentLayer.id() !== $("#currentLayer").val()) {
                 return;
@@ -384,7 +414,21 @@ function addImage(image, posx, posy, id) {
 
                 }
             }
-            generateImageWidget(e.target)
+            $("#widget-image").fadeIn(100);
+            
+            var imagePosition = image.absolutePosition();
+
+            var stagePosition = $(".konvajs-content").position();
+            var widget = document.getElementById('widget-image');
+            widget.style.display = 'block';
+
+            var positionTop = stagePosition.top + imagePosition.y + ((image.height() *image.getAbsoluteScale().y) + 50);
+            var positionLeft = stagePosition.left + imagePosition.x + ((image.width() / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop + 'px';
+            widget.style.left = positionLeft + 'px';
+            widget.style.display = "inline !important";
+
             layer.draw();
         });
 
@@ -395,6 +439,21 @@ function addImage(image, posx, posy, id) {
 
         });
         image.on('transform', (e) => {
+            limitGroup.moveToTop();
+            if (e.target.getAttr('fakeShapeId') != "stage") {
+
+                var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
+
+                limit.setAttrs({
+                    width: shape.width(),
+                    height: shape.height(),
+                    scaleX: shape.scaleX(),
+                    scaleY: shape.scaleY(),
+                    rotation: shape.rotation(),
+                    x: shape.x(),
+                    y: shape.y()
+                })
+            }
             updatePos();
         });
 
@@ -431,7 +490,7 @@ function addImage(image, posx, posy, id) {
 
 $("#widget-bg-btn").click(function () {
     $("#widget-background").hide();
-    var editor = $(".preview-img");
+    var editor = $(".editor");
     $("#widget-bg2").css("top", editor.position().top + editor.height() / 2 - $("#widget-bg2").height() / 2);
     $("#widget-bg2").css("left", editor.position().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
     $("#widget-bg2").show();
@@ -440,7 +499,7 @@ $("#widget-bg-btn").click(function () {
 
 $("#vazio").click(function () {
     cleanStage()
-    background.setAttrs({
+    rect1.setAttrs({
         fill: "#FFFFFF"
     });
     layer.draw();
@@ -451,24 +510,7 @@ $("#vazio").click(function () {
     $("[name2=Deitado]").next("span").show();
     $('[name2="Em pé"]').next("span").show();
 });
-function generateImageWidget(image){
-    $("#widget-image").fadeIn(100);
-            
-    var imagePosition = image.absolutePosition();
 
-    var stagePosition = $(".konvajs-content").position();
-    var widget = document.getElementById('widget-image');
-    widget.style.display = 'block';
-
-    const adjustedTop = (stagePosition.top + (imagePosition.y*zoom));
-    const adjustedLeft = (stagePosition.left + (imagePosition.x*zoom));
-
-    var positionTop = adjustedTop  + (((image.height()*zoom) *image.getAbsoluteScale().y) + 50);
-    var positionLeft = adjustedLeft + (((image.width()*zoom)  / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
-    widget.style.position = 'absolute';
-    widget.style.top = positionTop + 'px';
-    widget.style.left = positionLeft + 'px';
-}
 var v = 0;
 function createText(texto, color, posx, posy, font, fontSize, circle, textDecoration, align, fontStyle, scalex, scaley, rotation, width) {
     var layer = stage.findOne("#"+$("#currentLayer").val());
@@ -539,7 +581,7 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
     });
 
     Textpre.on('dblclick dbltap', (e) => {
-        textAreaPosition(e.target)
+        textAreaPosition(Textpre)
     });
     Textpre.on('transform', (e) => {
         updatePos();
@@ -624,25 +666,27 @@ $("#addText").click(function () {
 
     Text.on('mousedown touchstart', (e) => {
         
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        $('#selectedNode').val(e.target.id())
         $("#draggable").fadeIn(100);
         generateTextWidget(e.target); 
     });
     
     Text.on('dblclick dbltap', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        textAreaPosition(e.target)
+        $('#selectedNode').val(e.target.id())
+        textAreaPosition(Text)
     });
     Text.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
@@ -650,11 +694,12 @@ $("#addText").click(function () {
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
         updatePos();
+        $('#selectedNode').val(e.target.id())
         layer.draw();
         $("#draggable").fadeOut(100);
     });
     Text.on('dragend',(e)=>{
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
@@ -719,30 +764,26 @@ function generateTextWidget(Text) {
     var textPosition = Text.absolutePosition();
 
     var position = $(".konvajs-content").position();
- 
     var toolbox = document.getElementById('draggable');
-    const adjustedTop = (position.top + (textPosition.y*zoom));
-    const adjustedLeft = (position.left + textPosition.x*zoom);
-    var positionTop = adjustedTop + (((Text.height()*zoom) * Text.getAbsoluteScale().y) + 50);
-    var positionLeft = adjustedLeft + (((Text.width()*zoom) / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
+
+    var positionTop = position.top + textPosition.y + ((Text.height() * Text.getAbsoluteScale().y) + 50);
+    var positionLeft = position.left + textPosition.x + ((Text.width() / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
     toolbox.style.position = 'absolute';
     toolbox.style.top = positionTop + 'px';
     toolbox.style.left = positionLeft + 'px';
     toolbox.style.display = "inline !important";        
 }
 function textAreaPosition(Text){
-    var textPosition = Text.absolutePosition(); 
+    var textPosition = Text.absolutePosition();
+
     var position = $(".konvajs-content").position();
-    console.log(textPosition.y*zoom)
-    const adjustedTop = (position.top + (textPosition.y*zoom));
-    const adjustedLeft = (position.left + textPosition.x*zoom);
         $("#input-text-edit").css("position", "absolute");
         $("#input-text-edit").css("display", "block");
         $("#input-text-edit").css("z-index", "999999")
-        $("#input-text-edit").css("font-size", (Text.fontSize()* Text.getAbsoluteScale().x)*zoom  + "px");
+        $("#input-text-edit").css("font-size", Text.fontSize() * Text.getAbsoluteScale().x + "px");
         $("#input-text-edit").css("border", "none");
         $("#input-text-edit").css("margin", "0px");
-        $("#input-text-edit").css("padding", (Text.padding() * Text.getAbsoluteScale().x)*zoom  + "px");
+        $("#input-text-edit").css("padding", Text.padding() * Text.getAbsoluteScale().x + "px");
         $("#input-text-edit").css("overflow", "hidden");
         $("#input-text-edit").css("outline", "none");
         $("#input-text-edit").css("resize", "none");
@@ -752,10 +793,10 @@ function textAreaPosition(Text){
         $("#input-text-edit").css("line-height", Text.lineHeight());
         $("#input-text-edit").css("text-align", Text.align());
         $("#input-text-edit").css("transform-origin", "top left");
-        $("#input-text-edit").css("width", ((Text.width() * Text.getAbsoluteScale().x)*zoom + 'px'));
-        $("#input-text-edit").css("height", ((Text.height() * Text.getAbsoluteScale().y)*zoom + 'px'));
-        $("#input-text-edit").css("top", adjustedTop);
-        $("#input-text-edit").css("left", adjustedLeft);    
+        $("#input-text-edit").css("width", (Text.width() * Text.getAbsoluteScale().x + 'px'));
+        $("#input-text-edit").css("height", (Text.height() * Text.getAbsoluteScale().y + 'px'));
+        $("#input-text-edit").css("top", position.top + textPosition.y);
+        $("#input-text-edit").css("left", position.left + textPosition.x);    
     
         var textarea = document.getElementById('input-text-edit');
 
@@ -797,7 +838,7 @@ $('#bgcolor').on('input',
     function () {
         var layer = stage.findOne("#"+$("#currentLayer").val());
         cor = $('#bgcolor').val();
-        var node = layer.findOne("#"+$('#bgcolor').attr("object-id"))
+        var node = stage.find("#" + $('#bgcolor').attr("object-id"))[0];
         node.setAttrs({
             fill: $('#bgcolor').val()
         });
@@ -809,7 +850,7 @@ $('#bgcolor').on('input',
 $('#bg-remove').on('click',
     function () {
         var layer = stage.findOne("#"+$("#currentLayer").val());     
-        var node = layer.findOne("#"+$('#bgcolor').attr("object-id"))
+        var node = stage.find("#" + $('#bgcolor').attr("object-id"))[0];
         node.destroy()
         $("#widget-bg").fadeOut(100);
         layer.draw();
@@ -818,7 +859,7 @@ $('#draw-color').on('input',
     function () {
         var layer = stage.findOne("#"+$("#currentLayer").val());
         cor = $('#draw-color').val();
-        var node = transformer.nodes()[0];
+        var node = stage.find("#" + $('#draw-color').attr("object-id"))[0];
         node.setAttrs({
             fill: $('#draw-color').val()
         });
@@ -831,7 +872,7 @@ sliders.forEach(function (attr) {
     $('#' + attr).on('input',
         function () {
             value = $('#' + attr).val();
-            var node = transformer.nodes()[0];
+            var node = stage.find("#" + $('#' + attr).attr("object-id"))[0];
             const porcentagem = (value / $("#"+attr).attr("max")) * 100;
             $("." + attr).text(parseInt(porcentagem) + "%");
             if (node) {
@@ -866,7 +907,27 @@ $("#add-tri").on('click', function () {
     transformer.nodes([node]);
     layer.draw();
 
-    generateNodeWidget(node)
+   
+    var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+    var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+    $("#widget-node").fadeIn(100);
+    var widget = document.getElementById('widget-node');
+    widget.style.position = 'absolute';
+    // Calcular a posição correta no documento
+    var positionTop = stagePosition.top + position.y + ((200 * node.getAbsoluteScale().y));
+    var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+    
+    // Atualizar a posição do widget
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+    // Atualizar cor e exibir o widget
+    $("#draw-color").attr("disabled", false);
+    $("#draw-color").val(node.fill()); // Definir a cor do alvo
+    const colorButton = document.getElementById("node-color-button");
+
+    colorButton.style.backgroundColor = node.fill(); 
+    $("#draw-color").attr("object-id", node.id());
+    $('#selectedNode').val(node.id())
 
     node.on('transformstart', function () {
         $("#widget-node").fadeOut(100);
@@ -875,8 +936,27 @@ $("#add-tri").on('click', function () {
     node.on('transform', function () {
         updatePos();
     })
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target);
+    node.on('transformend', function () {
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((200 * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
 
     })
 
@@ -885,21 +965,59 @@ $("#add-tri").on('click', function () {
     });
 
     node.on('mousedown touchstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        generateNodeWidget(e.target);
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((200 * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
 
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
+
     node.on('dragend', (e)=>{
-        generateNodeWidget(e.target);
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((200 * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
     node.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
@@ -939,7 +1057,27 @@ $("#add-rect").on('click', function () {
     transformer.nodes([node]);
     layer.draw();
 
-    generateNodeWidget(node)
+    var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+    var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+    $("#widget-node").fadeIn(100);
+    var widget = document.getElementById('widget-node');
+    widget.style.position = 'absolute';
+    // Calcular a posição correta no documento
+    var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y)+20);
+    var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2) - (node.width()/2)* node.getAbsoluteScale().x);
+    
+    // Atualizar a posição do widget
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+    // Atualizar cor e exibir o widget
+    $("#draw-color").attr("disabled", false);
+    $("#draw-color").val(node.fill()); // Definir a cor do alvo
+    const colorButton = document.getElementById("node-color-button");
+
+    colorButton.style.backgroundColor = node.fill(); 
+    $("#draw-color").attr("object-id", node.id());
+    $('#selectedNode').val(node.id())
+
     node.on('transformstart', function () {
         $("#widget-node").fadeOut(100);
     })
@@ -947,8 +1085,27 @@ $("#add-rect").on('click', function () {
     node.on('transform', function () {
         updatePos();
     })
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target)
+    node.on('transformend', function () {
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y)+20);
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2) - (node.width()/2)* node.getAbsoluteScale().x);
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
 
     })
 
@@ -957,21 +1114,59 @@ $("#add-rect").on('click', function () {
     });
 
     node.on('mousedown touchstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        generateNodeWidget(e.target)
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y)+20);
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2) - (node.width()/2)* node.getAbsoluteScale().x);
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
 
     node.on('dragend', (e)=>{
-        generateNodeWidget(e.target);
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((200 * node.getAbsoluteScale().y)+20);
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2) - (node.width()/2)* node.getAbsoluteScale().x);
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
     node.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer(); 
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
@@ -985,50 +1180,9 @@ $("#add-rect").on('click', function () {
 
     updatePos();
 })
-function generateNodeWidget(node){
-    var nodePosition = node.getAbsolutePosition();
-    var stagePosition = $(".konvajs-content").offset();
-    $("#widget-node").fadeIn(100);
-    var widget = document.getElementById('widget-node');
-    widget.style.position = 'absolute';
 
-    const adjustedTop = (stagePosition.top + (nodePosition.y*zoom));
-    const adjustedLeft = (stagePosition.left + (nodePosition.x*zoom));
-
-    const className = node.getClassName();
-
-    if (className === 'Rect') {
-        var positionTop = adjustedTop + (((node.height()*zoom) * node.getAbsoluteScale().y)+20);
-        var positionLeft = adjustedLeft  - ((widget.offsetWidth / 2) - ((node.width()*zoom)/2)* node.getAbsoluteScale().x);
-    } else if (className === 'Circle') {
-        var positionTop = adjustedTop + (((node.height()* zoom) * node.getAbsoluteScale().y));
-        var positionLeft = adjustedLeft  - ((widget.offsetWidth / 2));
-    } else if (className === 'RegularPolygon') {
-        var positionTop = adjustedTop + ((200 * node.getAbsoluteScale().y));
-        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
-    } else {
-        console.log('Outro tipo:', className);
-    }
-
-    
-    widget.style.top = positionTop + 'px';
-    widget.style.left = positionLeft + 'px';
-
-    $("#draw-color").attr("disabled", false);
-    $("#draw-color").val(node.fill());
-    const colorButton = document.getElementById("node-color-button");
-
-    colorButton.style.backgroundColor = node.fill(); 
-    $("#draw-color").attr("object-id", node.id());
-}
 $("#add-bg").on('click', function(){
     var layer = stage.findOne("#"+$("#currentLayer").val());
-    var background = layer.findOne('.background');
-    
-    if (background) {
-        background.destroy();
-        layer.draw();
-    }
     var bg = new Konva.Rect({
         x: 0,
         y: 0,
@@ -1040,19 +1194,18 @@ $("#add-bg").on('click', function(){
     });
 
     bg.on("mousedown touchstart", function() {
-        if(!drawMode){
-            $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
-            var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height()+10;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-    
-            widget.style.position = 'absolute';
-            widget.style.top = positionTop + 'px';
-            widget.style.left = positionLeft + 'px';
+        $("#widget-bg").fadeIn(100);
+        var position = $(".konvajs-content").position();
+        var widget = document.getElementById('widget-bg');
+        var positionTop = position.top + stage.height()+10;
+        var positionLeft = position.left + (stage.width() / 2 - (widget.offsetWidth / 2));
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
 
-        }
-
+        // Mostrar widget ao clicar
+        var widget = document.getElementById('widget-bg');
+        widget.style.display = "block";
     });
 
     layer.add(bg);
@@ -1087,7 +1240,26 @@ $("#add-circle").on('click', function () {
 
     layer.draw();
 
-    generateNodeWidget(node)
+    var position = node.getAbsolutePosition();
+    var stagePosition = $(".konvajs-content").offset(); 
+    $("#widget-node").fadeIn(100);
+    var widget = document.getElementById('widget-node');
+    widget.style.position = 'absolute';
+    // Calcular a posição correta no documento
+    var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y));
+    var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+    
+    // Atualizar a posição do widget
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+    // Atualizar cor e exibir o widget
+    $("#draw-color").attr("disabled", false);
+    $("#draw-color").val(node.fill()); // Definir a cor do alvo
+    const colorButton = document.getElementById("node-color-button");
+
+    colorButton.style.backgroundColor = node.fill(); 
+    $("#draw-color").attr("object-id", node.id());
+    $('#selectedNode').val(node.id())
 
     node.on('transformstart', function () {
         $("#widget-node").fadeOut(100);
@@ -1096,8 +1268,28 @@ $("#add-circle").on('click', function () {
     node.on('transform', function () {
         updatePos();
     })
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target);
+    node.on('transformend', function () {
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
+
     })
 
     node.on('mouseover', function () {
@@ -1105,21 +1297,59 @@ $("#add-circle").on('click', function () {
     });
 
     node.on('mousedown touchstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        generateNodeWidget(e.target);
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x  - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
 
     node.on('dragend', (e)=>{
-        generateNodeWidget(e.target);
+        var position = node.getAbsolutePosition(); // Posição absoluta do nó dentro do Stage
+        var stagePosition = $(".konvajs-content").offset(); // Deslocamento do container Konva no documento
+        $("#widget-node").fadeIn(100);
+        var widget = document.getElementById('widget-node');
+        widget.style.position = 'absolute';
+        // Calcular a posição correta no documento
+        var positionTop = stagePosition.top + position.y + ((node.height() * node.getAbsoluteScale().y));
+        var positionLeft = stagePosition.left + position.x - ((widget.offsetWidth / 2));
+        
+        // Atualizar a posição do widget
+        widget.style.top = positionTop + 'px';
+        widget.style.left = positionLeft + 'px';
+        // Atualizar cor e exibir o widget
+        $("#draw-color").attr("disabled", false);
+        $("#draw-color").val(node.fill()); // Definir a cor do alvo
+        const colorButton = document.getElementById("node-color-button");
+
+        colorButton.style.backgroundColor = node.fill(); 
+        $("#draw-color").attr("object-id", node.id());
+        $('#selectedNode').val(node.id())
     });
 
     node.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
+        const parentLayer = e.target.getLayer(); // Camada à qual o objeto pertence
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
@@ -1136,9 +1366,14 @@ $("#add-circle").on('click', function () {
 })
 
 function updatePos() {
+    var deleteButton = stage.find(".button-delete")[0];
     var sizeButton = stage.find(".button-size")[0];
     var rotateButton = stage.find(".button-edit")[0];
-
+    var buttonCopy = stage.find(".button-copy")[0];
+    deleteButton.position({
+        x: transformer.findOne('.top-left').position().x - 20,
+        y: transformer.findOne('.top-left').position().y - 20
+    });
     sizeButton.position({
         x: transformer.findOne('.bottom-right').position().x - 5,
         y: transformer.findOne('.bottom-right').position().y - 5
@@ -1147,32 +1382,38 @@ function updatePos() {
         x: transformer.findOne('.top-center').position().x -8,
         y: transformer.findOne('.top-center').position().y - 58
     });
+
+    buttonCopy.position({
+        x: transformer.findOne('.bottom-left').position().x - 20,
+        y: transformer.findOne('.bottom-left').position().y - 5
+    });
+
 }
 
 function cleanStage() {
-    const layers = Array.from(stage.getLayers());
-    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
-    userLayers.forEach((layer) => {
-        layer.destroy();
-    });
-    layer = new Konva.Layer({
-        id:"layer"+getRandomInt(1000),
-        name:"Plano de fundo",
-        zIndex:1
-    });
-    stage.add(layer);
-    $("#currentLayer").val(layer.id())
+    stage.find('Transformer').nodes([]);
+    stage.find('.background').destroy();
+    stage.find('.fakeShape').destroy();
+    stage.find('.camera').destroy();
+    stage.find('.background-text').destroy();
+    stage.find('.text').destroy();
+    stage.find('.image').destroy();
+    stage.find('Circle').destroy();
 }
 var transformer;
+var limit;
+var limitGroup;
 var stageWidth;
 var stageHeight;
 var stage;
 var tr;
 var layer;
-var background;
+var rect1;
 var group;
+var deleteButton;
 var rotateButton;
 var sizeButton;
+var buttonCopy;
 var groupTrans;
 var currentLayerId;
 var originalStageWidth;
@@ -1187,7 +1428,6 @@ $(function () {
     stageHeight = 600;
     originalStageWidth = stageWidth;
     originalStageHeight = stageHeight;
-    $(".header").text(title+" - "+stageWidth+"x"+stageHeight )
     stage = new Konva.Stage({
         container: 'container',
         width: stageWidth,
@@ -1218,7 +1458,7 @@ $(function () {
     layerIndex = 2;
     
     
-    background = new Konva.Rect({
+    rect1 = new Konva.Rect({
         x: 0,
         y: 0,
         width: stageWidth,
@@ -1228,24 +1468,41 @@ $(function () {
         fill: $('#bgcolor').val(),
     });
 
-    $('#bgcolor').attr("object-id", background.id());
-
-    background.on('mouseover', function () {
+    $('#bgcolor').attr("object-id", rect1.id());
+    limit = new Konva.Rect({
+        x: 0,
+        y: 0,
+        name: 'buttons',
+        draggable: false,
+        fill: 'rgba(0,0,0,0)',
+        stroke: 'green',
+        strokeWidth: 3,
+        strokeScaleEnabled: false,
+        width: stageWidth,
+        height: stageHeight,
+        listening: false,
+        dash: [6, 3]
+    });
+    limitGroup = new Konva.Group();
+    limitGroup.add(limit);
+    rect1.on('mouseover', function () {
 
     });
 
-    background.on("mousedown touchstart", function() {
+    rect1.on("mousedown touchstart", function() {
         if(!drawMode){
             $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
+            var position = $(".konvajs-content").position();
             var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height()+10;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+            var positionTop = position.top + stage.height()+10;
+            var positionLeft = position.left + (stage.width() / 2 - (widget.offsetWidth / 2));
     
             widget.style.position = 'absolute';
             widget.style.top = positionTop + 'px';
             widget.style.left = positionLeft + 'px';
-
+    
+            // Mostrar widget ao clicar
+            var widget = document.getElementById('widget-bg');
         }
     });
 
@@ -1264,9 +1521,11 @@ $(function () {
 
             isPaint = true;
 
+            // Obtém a posição do ponteiro (mouse ou toque)
             var pointerPosition = stage.getPointerPosition();
-            if (!pointerPosition) return;
+            if (!pointerPosition) return; // Se não houver posição do ponteiro, não faz nada
         
+            // Ajuste a posição do ponteiro com base na escala e no deslocamento do stage
             var scale = stage.scale();
             var stagePosition = stage.position();
             var adjustedPosition = {
@@ -1274,8 +1533,9 @@ $(function () {
                 y: (pointerPosition.y - stagePosition.y) / scale.y
             };
         
+            // Cria a linha quando começar o desenho
             lastLine = new Konva.Line({
-                points: [adjustedPosition.x, adjustedPosition.y],
+                points: [adjustedPosition.x, adjustedPosition.y], // Define o ponto inicial
                 stroke: 'black',
                 strokeWidth: 2,
                 stroke: color,
@@ -1286,6 +1546,7 @@ $(function () {
                 lineCap: 'round',
             });
         
+            // Adiciona a linha à camada
             var layer = stage.findOne(`#${$("#currentLayer").val()}`);
             layer.add(lastLine);
             layer.draw();
@@ -1315,24 +1576,28 @@ $(function () {
     stage.on('mousemove touchmove', function (e) {
         if (drawMode) {
             stage.draw();
-
+            // Garantir que só desenhe se o usuário estiver realmente desenhando
             if (!isPaint) {
                 return;
             }
             e.evt.preventDefault();
-
+            // Obtém a posição do ponteiro (mouse ou toque)
             var pointerPosition = stage.getPointerPosition();
     
+            // Se não houver posição do ponteiro, não deve desenhar
             if (!pointerPosition) return;
     
+            // Obtém a escala e o deslocamento do stage
             var scale = stage.scale();
             var stagePosition = stage.position();
     
+            // Ajusta a posição do ponteiro levando em conta a escala e o deslocamento
             var adjustedPosition = {
                 x: (pointerPosition.x - stagePosition.x) / scale.x,
                 y: (pointerPosition.y - stagePosition.y) / scale.y
             };
 
+            // Adiciona o ponto à linha
             var newPoints = lastLine.points().concat([adjustedPosition.x, adjustedPosition.y]);
             lastLine.points(newPoints);
     
@@ -1353,15 +1618,61 @@ $(function () {
     });
     
 
-
+    stage.on('wheel', (e) => {
+        e.evt.preventDefault(); // Impedir que a página role junto
+        const zoomScale = 1.05; // Fator de zoom
+        const oldScale = stage.scaleX(); // Obter a escala atual
+    
+        // Determinar direção do scroll
+        const delta = e.evt.deltaY;
+    
+        // Se deltaY for positivo (rolagem para baixo), diminui o zoom
+        // Se deltaY for negativo (rolagem para cima), aumenta o zoom
+        let newScale = (delta > 0) ? oldScale / zoomScale : oldScale * zoomScale;
+    
+        // Limitar o zoom para evitar que fique muito pequeno ou muito grande
+        if (newScale > 5) newScale = 5;
+        if (newScale < 0.1) newScale = 0.1;
+    
+        // Atualiza a escala do stage
+        stage.scale({ x: newScale, y: newScale });
+    
+        // Calcula a posição do mouse em relação ao stage (para zoom no ponto do mouse)
+        const mousePointTo = {
+            x: (stage.getPointerPosition().x - stage.x()) / oldScale,
+            y: (stage.getPointerPosition().y - stage.y()) / oldScale,
+        };
+    
+        const newPos = {
+            x: stage.getPointerPosition().x - mousePointTo.x * newScale,
+            y: stage.getPointerPosition().y - mousePointTo.y * newScale,
+        };
+    
+        // Atualiza a posição do stage com o novo valor calculado
+        stage.position(newPos);
+    
+        // Ajusta o tamanho do stage, de acordo com o novo scale
+        const parentWidth = stage.width();
+        const parentHeight = stage.height();
+        const containerWidth = $("#stage-parent").width();
+        const containerHeight = $("#stage-parent").height();
+    
+        // Não queremos que o stage ultrapasse os limites do #stage-parent
+        if (stage.x() < 0) stage.x(0); // Limite esquerda
+        if (stage.y() < 0) stage.y(0); // Limite superior
+    
+        if (stage.x() + stage.width() > containerWidth) stage.x(containerWidth - stage.width()); // Limite direita
+        if (stage.y() + stage.height() > containerHeight) stage.y(containerHeight - stage.height()); // Limite inferior
+    
+        updatePos(); // Se necessário, para recalcular outras variáveis
+        stage.batchDraw(); // Redesenha o stage após zoom
+    });
     stage.on('click tap dragstart', function (e) {
 
         if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')) {
-
+            limit.hide();
             $("#draggable").fadeOut(100);
-            $("#widget-node").fadeOut(100);
-
-            $("#widget-image").fadeOut(100);
+            
             transformer.nodes([]);
             sliders.forEach(function (attr) {
                 $("#" + attr).attr("object-id", "0")
@@ -1382,7 +1693,7 @@ $(function () {
                 $("#" + attr).attr("object-id", e.target.id())
                 $("#" + attr).val(e.target[attr]())
                 const porcentagem = (e.target[attr]() / $("#"+attr).attr("max")) * 100;
-                $("." + attr).text(parseInt(porcentagem)+"%");
+                $("." + attr).text(porcentagem+"%");
                 if (e.target.name() === 'image') {
                     $("#" + attr).prop("disabled", false);
                 } else {
@@ -1407,7 +1718,7 @@ $(function () {
             }
             
             groupTrans.moveToTop();
-
+            limitGroup.moveToTop();
             updatePos();
             layer.draw();
             return;
@@ -1421,12 +1732,13 @@ $(function () {
     groupTrans.add(transformer);
     transformerLayer.add(groupTrans);
     transformerLayer.draw();
-    layer.add(background);
+    layer.add(rect1);
 
 
     layer.add(group);
+    layer.add(limitGroup);
+    limit.hide();
     layer.draw();
-    $(".layers-header").width(243);
     updateLayerButtons();
     setInterval(function () {
         if (!isMousePressed) {
@@ -1434,26 +1746,27 @@ $(function () {
         }
     }, 1000);
 
-    adjustContainerToFitStage('#stage-parent', stageWidth, stageHeight); 
+
     fitStageIntoParentContainer();
-
-
     window.addEventListener('resize', fitStageIntoParentContainer);
 
 
     stage.draw();
-
+    $('#zoom-slider').val(stage.scaleX());
+    $('#zoom-slider').attr("original-scale",stage.scaleX())
 
 });
 
 function fitStageIntoParentContainer() {
-    stageParent = document.getElementById('preview');
+    stageParent = document.getElementById('stage-parent');
     const containerWidth = stageParent.offsetWidth;
     const containerHeight = stageParent.offsetHeight;
 
+    // Calcula escala proporcionalmente ao menor lado (horizontal ou vertical)
     const scaleX = containerWidth / originalStageWidth;
     const scaleY = containerHeight / originalStageHeight;
     const scale = Math.min(scaleX, scaleY);
+    $("#zoom-slider").attr("original-scale",scale)
     stage.width(originalStageWidth * scale);
     stage.height(originalStageHeight * scale);
     stage.scale({ x: scale, y: scale });
@@ -1505,13 +1818,16 @@ $(function () {
     $(".btn-align").on("click", function () {
         const currentIcon = icons[currentIndex];
         $(this).find("i").attr("class", `fa ${currentIcon}`);
-
+        // Obter o texto correspondente ao ID
         var text = stage.find("#" + $("#input-edit-id").val())[0];
-        if (!text) return;
+        if (!text) return; // Certifique-se de que o texto existe
+    
+        // Atualizar o alinhamento com base no índice atual
         const newAlignment = alignments[currentIndex];
         text.align(newAlignment);
         layer.draw();
     
+        // Atualizar o índice para o próximo alinhamento
         currentIndex = (currentIndex + 1) % alignments.length;
     
     });
@@ -1531,10 +1847,8 @@ $(function () {
     });
 
     $(".widget").draggable({ disabled: true });
-    $(".widget-sm").draggable({ disabled: true });
     $(".widget-header").on('mouseover touchstart', function (e) {
         $(".widget").draggable('enable');
-        $(".widget-sm").draggable('enable');
         document.body.style.cursor = 'move';
     });
 
@@ -1579,6 +1893,7 @@ $(document).on('mousedown touchstart', function (e) {
             for (var i = 0; i < transformers.length; i++) {
                 transformers[i].nodes([]);
             }
+            limit.hide();
             layer.draw();
             $("#draggable").fadeOut(100);
             $("#widget-bg").fadeOut(100);
@@ -1589,8 +1904,10 @@ $(document).on('mousedown touchstart', function (e) {
     }
 });
 function addTransformer() {
-    var sizeImage = new Image();
-    var rotateImage = new Image();
+    var imageObj1 = new Image();
+    var imageObj2 = new Image();
+    var imageObj3 = new Image();
+    var copybtnObj = new Image();
     var transformer = new Konva.Transformer({
         anchorStyleFunc: (anchor) => {
             anchor.cornerRadius(20);
@@ -1614,14 +1931,21 @@ function addTransformer() {
         draggable: true,
         nodes: [],
     });
-
     transformer.flipEnabled(false);
     transformer.borderDash([2, 2]);
     transformer.anchorCornerRadius(5);
+    var deleteButton = new Konva.Image({
 
+        image: imageObj1,
+        width: 20,
+        height: 20,
+        stroke: 'gray',
+        strokeWidth: 0,
+        name: 'button-delete'
+    });
     var rotateButton = new Konva.Image({
 
-        image: rotateImage,
+        image: imageObj3,
         width: 20,
         height: 20,
         stroke: 'gray',
@@ -1631,21 +1955,135 @@ function addTransformer() {
     var sizeButton = new Konva.Image({
         width: 20,
         height: 20,
-        image: sizeImage,
+        image: imageObj2,
         stroke: 'gray',
         strokeWidth: 0,
         name: 'button-size'
 
     });
 
+    var copybtnObj = new Image();
+    var buttonCopy = new Konva.Image({
+        x: stage.getWidth() / 2,
+        y: stage.getHeight() / 2,
+        image: copybtnObj,
+        name: 'button-copy',
+        draggable: false,
+        width: 20,
+        height: 20,
+        stroke: 'gray',
+        strokeWidth: 0,
+    });
+
+    buttonCopy.on("click tap", function (e) {
+        var layer = stage.findOne("#"+$("#currentLayer").val());
+        var node = transformer.nodes()[0];
+
+        i++;
+        if(node.name()==="image"){
+            var NodeClone = node.clone({
+                id: 'imagecopy' + i.toString(),
+                y: node.position().y - 100,
+                name: node.name(),
+            });
+            NodeClone.cache();
+        }else{
+            var NodeClone = node.clone({
+                id: i.toString()+"copy",
+                y: node.position().y - 100,
+                name: node.name(),
+            });
+        }
+
+        if (node.getAttr('fakeShapeId') != "stage") {
+
+
+            var fakeShape = stage.find("#" + node.getAttr('fakeShapeId'))[0];
+
+            var groupImage = new Konva.Group({
+                clipFunc: (ctx) => {
+
+                    ctx.save();
+                    ctx.translate(fakeShape.x(), fakeShape.y())
+                    ctx.rotate(Konva.getAngle(fakeShape.rotation()))
+                    ctx.rect(0, 0, fakeShape.width() * fakeShape.scaleX(), fakeShape.height() * fakeShape.scaleY());
+                    ctx.restore()
+
+                },
+                textId: NodeClone.id()
+            });
+            groupImage.add(NodeClone);
+            layer.add(groupImage);
+            groupImage.moveUp();
+        } else {
+            var groupImage1 = new Konva.Group({ textId: NodeClone.id() })
+            groupImage1.add(NodeClone);
+            layer.add(groupImage1);
+        }
+
+        groupTrans.moveToTop();
+        NodeClone.fire('click');
+        updatePos();
+        NodeClone.zIndex(node.zIndex() + 1);
+        layer.draw();
+
+        
+    });
+
+    deleteButton.on('click tap', function () {
+        var layer = stage.findOne("#"+$("#currentLayer").val());
+        var node = transformer.nodes()[0];
+
+        var fakeShapeId = node.getAttr('fakeShapeId');
+
+        node.destroy();
+        if (fakeShapeId != "stage") {
+
+            var camera = layer.find(nd => {
+                return nd.getAttr("camerafakeShapeId") === fakeShapeId;
+            });
+
+            var image = layer.find(nd => {
+                return nd.getAttr("fakeShapeId") === fakeShapeId;
+            });
+
+            if (image[0]) {
+
+                camera.hide();
+            } else {
+                camera.show();
+                stage.find("#" + fakeShapeId)[0].listening(true);
+                stage.find("#" + fakeShapeId)[0].show();
+            }
+
+        }
+
+        transformer.nodes([]);
+        layer.draw();
+        if ($("#input-edit-id").val() == node.id()) {
+            $("#draggable").fadeOut(100);
+        }
+        $("#widget-image").fadeOut(100);
+        $("#widget-node").fadeOut(100);
+    });
+
+    deleteButton.on('mouseover', function () {
+
+    });
     rotateButton.listening(false);
 
     sizeButton.listening(false);
 
-    sizeImage.src = "images/size-icon.png";
-    rotateImage.src = "images/edit-icon.png" 
+
+
+    imageObj1.src = "images/x-png-icon-8.png?32";
+    imageObj2.src = "images/size-icon.png";
+    copybtnObj.src = "images/btn-copy.png";
+    imageObj3.src = "images/edit-icon.png";
+    transformer.add(deleteButton);
     transformer.add(sizeButton);
     transformer.add(rotateButton);
+    transformer.add(buttonCopy);
     transformer.rotationSnaps([0, 90, 180, 270]);
 
     return transformer;
@@ -1770,15 +2208,16 @@ $("#draw").on("click", function () {
         const colorButton = document.getElementById("brush-color-button");
 
         colorButton.style.backgroundColor = color; 
-        var position = $(".preview-img").offset();
+        var position = $(".konvajs-content").position();
         var widget = document.getElementById('widget-draw');
-        var positionTop = position.top + $(".preview-img").height()+10;
-        var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+        var positionTop = position.top + stage.height()+10;
+        var positionLeft = position.left + (stage.width() / 2 - (widget.offsetWidth / 2));
 
         widget.style.position = 'absolute';
         widget.style.top = positionTop + 'px';
         widget.style.left = positionLeft + 'px';
 
+        // Mostrar widget ao clicar
         var widget = document.getElementById('widget-draw');
     } else {
         $(this).css('background', "transparent");
@@ -1877,11 +2316,11 @@ function updateLayerButtons() {
             const layer = stage.findOne("#" + layerId);
             const imgsrc = img.src;
         
-            const isChecked = layer.visible() ? "checked" : "";
-       
+            const isChecked = layer.visible() ? "checked" : ""; // Verifica se o layer está visível
+        
             const buttonHtml = `
                 <li class="layer" layer-id="${layerId}">
-                    <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="max-width: 70px; max-height: 70px; width:auto; height:auto;">
+                    <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="width: 70px; height: 43px;">
                     <span class="layer-name">${layer.name()}</span>
                     <input class="check-visible" layer-id="${layerId}" type="checkbox" ${isChecked}>
                 </li>
@@ -1921,16 +2360,17 @@ function setActiveLayer(selectedLayerId) {
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     userLayers.forEach((layer) => {
         if (layer.id() === selectedLayerId) {
+            // Ativar eventos para a camada selecionada
             layer.listening(true);
         } else {
-           
+            // Desativar eventos para as outras camadas
             layer.listening(false);
         }
     });
 }
-
+// Clique no botão da camada
 $('#layers').on('click', '.layer', function (e) {
-
+    // Ignora o clique caso seja no checkbox para evitar conflito
     if ($(e.target).is('.check-visible')) {
         return;
     }
@@ -1950,7 +2390,20 @@ $('#layers').on('change', '.check-visible', function () {
 
         const isChecked = $(this).is(':checked');
         layer.visible(isChecked);
-        readjustBackground();
+        var background = stage.find('.background');
+        if (background) {
+            background.forEach(bg => {
+                const scale = stage.scaleX(); 
+                const position = stage.position(); 
+            
+                bg.width(stage.width() / scale);
+                bg.height(stage.height() / scale);
+                bg.x(-position.x / scale);
+                bg.y(-position.y / scale);
+            
+                layer.draw();
+            });
+        }
         stage.batchDraw();
     }
 });
@@ -1964,79 +2417,10 @@ function downloadURI(uri, name) {
     delete link;
 }
 
-$(".btn-delete").click(function(){
-    var layer = stage.findOne("#"+$("#currentLayer").val());
-    var node = transformer.nodes()[0];
-
-    node.destroy();
-
-    transformer.nodes([]);
-    layer.draw();
-    if ($("#input-edit-id").val() == node.id()) {
-        $("#draggable").fadeOut(100);
-    }
-    $("#widget-image").fadeOut(100);
-    $("#widget-node").fadeOut(100);
-})
-
-$(".btn-copy").click(function()
-{
-    var layer = stage.findOne("#"+$("#currentLayer").val());
-    var node = transformer.nodes()[0];
-
-    i++;
-    if(node.name()==="image"){
-        var NodeClone = node.clone({
-            id: 'imagecopy' + i.toString(),
-            y: node.position().y - 100,
-            name: node.name(),
-        });
-        NodeClone.cache();
-    }else{
-        var NodeClone = node.clone({
-            id: i.toString()+"copy",
-            y: node.position().y - 100,
-            name: node.name(),
-        });
-    }
-
-    if (node.getAttr('fakeShapeId') != "stage") {
-
-
-        var fakeShape = stage.find("#" + node.getAttr('fakeShapeId'))[0];
-
-        var groupImage = new Konva.Group({
-            clipFunc: (ctx) => {
-
-                ctx.save();
-                ctx.translate(fakeShape.x(), fakeShape.y())
-                ctx.rotate(Konva.getAngle(fakeShape.rotation()))
-                ctx.rect(0, 0, fakeShape.width() * fakeShape.scaleX(), fakeShape.height() * fakeShape.scaleY());
-                ctx.restore()
-
-            },
-            textId: NodeClone.id()
-        });
-        groupImage.add(NodeClone);
-        layer.add(groupImage);
-        groupImage.moveUp();
-    } else {
-        var groupImage1 = new Konva.Group({ textId: NodeClone.id() })
-        groupImage1.add(NodeClone);
-        layer.add(groupImage1);
-    }
-
-    groupTrans.moveToTop();
-    transformer.nodes([NodeClone]);
-    updatePos();
-    NodeClone.zIndex(node.zIndex() + 1);
-    layer.draw();
-
-});
 $(".moveUp").click(function()
 {
     var layer = stage.findOne("#"+$("#currentLayer").val());
-    var node = transformer.nodes()[0];
+    var node = stage.find("#" + $('#selectedNode').val())[0];
 
     var textGroup = layer.find(nd => {
         return nd.getAttr("textId") === node.id();
@@ -2053,7 +2437,7 @@ $(".moveUp").click(function()
 $(".moveDown").click(function()
 {
     var layer = stage.findOne("#"+$("#currentLayer").val());
-    var node = transformer.nodes()[0];
+    var node = stage.find("#" + $('#selectedNode').val())[0];
 
     var textGroup = layer.find(nd => {
         return nd.getAttr("textId") === node.id();
@@ -2068,16 +2452,76 @@ $(".moveDown").click(function()
     layer.draw();
 });
 $('#zoom-slider').on('input', function () {
-  
-    zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
+    const newScale = parseFloat($(this).val());
 
+    // Obtém o centro do palco
+    const stageCenter = {
+        x: stage.width() / 2,
+        y: stage.height() / 2,
+    };
+
+    // Converte o centro do palco para as coordenadas do conteúdo
+    const stagePosition = stage.position();
+    const currentScale = stage.scaleX();
+    const centerPointTo = {
+        x: (stageCenter.x - stagePosition.x) / currentScale,
+        y: (stageCenter.y - stagePosition.y) / currentScale,
+    };
+
+    // Atualiza o scale do stage
+    stage.scale({ x: newScale, y: newScale });
+
+    // Ajusta a nova posição do stage para manter o zoom centralizado
+    const newPosition = {
+        x: stageCenter.x - centerPointTo.x * newScale,
+        y: stageCenter.y - centerPointTo.y * newScale,
+    };
+    stage.position(newPosition);
+
+    var layer = stage.findOne("#"+$("#currentLayer").val());
+    var background = stage.find('.background');
+    if (background) {
+        background.forEach(bg => {
+            const scale = stage.scaleX(); // Supõe que scaleX e scaleY sejam iguais
+            const position = stage.position(); // Pega o deslocamento do stage
+        
+            // Calcula o tamanho e posição do fundo ajustados ao zoom
+            bg.width(stage.width() / scale);
+            bg.height(stage.height() / scale);
+            bg.x(-position.x / scale);
+            bg.y(-position.y / scale);
+        
+            layer.draw(); // Redesenha a camada para aplicar as alterações
+        });
+    }
+
+    // Redesenha o palco
+    stage.batchDraw();
 });
 
-
+// Botão para redefinir o zoom
 $('#reset-zoom').on('click', function () {
-   
-    zoomElement.style.transform = `scale(${zoom = 1})`;
-    $("#zoom-slider").val(1);
+    stage.scale({ x: $("#zoom-slider").attr("original-scale"), y: $("#zoom-slider").attr("original-scale") });
+    stage.position({ x: 0, y: 0 });
+
+    var layer = stage.findOne("#"+$("#currentLayer").val());
+    var background = stage.find('.background');
+    if (background) {
+        background.forEach(bg => {
+            const scale = stage.scaleX(); // Supõe que scaleX e scaleY sejam iguais
+            const position = stage.position(); // Pega o deslocamento do stage
+        
+            // Calcula o tamanho e posição do fundo ajustados ao zoom
+            bg.width(stage.width() / $("#zoom-slider").attr("original-scale"));
+            bg.height(stage.height() / $("#zoom-slider").attr("original-scale"));
+            bg.x(-0 / $("#zoom-slider").attr("original-scale"));
+            bg.y(-0 / $("#zoom-slider").attr("original-scale"));
+        
+            layer.draw(); // Redesenha a camada para aplicar as alterações
+        });
+    }
+    stage.batchDraw();
+    $('#zoom-slider').val($("#zoom-slider").attr("original-scale")); // Sincroniza o slider
 
 });
 $("#download").click(function () {
@@ -2095,167 +2539,66 @@ $('.editor').on("mousemove", function (event) {
     $("#widget-image-zoom").css("top", relY + "px");
     $("#widget-image-zoom").css("left", relX + "px");
 });
-
-$("#resize-stage").click(function(){
-    const userWidth = $("#resize-input-width").val();
-    const userHeight = $("#resize-input-height").val();
-
-
-    if (userWidth > 0 && userHeight > 0) {
-        $(".header").text(title+" - "+userWidth+"x"+userHeight )
-        setNewCanvasSize(userWidth, userHeight);
-        $("#resize-stage-prompt").fadeOut(100);
-    }
-})
-
-$("#resize-stage-prompt-btn").click(function(){
-    $("#resize-stage-prompt").fadeIn(100);
-    const windowWidth = $(window).width();
-    const windowHeight = $(window).height();
-
-    const elementWidth = $("#resize-stage-prompt").outerWidth();
-    const elementHeight = $("#resize-stage-prompt").outerHeight();
-
-    const left = (windowWidth - elementWidth) / 2;
-    const top = (windowHeight - elementHeight) / 2;
-
-    $("#resize-stage-prompt").css({
-        position: 'absolute', 
-        left: left + 'px',
-        top: top + 'px',
-    });
-})
-
-
 $("#new-image").click(function(){
-
-    const userWidth = $("#input-width").val();
-    const userHeight = $("#input-height").val();
-    title = $("#input-title").val();
+    const userWidth = parseInt(prompt('Digite a largura do canvas:', 800));
+    const userHeight = parseInt(prompt('Digite a altura do canvas:', 600));
 
     if (userWidth > 0 && userHeight > 0) {
-        setNewCanvas(userWidth, userHeight);
-        $(".header").text(title+" - "+userWidth+"x"+userHeight )
-        $("#new-image-prompt").fadeOut(100);
+        setNewCanvasSize(userWidth, userHeight);
     }
 })
-
-
-$("#new-image-prompt-btn").click(function(){
-    $("#new-image-prompt").fadeIn(100);
-    const windowWidth = $(window).width();
-    const windowHeight = $(window).height();
-
-    const elementWidth = $("#new-image-prompt").outerWidth();
-    const elementHeight = $("#new-image-prompt").outerHeight();
-
-    const left = (windowWidth - elementWidth) / 2;
-    const top = (windowHeight - elementHeight) / 2;
-
-    $("#new-image-prompt").css({
-        position: 'absolute',
-        left: left + 'px',
-        top: top + 'px',
-    });
-})
-
-
 function setNewCanvasSize(userWidth, userHeight) {
-    $("#reset-zoom").click();
-
+    // Atualiza stage com novo tamanho original
     originalStageWidth = userWidth;
     originalStageHeight = userHeight;
     stageWidth = userWidth
     stageHeight = userHeight;
     stage.width(userWidth);
     stage.height(userHeight);
-
-    adjustContainerToFitStage('#stage-parent', userWidth, userHeight); 
-    fitStageIntoParentContainer();
     stage.batchDraw();
-    readjustBackground();
-}
-
-function readjustBackground(){
-    var layer = stage.findOne("#"+$("#currentLayer").val());
-    var background = stage.find('.background');
-    if (background) {
-        background.forEach(bg => {
-            const scale = stage.scaleX(); 
-            const position = stage.position(); 
-        
-   
-            bg.width(stage.width() / scale);
-            bg.height(stage.height() / scale);
-            bg.x(-position.x / scale);
-            bg.y(-position.y / scale);
-        
-            layer.draw(); 
-        });
-    }
-
-}
-
-function setNewCanvas(userWidth, userHeight) {
-    $("#reset-zoom").click();
-
-    originalStageWidth = userWidth;
-    originalStageHeight = userHeight;
-    stageWidth = userWidth
-    stageHeight = userHeight;
-    stage.width(userWidth);
-    stage.height(userHeight);
-    cleanStage();
-    $("#add-bg").click();
-    stage.batchDraw();
-
-    adjustContainerToFitStage('#stage-parent', userWidth, userHeight); 
+    // Ajustar ao contêiner enquanto mantém escala
     fitStageIntoParentContainer();
-    
+    adjustContainerToFitStage('#stage-parent', userWidth, userHeight); // Ajusta o contêiner
 }
 function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
     const container = document.querySelector(containerId);
-    const container2 = document.querySelector("#preview");
-    const containerWidth = container2.offsetWidth;
-    const containerHeight = container2.offsetHeight;
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
     const scaleX = containerWidth / originalStageWidth;
     const scaleY = containerHeight / originalStageHeight;
     const scale = Math.min(scaleX, scaleY); 
+    // Ajusta o tamanho do contêiner ao tamanho do stage
+    container.style.width = `${stageWidth * scale}px`;
+    container.style.height = `${stageHeight * scale}px`;
 
-    container.style.width = stageWidth * scale+"px";
-    container.style.height = stageHeight * scale+"px";
+    // Verifica se o stage ultrapassa as dimensões do navegador
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Adiciona scroll se o stage for maior que o viewport
+    container.style.overflowX = stageWidth > viewportWidth ? 'auto' : 'hidden';
+    container.style.overflowY = stageHeight > viewportHeight ? 'auto' : 'hidden';
+
+    // Opcional: centraliza o contêiner no viewport
 
 }
-
-
-zoomElement.addEventListener("wheel", function(e) {
-    if (!e.ctrlKey) return; 
-
-    e.preventDefault(); 
-
-    if (e.deltaY > 0) {    
-        zoomElement.style.transform = `scale(${zoom -= ZOOM_SPEED})`;  
-    } else {    
-        zoomElement.style.transform = `scale(${zoom += ZOOM_SPEED})`;  
-    }
-
-    $("#zoom-slider").val(zoom);
-});
-
 function saveImageOriginalScale() {
-
-    const currentScale = stage.scaleX();
+    // Temporariamente redefina para escala original
+    const currentScale = stage.scaleX(); // Supondo que scaleX = scaleY
     stage.scale({ x: 1, y: 1 });
     stage.width(originalStageWidth);
     stage.height(originalStageHeight);
     stage.batchDraw();
 
+    // Exporta o conteúdo do stage
     const dataURL = stage.toDataURL();
 
+    // Restaure o estado do stage para o ajuste de contêiner
     fitStageIntoParentContainer();
 
+    // Opcional: download da imagem
     const link = document.createElement('a');
-    link.download = title;
+    link.download = 'stage-image.png';
     link.href = dataURL;
     link.click();
 }
