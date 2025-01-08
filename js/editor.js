@@ -39,7 +39,6 @@ $(document).ready(function () {
     });
 
     $(".minimize").on('click', function (e) {
-        $(this).closest(".widget").hide();
         var width = $(this).closest(".widget-header").width();
         $(this).closest(".widget-sm").children("#layers-body").toggle();
         $(this).closest(".widget-header").width(width);
@@ -1540,6 +1539,7 @@ $(function () {
 
     $(".widget-header").on('mouseleave touchend', function (e) {
         $(".widget").draggable('disable');
+        $(".widget-sm").draggable('disable');
         document.body.style.cursor = 'default';
     });
 });

@@ -36,7 +36,7 @@ body::after {
   width: 100%;
   list-style-type: none;
   align-items: start;
-  padding-left: 0 !important;
+
 }
 .btn-layers{
   width:70px;
@@ -69,7 +69,6 @@ body::after {
   color: #6c757d;
   background: rgba(0, 0, 0, 0.0);
   border-radius: 5px;
-  margin-bottom: 8px;
   display: flex; /* Usando flexbox para alinhar itens horizontalmente */
   align-items: center; /* Centraliza verticalmente os itens */
   border: 1px solid rgba(255, 255, 255, 0.095);
@@ -79,7 +78,7 @@ body::after {
 }
 .row{
 
-  margin: 5px 10px 5px 5px;
+  margin: 5px 5px 5px 5px;
 }
 .layer.active{
   background-color: rgb(66, 67, 68);
@@ -121,7 +120,7 @@ body::after {
   display: none;
 }
 .layers{
-  margin:10px;
+
   width: 250px;
 }
 .layers i{
@@ -180,9 +179,7 @@ body::after {
 
   margin:10px 0px 10px 0px;
 }
-#widget-layers{
 
-}
 .wrapper .editor-panel {
   padding: 15px 20px;
   width: 280px;
@@ -295,7 +292,7 @@ body::after {
 }
 .select-font
 {
- width: 336px;
+  width: 100%;
   margin:5px;
   height: 40px;
   font-size: 14px;
