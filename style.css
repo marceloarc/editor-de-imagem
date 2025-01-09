@@ -295,6 +295,7 @@ body::after {
 }
 
 .slider2{
+  height:40px;
   width: 100%;
 }
 .filter .slider2 .filter-info {
