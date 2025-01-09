@@ -1,10 +1,10 @@
-body{
-    background-color:black;
+body {
+    background-color: black;
 }
 
 .close {
-    border:0;
-    background:transparent;
+    border: 0;
+    background: transparent;
     color: #fff;
     opacity: 1;
     float: right;
@@ -50,39 +50,44 @@ body{
 }
 
 
-.slidecontainer{
+.slidecontainer {
     overflow-x: scroll;
-    overflow-y:hidden;
-    display: flex; 
+    overflow-y: hidden;
+    display: flex;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
 }
+
 .slidecontainer::-webkit-scrollbar {
     width: 3px;
-    height: 3px; 
-    background-color: transparent; 
-  }
-  .slidecontainer::-webkit-scrollbar-track {
-    background-color: transparent; 
-  }
-  .slidecontainer::-webkit-scrollbar-corner {
-    background-color: transparent; 
-  }
-  .slidecontainer::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 216, 67, 0.2); 
-    border-radius: 10px; 
-  }
+    height: 3px;
+    background-color: transparent;
+}
+
+.slidecontainer::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.slidecontainer::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.slidecontainer::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 216, 67, 0.2);
+    border-radius: 10px;
+}
 
 .slider {
     width: 100%;
-    margin:5px;
-    color:#FFD843;
-    background-color: #FFD843;;
+    margin: 5px;
+    color: #FFD843;
+    background-color: #FFD843;
+    ;
 }
 
 .selected i {
-    color:#FFD843;
+    color: #FFD843;
 }
 
 select {
@@ -130,7 +135,8 @@ select {
     margin: 0px;
     filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
 }
-.widget-lg{
+
+.widget-lg {
     border-radius: 5px;
     line-height: 1;
     color: white;
@@ -141,16 +147,19 @@ select {
     margin: 0px;
     filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
 }
-.p-10{
+
+.p-10 {
     padding: 10px;
 }
 
-.widget-sm span{
+.widget-sm span {
     font-size: 11px;
 }
-.widget-lg span{
+
+.widget-lg span {
     font-size: 11px;
 }
+
 .widget-models {
     padding: 10px;
     overflow-x: hidden;
@@ -164,22 +173,25 @@ select {
     background-color: white;
     color: black;
 }
+
 textarea {
-    margin-top:20px;
+    margin-top: 20px;
     min-height: 100px;
     border: 1px solid rgba(0, 0, 0, 0.095);
-    padding:10px;
+    padding: 10px;
 }
+
 textarea:focus {
     outline: none !important;
 }
+
 .widget-black {
     background-color: rgba(0, 0, 0, 0.60);
     color: white;
 }
 
 .widget-header {
-    border-radius:3px 3px 0px 0px;
+    border-radius: 3px 3px 0px 0px;
     float: center;
     min-width: 100%;
     height: 40px;
@@ -192,11 +204,13 @@ textarea:focus {
 .konvajs-content {
     margin: 0 auto;
     background-color: #fff;
-    background-image: 
+    background-image:
         linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
         linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
-    background-size: 20px 20px; /* Ajuste o tamanho do quadrado */
-    background-position: 0 0, 10px 10px; /* Offset para criar o xadrez */
+    background-size: 20px 20px;
+    /* Ajuste o tamanho do quadrado */
+    background-position: 0 0, 10px 10px;
+    /* Offset para criar o xadrez */
     box-shadow: 0 0 0 px black;
 
 }
@@ -210,33 +224,34 @@ textarea:focus {
     background-color: rgba(0, 0, 0, 0.20)
 }
 
-.editor {  
-    width:100%;
-    height:100%;
+.editor {
+    width: 100%;
+    height: 100%;
 }
 
-.widget-row
-{
-    width:auto;
+.widget-row {
+    width: auto;
 }
-.widget-body
-{
+
+.widget-body {
     padding: 10px;
 }
-.row{
+
+.row {
     --bs-gutter-x: 0rem !important;
 }
+
 @media (max-width: 450px) {
-    .widget-lg
-    {
-        width:100%;
+    .widget-lg {
+        width: 100%;
     }
-    .widget-row
-    {
+
+    .widget-row {
         width: auto;
-      
+
     }
 }
+
 @media (max-width: 768px) {
     .editor-btn {
         display: none;

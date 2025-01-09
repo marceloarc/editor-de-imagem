@@ -29,6 +29,7 @@ body::after {
   position: absolute;
   z-index: -1;
 }
+
 #layers {
   display: flex;
   flex-direction: column;
@@ -38,29 +39,39 @@ body::after {
   align-items: start;
 
 }
-.btn-layers{
-  width:70px;
-  height:30px;
-  margin:0px 3px 20px 3px;
+
+.btn-layers {
+  width: 70px;
+  height: 30px;
+  margin: 0px 3px 20px 3px;
   border: 1px solid rgba(255, 255, 255, 0.095);
   border-radius: 5px;
   color: rgba(255, 255, 255, 0.8);
 }
-.btn-layer-add{
-  color:#2A2B2D;
-  background-color: #FFD843;;
+
+.btn-layer-add {
+  color: #2A2B2D;
+  background-color: #FFD843;
+  ;
 }
-.label-layers{
-  margin-bottom:10px;
+
+.label-layers {
+  margin-bottom: 10px;
 }
+
 .ui-sortable-placeholder {
-  background-color: rgba(200, 200, 200, 0.5); /* Fundo visível */
-  border: 2px dashed #FFD843;                    /* Borda para destaque */
-  height: 80px;                               /* Mesma altura das camadas */
-  min-width: 100%;                                /* Largura total */
-  margin: 0; 
+  background-color: rgba(200, 200, 200, 0.5);
+  /* Fundo visível */
+  border: 2px dashed #FFD843;
+  /* Borda para destaque */
+  height: 80px;
+  /* Mesma altura das camadas */
+  min-width: 100%;
+  /* Largura total */
+  margin: 0;
   border-radius: 5px;
 }
+
 .layer {
   outline: none;
   height: 80px;
@@ -69,34 +80,46 @@ body::after {
   color: #6c757d;
   background: rgba(0, 0, 0, 0.0);
   border-radius: 5px;
-  display: flex; /* Usando flexbox para alinhar itens horizontalmente */
-  align-items: center; /* Centraliza verticalmente os itens */
+  display: flex;
+  /* Usando flexbox para alinhar itens horizontalmente */
+  align-items: center;
+  /* Centraliza verticalmente os itens */
   border: 1px solid rgba(255, 255, 255, 0.095);
-  padding:0px 10px; /* Espaçamento entre o conteúdo e as bordas */
-  cursor: move; /* Indica que o item pode ser movido */
+  padding: 0px 10px;
+  /* Espaçamento entre o conteúdo e as bordas */
+  cursor: move;
+  /* Indica que o item pode ser movido */
 
 }
-.btn-text{
+
+.btn-text {
   font-size: 10px;
-  margin:5px;
+  margin: 5px;
 }
-.layer.active{
+
+.layer.active {
   background-color: rgb(66, 67, 68);
 }
 
-.draw-mode.active{
+.draw-mode.active {
   background-color: #FFD843;
-  color:black;
+  color: black;
 }
+
 .layer-img {
-  width: 40px; /* Defina o tamanho da imagem */
-  height: 40px; /* Defina o tamanho da imagem */
-  margin-right: 10px; /* Espaçamento entre a imagem e o nome */
+  width: 40px;
+  /* Defina o tamanho da imagem */
+  height: 40px;
+  /* Defina o tamanho da imagem */
+  margin-right: 10px;
+  /* Espaçamento entre a imagem e o nome */
 }
 
 .layer-name {
-  flex-grow: 1; /* Faz com que o nome da camada ocupe o espaço restante */
-  text-align: center; /* Centraliza o nome */
+  flex-grow: 1;
+  /* Faz com que o nome da camada ocupe o espaço restante */
+  text-align: center;
+  /* Centraliza o nome */
 }
 
 .layer:focus {
@@ -119,22 +142,22 @@ body::after {
 .hidden {
   display: none;
 }
-.layers{
+
+.layers {
 
   width: 250px;
 }
-.layers i{
+
+.layers i {
   width: 10px !important;
 }
 
-.col-widget
-{
+.col-widget {
   flex: 0 0 auto;
   width: 136.81px;
 }
 
-.col-span-widget
-{
+.col-span-widget {
   flex: 0 0 auto;
   width: 162px;
   height: 48px;
@@ -143,7 +166,8 @@ body::after {
 .container2 {
   width: 80vw;
   height: 80vh;
-  overflow: hidden; /* Esconde conteúdo que ultrapassa o tamanho */
+  overflow: hidden;
+  /* Esconde conteúdo que ultrapassa o tamanho */
   justify-content: center;
   align-items: center;
   padding: 25px 25px 25px;
@@ -164,7 +188,8 @@ body::after {
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  border-bottom: 1px dotted black;
+  /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -176,57 +201,65 @@ body::after {
   text-align: center;
   padding: 5px 0;
   border-radius: 6px;
- 
+
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
 }
+
 .editor-panel::-webkit-scrollbar {
-  width: 3px; /* Largura */
-  height: 3px; /* Altura */
+  width: 3px;
+  /* Largura */
+  height: 3px;
+  /* Altura */
   background-color: transparent;
 }
+
 .editor-panel::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
 .editor-panel::-webkit-scrollbar-corner {
   background-color: transparent;
 }
+
 .editor-panel::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 216, 67, 0.2); 
-  border-radius: 10px; 
+  background-color: rgba(255, 216, 67, 0.2);
+  border-radius: 10px;
 }
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
 .container2 .wrapper {
   display: flex;
   overflow: hidden;
   height: auto;
   align-items: center;
   justify-content: center;
-  margin:10px 0px 10px 0px;
+  margin: 10px 0px 10px 0px;
 }
 
 .editor-panel {
   margin-top: 10px;
-  display:flex;
+  display: flex;
   width: auto;
   border-radius: 5px;
   position: relative;
   overflow-x: hidden;
   align-items: baseline;
-  justify-content:baseline;
+  justify-content: baseline;
   overflow-y: scroll;
   flex-direction: column;
   height: 480px;
 }
-#widget-zoom
-{
-  top:0;
+
+#widget-zoom {
+  top: 0;
 }
-.editor-panel button{
+
+.editor-panel button {
 
   min-height: 4em;
   min-width: 4em;
@@ -234,13 +267,17 @@ body::after {
   max-height: 80px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centralizar horizontalmente o conteúdo */
-  justify-content: center; /* Centralizar verticalmente o conteúdo */
+  align-items: center;
+  /* Centralizar horizontalmente o conteúdo */
+  justify-content: center;
+  /* Centralizar verticalmente o conteúdo */
   margin: 5px;
-  line-height: 1.2; /* Ajustar o espaçamento do texto */
+  line-height: 1.2;
+  /* Ajustar o espaçamento do texto */
   min-width: 80px;
   min-height: 80px;
-  text-align: center; /* Centralizar o texto no botão */
+  text-align: center;
+  /* Centralizar o texto no botão */
 }
 
 .editor-panel .title {
@@ -294,10 +331,11 @@ body::after {
   margin-bottom: 15px;
 }
 
-.slider2{
-  height:40px;
+.slider2 {
+  height: 40px;
   width: 100%;
 }
+
 .filter .slider2 .filter-info {
   display: flex;
   color: #464646;
@@ -327,101 +365,105 @@ body::after {
   font-size: 18px;
 }
 
-.options .btn 
-{
+.options .btn {
   min-width: 50px !important;
   min-height: 50px !important;
   margin-right: 4px;
   margin-left: 4px;
 }
-.input-group-prepend
-{
-  width:90px;
+
+.input-group-prepend {
+  width: 90px;
 }
-.input-group-text
-{
-  border-radius:0.375rem 0 0 0.375rem;
-  color:rgba(0, 0, 0, 0.4) !important;
+
+.input-group-text {
+  border-radius: 0.375rem 0 0 0.375rem;
+  color: rgba(0, 0, 0, 0.4) !important;
 }
-.select-font
-{
+
+.select-font {
   width: 100%;
-  margin:5px 0px 5px 0px;
+  margin: 5px 0px 5px 0px;
   height: 40px;
   font-size: 14px;
   border-radius: 5px;
-  padding:0px 0px;
+  padding: 0px 0px;
 }
 
 .select-font:focus {
   outline: none;
   border: none;
 }
-.footer-btn
-{
-  bottom:0px;
-  left:0;
-  padding:20px 20px 20px 20px;
+
+.footer-btn {
+  bottom: 0px;
+  left: 0;
+  padding: 20px 20px 20px 20px;
   margin-left: auto;
   bottom: 0px;
   left: 0;
   bottom: 0px;
   left: 0;
   position: absolute;
-  width: 100%; /* Garante que o conteúdo ocupe toda a largura */
-  text-align: right; /* Alinha o botão à direita */
+  width: 100%;
+  /* Garante que o conteúdo ocupe toda a largura */
+  text-align: right;
+  /* Alinha o botão à direita */
 }
-.btn-small
-{
-  border-radius:5px;
-  padding:0px;  
+
+.btn-small {
+  border-radius: 5px;
+  padding: 0px;
   min-width: 38px;
-  min-height:38px;
+  min-height: 38px;
   max-width: 40px;
-  max-height:40px;
+  max-height: 40px;
   line-height: 1;
-  margin:5px;
-  background-color:rgba(255, 255, 255, 0.3); ;
+  margin: 5px;
+  background-color: rgba(255, 255, 255, 0.3);
+  ;
 }
 
 
-.btn-manage-layer{
+.btn-manage-layer {
   width: 25px;
-  height:25px;
-  border-radius:5px;
-  padding:0px;  
+  height: 25px;
+  border-radius: 5px;
+  padding: 0px;
   line-height: 1;
-  margin:5px;
-  background-color:rgba(255, 255, 255, 0.3); ;
+  margin: 5px;
+  background-color: rgba(255, 255, 255, 0.3);
+  ;
 }
 
-.btn-color
-{
-  border:1px rgba(255, 255, 255, 0.3) !important;
+.btn-color {
+  border: 1px rgba(255, 255, 255, 0.3) !important;
 }
-.btn-small:hover
-{
-  background-color:rgba(255, 255, 255, 0.3); ;
-  color:#FFD843;
+
+.btn-small:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  ;
+  color: #FFD843;
 }
-.btn-left
-{
+
+.btn-left {
   border-radius: 5px 0 0 5px;
-  margin-right:0px !important;
-  border:0;
+  margin-right: 0px !important;
+  border: 0;
 }
 
-.btn-middle{
-  border:0;
+.btn-middle {
+  border: 0;
   border-radius: 0 0px 0px 0;
-  margin:0px !important;
+  margin: 0px !important;
 }
-.btn-right
-{
-  border:0;
+
+.btn-right {
+  border: 0;
   border-radius: 0 5px 5px 0;
-  margin-left:0px !important;
+  margin-left: 0px !important;
 }
+
 .rotate .options .btn:active {
   color: #fff;
   background: #5372f0;
@@ -432,20 +474,24 @@ body::after {
   flex-grow: 1;
   display: flex;
   overflow: scroll;
-  
+
   margin-left: 10px;
   margin-right: 10px;
   align-items: center;
   border: 1px white;
   justify-content: center;
 }
+
 .preview-img::-webkit-scrollbar {
-  display: none; /* Esconde a barra de rolagem no Chrome, Edge e Safari */
+  display: none;
+  /* Esconde a barra de rolagem no Chrome, Edge e Safari */
 }
+
 .preview-img {
-  scrollbar-width: none; /* Esconde a barra de rolagem no Firefox */
+  scrollbar-width: none;
+  /* Esconde a barra de rolagem no Firefox */
   object-fit: contain;
-  border:1px;
+  border: 1px;
 }
 
 .controls .btn {
@@ -502,25 +548,25 @@ body::after {
   background: #FFD843;
   border-radius: 10px;
 }
-.btn-yellow
-{
+
+.btn-yellow {
   font-size: 12px;
-  width:80px;
+  width: 80px;
   height: 28;
   border-radius: 9999em;
   color: black;
   background: #FFD843;
 }
-.btn-right
-{
-  float:right;
+
+.btn-right {
+  float: right;
 }
 
-.btn-yellow:hover
-{
+.btn-yellow:hover {
   color: black;
   background: #ddbe3f;
 }
+
 @media screen and (max-width: 719px) {
   .container2 {
     padding: 25px;
@@ -538,20 +584,27 @@ body::after {
     flex-direction: row;
     height: 100px;
     overflow-x: scroll;
-    margin:20px 0px 20px 0px;
+    margin: 20px 0px 20px 0px;
     width: auto;
   }
-  .wrapper .editor-panel button{
+
+  .wrapper .editor-panel button {
     display: flex;
-    flex-direction: column; /* Colocar os elementos em coluna (ícone em cima, texto embaixo) */
-    align-items: center; /* Centralizar horizontalmente o conteúdo */
-    justify-content: center; /* Centralizar verticalmente o conteúdo */
+    flex-direction: column;
+    /* Colocar os elementos em coluna (ícone em cima, texto embaixo) */
+    align-items: center;
+    /* Centralizar horizontalmente o conteúdo */
+    justify-content: center;
+    /* Centralizar verticalmente o conteúdo */
     margin: 5px;
-    line-height: 1.2; /* Ajustar o espaçamento do texto */
+    line-height: 1.2;
+    /* Ajustar o espaçamento do texto */
     min-width: 64px;
     min-height: 64px;
-    text-align: center; /* Centralizar o texto no botão */
+    text-align: center;
+    /* Centralizar o texto no botão */
   }
+
   .wrapper .preview-img {
     width: auto;
     height: auto;
@@ -560,6 +613,7 @@ body::after {
     object-fit: contain;
   }
 }
+
 @media screen and (min-width: 720px) and (max-width:820px) {
   .container2 {
     width: auto;
@@ -577,7 +631,7 @@ body::after {
     flex-direction: row;
     height: 100px;
     overflow-x: scroll;
-    margin:20px 0px 20px 0px;
+    margin: 20px 0px 20px 0px;
     width: auto;
   }
 
@@ -589,12 +643,14 @@ body::after {
 
   }
 }
+
 @media screen and (min-width: 1025px) and (max-width:1280px) {
 
   .container2 {
     min-width: 90vw;
     min-height: 90vh;
   }
+
   .wrapper .editor-panel {
     width: auto;
     height: 450px;
@@ -602,28 +658,32 @@ body::after {
     overflow-y: scroll !important;
     padding: 10px;
   }
-  
+
   .options .btn {
     min-width: 10px !important;
     min-height: 10px !important;
     margin-right: 4px;
     margin-left: 4px;
   }
+
   .options .btn {
-  font-size: 14px;
+    font-size: 14px;
   }
-  .btn-layers{
-  width: auto;
-  height: auto;
+
+  .btn-layers {
+    width: auto;
+    height: auto;
   }
+
   .preview-img {
-   width: 100%;
+    width: 100%;
     height: 100%;
-    margin-top:5px;
+    margin-top: 5px;
     object-fit: contain;
   }
-  
+
 }
+
 @media screen and (min-width: 821px) and (max-width:1024px) {
 
   .container2 {
@@ -631,28 +691,33 @@ body::after {
     height: auto;
 
   }
+
   .wrapper .editor-panel {
     justify-content: flex-start;
     flex-direction: column;
     height: 450px;
     overflow-x: scroll;
-    margin:20px 0px 20px 0px;
+    margin: 20px 0px 20px 0px;
     width: auto;
 
   }
+
   .options .btn {
     min-width: 10px !important;
     min-height: 10px !important;
     margin-right: 4px;
     margin-left: 4px;
-}
-.options .btn {
-font-size: 14px;
-}
-.btn-layers{
-width: auto;
-height: auto;
-}
+  }
+
+  .options .btn {
+    font-size: 14px;
+  }
+
+  .btn-layers {
+    width: auto;
+    height: auto;
+  }
+
   .preview-img {
     width: auto;
     height: auto;
@@ -660,8 +725,9 @@ height: auto;
     margin-right: 0px;
     object-fit: contain;
   }
-  
+
 }
+
 /* ! Image Resizer */
 .imageResizer {
   position: absolute;
@@ -700,13 +766,15 @@ height: auto;
 .imageResizer .row2 .column2 {
   width: calc(100% - 15px);
 }
-.row2{
+
+.row2 {
   display: flex;
   justify-content: space-between;
-  align-items: center; 
+  align-items: center;
   width: 100%;
   margin-bottom: 10px;
 }
+
 .imageResizer .column2 label {
   font-size: 1.06rem;
 }
