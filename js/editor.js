@@ -1551,8 +1551,7 @@ $(function () {
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         $(this).css("font-family", '"' + $(this).val() + '"');
         text.fontFamily($(this).val());
-        transformer.forceUpdate();
-        transformer.update();
+        transformer.attachTo(text);
         updatePos();
         layer.draw();
     });
