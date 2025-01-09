@@ -1518,6 +1518,7 @@ function fitStageIntoParentContainer() {
 
 $(function () {
     $(".btn-style").on('click', function () {
+        var layer = stage.findOne("#"+$("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
@@ -1538,7 +1539,7 @@ $(function () {
         layer.draw();
     });
     $("#opacity").on('input', function () {
-
+        var layer = stage.findOne("#"+$("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
 
         text.opacity($(this).val());
@@ -1546,11 +1547,12 @@ $(function () {
     });
 
     $("#text-font-edit").on('change', function () {
-
+        var layer = stage.findOne("#"+$("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         $(this).css("font-family", '"' + $(this).val() + '"');
         text.fontFamily($(this).val());
-        transformer.forceUpdate()
+        transformer.forceUpdate();
+        transformer.update();
         updatePos();
         layer.draw();
     });
@@ -1558,6 +1560,7 @@ $(function () {
     transformer.nodes([]);
 
     $(".btn-align").on("click", function () {
+        var layer = stage.findOne("#"+$("#currentLayer").val());
         const currentIcon = icons[currentIndex];
         $(this).find("i").attr("class", `fa ${currentIcon}`);
 
@@ -1571,6 +1574,7 @@ $(function () {
     
     });
     $(".btn-decoration").on('click', function () {
+        var layer = stage.findOne("#"+$("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
