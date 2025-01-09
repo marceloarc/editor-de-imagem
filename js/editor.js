@@ -115,7 +115,6 @@ $(document).ready(function () {
         var text = stage.find("#" + $("#input-edit-id").val())[0];
 
         text.text($(this).val());
-        updatePos();
         layer.draw();
         var textPosition = text.absolutePosition();
         $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
@@ -302,7 +301,6 @@ function addImage(image, posx, posy, id) {
             $("#widget-image").fadeIn(100);
             
             generateImageWidget(e.target)
-            updatePos();
             layer.draw();
         });
         image.on('dragstart transformstart', (e) => {
@@ -313,7 +311,6 @@ function addImage(image, posx, posy, id) {
             }
             transformer.nodes([e.target]);
             $("#widget-image").fadeOut(100);
-            updatePos();
             layer.draw();
         });
 
@@ -397,11 +394,6 @@ function addImage(image, posx, posy, id) {
 
 
         });
-        image.on('transform', (e) => {
-            updatePos();
-        });
-
-
 
         var background = stage.find(".background")[0];
         if (background) {
@@ -417,8 +409,6 @@ function addImage(image, posx, posy, id) {
             }
         }
 
-        updatePos();
-
         stage.draw();
         $("#modalImagem").modal("hide");
         transformer.nodes([image]);
@@ -427,7 +417,6 @@ function addImage(image, posx, posy, id) {
             $("#" + attr).prop("disabled", false);
         });
         groupTrans.moveToTop();
-        updatePos();
     }
 }
 
@@ -552,15 +541,10 @@ function createText(texto, color, posx, posy, font, fontSize, circle, textDecora
     Textpre.on('dblclick dbltap', (e) => {
         textAreaPosition(e.target)
     });
-    Textpre.on('transform', (e) => {
-        updatePos();
-    });
 
     Textpre.on('dragstart', (e) => {
         transformer.nodes([e.target]);
-        updatePos();
         layer.draw();
-
 
     });
 
@@ -611,11 +595,6 @@ $("#addText").click(function () {
     layer.add(groupText);
     transformer.nodes([Text]);
     groupTrans.moveToTop();
-    updatePos()
-    Text.on('transform', function () {
-
-        updatePos();
-    })
 
     Text.on('transformstart', function (e) {
         $("#draggable").fadeOut(100);
@@ -660,7 +639,6 @@ $("#addText").click(function () {
         }
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
-        updatePos();
         layer.draw();
         $("#draggable").fadeOut(100);
     });
@@ -796,7 +774,6 @@ function textAreaPosition(Text){
             Text.show();
             transformer.show();
             transformer.forceUpdate();
-            updatePos();
         }
     
         function handleOutsideClick(e) {
@@ -890,9 +867,6 @@ $("#add-tri").on('click', function () {
         $("#widget-node").fadeOut(100);
     })
 
-    node.on('transform', function () {
-        updatePos();
-    })
     node.on('transformend', function (e) {
         generateNodeWidget(e.target);
 
@@ -925,11 +899,9 @@ $("#add-tri").on('click', function () {
         $("#widget-node").fadeOut(100);
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
-        updatePos();
         layer.draw();
     });
     groupTrans.moveToTop();
-    updatePos();
 
 })
 $("#add-rect").on('click', function () {
@@ -962,9 +934,6 @@ $("#add-rect").on('click', function () {
         $("#widget-node").fadeOut(100);
     })
 
-    node.on('transform', function () {
-        updatePos();
-    })
     node.on('transformend', function (e) {
         generateNodeWidget(e.target)
 
@@ -997,11 +966,9 @@ $("#add-rect").on('click', function () {
         $("#widget-node").fadeOut(100);
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
-        updatePos();
         layer.draw();
     });
 
-    updatePos();
 })
 function generateNodeWidget(node){
     var nodePosition = node.getAbsolutePosition();
@@ -1128,9 +1095,6 @@ $("#add-circle").on('click', function () {
         $("#widget-node").fadeOut(100);
     })
 
-    node.on('transform', function () {
-        updatePos();
-    })
     node.on('transformend', function (e) {
         generateNodeWidget(e.target);
     })
@@ -1162,27 +1126,11 @@ $("#add-circle").on('click', function () {
         $("#widget-node").fadeOut(100);
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
-        updatePos();
         layer.draw();
     });
     groupTrans.moveToTop();
-    updatePos();
 
 })
-
-function updatePos() {
-    var sizeButton = stage.find(".button-size")[0];
-    var rotateButton = stage.find(".button-edit")[0];
-
-    sizeButton.position({
-        x: transformer.findOne('.bottom-right').position().x - 5,
-        y: transformer.findOne('.bottom-right').position().y - 5
-    });
-    rotateButton.position({
-        x: transformer.findOne('.top-center').position().x -8,
-        y: transformer.findOne('.top-center').position().y - 58
-    });
-}
 
 function cleanStage() {
     const layers = Array.from(stage.getLayers());
@@ -1463,7 +1411,6 @@ $(function () {
             
             groupTrans.moveToTop();
 
-            updatePos();
             layer.draw();
             return;
         }
@@ -1552,7 +1499,6 @@ $(function () {
         $(this).css("font-family", '"' + $(this).val() + '"');
         text.fontFamily($(this).val());
         transformer.attachTo(text);
-        updatePos();
         layer.draw();
     });
 
@@ -1652,10 +1598,21 @@ function addTransformer() {
     var rotateImage = new Image();
     var transformer = new Konva.Transformer({
         anchorStyleFunc: (anchor) => {
-            anchor.cornerRadius(20);
+            if (anchor.hasName('bottom-right')&& sizeImage.complete){
+                anchor.fill('');
+                anchor.stroke('');
+                anchor.fillPatternImage(sizeImage);
+            
+            }
+            if (anchor.hasName('rotater')&& rotateImage.complete) {
+                anchor.fill('');
+                anchor.stroke('');
+                anchor.fillPatternImage(rotateImage);
+  
+            }
             if (anchor.hasName('bottom-right')|| anchor.hasName('rotater')) {
-              anchor.height(16);
-              anchor.width(16)
+                anchor.height(22);
+                anchor.width(22) 
             }else{
                 anchor.height(7);
                 anchor.width(7) 
@@ -1678,33 +1635,9 @@ function addTransformer() {
     transformer.borderDash([2, 2]);
     transformer.anchorCornerRadius(5);
 
-    var rotateButton = new Konva.Image({
-
-        image: rotateImage,
-        width: 20,
-        height: 20,
-        stroke: 'gray',
-        strokeWidth: 0,
-        name: 'button-edit'
-    });
-    var sizeButton = new Konva.Image({
-        width: 20,
-        height: 20,
-        image: sizeImage,
-        stroke: 'gray',
-        strokeWidth: 0,
-        name: 'button-size'
-
-    });
-
-    rotateButton.listening(false);
-
-    sizeButton.listening(false);
 
     sizeImage.src = "images/size-icon.png";
     rotateImage.src = "images/edit-icon.png" 
-    transformer.add(sizeButton);
-    transformer.add(rotateButton);
     transformer.rotationSnaps([0, 90, 180, 270]);
 
     return transformer;
@@ -2011,7 +1944,6 @@ $(".btn-copy").click(function()
 
     groupTrans.moveToTop();
     transformer.nodes([NodeClone]);
-    updatePos();
     NodeClone.zIndex(node.zIndex() + 1);
     layer.draw();
 
