@@ -12,7 +12,7 @@
     <link href="css/editor.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-solid.css">
 
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-regular.css">
@@ -41,47 +41,25 @@
 
 <body>
     <div class="container2">
-        <h2 class="header">Easy Image Editor</h2>
         <div class="row2">
             <button id="new-image-prompt-btn" class="btn btn-yellow">Novo</button>
-            <button id="resize-stage-prompt-btn" class="btn btn-yellow">Redimensionar</button>
+            <h5 class="header">Easy Image Editor</h5> <button id="resize-stage-prompt-btn" class="btn btn-small btn-yellow"><i class="mdi mdi-resize"></i></button>
         </div>
         <div class="wrapper">
             <div class="editor-panel">
-                <div class="filter active">
-                    <label class="title">Imagem e Texto</label>
-                    <div class="options">
-                        <button class="btn" id="add-image"><i class="fa-solid fa-image"></i></button>
-                        <button class="btn" id="widget-text"><i class="fa-solid fa-text"></i></button>
-                    </div>
-                </div>
-                <div class="filter active">
-                    <label class="title">Desenhos</label>
-                    <div class="options">
-                        <button class="btn" id="draw"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                        <button class="btn" id="add-tri"><i class="fa-solid fa-triangle"></i></button>
-                        <button class="btn" id="add-rect"><i class="fa-solid fa-square"></i></button>
-                        <button class="btn" id="add-circle"><i class="fa-solid fa-circle"></i></button>
-                    </div>
-                </div>
-                <div class="filter active">
-                    <label class="title">Planos de fundo</label>
-                    <div class="options">
-                        <button class="btn" id="add-bg">Cor sólida</button>
-                        <button class="btn" id="pick-bg">Escolher</button>
-                    </div>
-                </div>
-                <div class="filter active">
-                    <div class="slider2">
-                        <div class="filter-info">
-                            <span class="name">Zoom</span>
-                        </div>
-                        <input class="slider2" original-scale="" type="range" id="zoom-slider" object-id="0" min="0.01"
-                        max="2"
-                        step="0.01" value="1">
-                        <button class="btn" id="reset-zoom">Reset</button>
-                    </div>
-                </div>
+
+                        <button class="btn" id="add-image"><i class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
+                        <button class="btn" id="widget-text"><i class="mdi mdi-format-textbox"></i> <span class="btn-text">Texto</span></button>
+                    
+          
+                        <button class="btn" id="btn-widget-figures"><i class="mdi mdi-pencil-outline" aria-hidden="true"></i><span class="btn-text">Desenhos</span></button>           
+
+                        <button class="btn" id="add-bg"><i class="mdi mdi-image-album" aria-hidden="true"></i><span class="btn-text">Background</span></button>       
+                        <button class="btn" id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>      
+                        <button class="btn" id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>      
+                        <button class="btn" id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span class="btn-text">Soon</span></button>      
+                        <button class="btn" id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span class="btn-text">Soon</span></button>          
+
             </div>
             <input id="currentLayer" style="display:none;" value="0">
             <input id="selectedNode" style="display:none;" value="0">
@@ -102,17 +80,17 @@
             <br>
             <input style="display:none;" id="input-image" type="file" name="file" posx="" posy="" idshape="stage" />
             <div class="text-center widget-lg widget-black" id="draggable">
-
-                    <div class="row widget-body">
+                <div class="widget-body">
+                    <div class="row">
   
-                        <div class="col-2" style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                        <div class="col-2" style="position: relative; display: inline-block;">
                             <button id="text-color-button" class="btn btn-small">
-                            <i class="fa-solid fa-droplet" style="font-size: 20px; color: #555;"></i>
+                            <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                             </button>
                             <input type="color" id="input-color-edit" 
                                 style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                         </div>
-                        <div class="col-10 ">
+                        <div class="col-10">
                             <select id="text-font-edit" class="select-font">
                                 <option class="fpd-item" value="Alex Brush"
                                     style="font-family: &quot;Alex Brush&quot;; display: block;">Alex Brush</option>
@@ -205,7 +183,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="widget-body">
+                        <div class="widget-row">
                             <div class="slidecontainer">
 
                                 <button class="btn btn-small btn-left btn-style" value="bold"><i class="fas fa-bold"></i></button>
@@ -221,158 +199,28 @@
                                 <input type="text" id="input-edit-id" style="display:none;">
                             </div>
                         </div>
-                </div>
-                <div class="row">
-                    <div class="slidecontainer">
-                        <span>Transparencia </span>
-                        <input type="range" min="0" max="1" class="slider" id="opacity" step="0.01">
+                    </div>
+                    <div class="row">
+                        <div class="slidecontainer">
+                            <span>Transparencia </span>
+                            <input type="range" min="0" max="1" class="slider" id="opacity" step="0.01">
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 text-center widget widget-white" id="add-text-widget">
-                <div class="widget-header">
-                    
-                    <i class="fas fa-arrows-alt" style="margin:10px; float:left; font-size:14px;"> Texto</i>
-                   
-                    <button type="button" class="close" id="close-edit"
-                        style="color:white; margin:5px;">&times;</button>
-                </div>
-
-                <div class="col-12">
-                    <textarea id="input-text" placeholder="Digite aqui seu texto" row="50" cols="50"
-                        style="width:80%;"></textarea>
-                </div>
-                <button id="addText" class="btn-add-text">Adicionar texto</button>
-            </div>
-
-
-            <div class="text-center widget widget-white" id="new-image-prompt">
-                <div class="widget-header">
-                    
-                    <i class="fas fa-arrows-alt" style="margin:10px; float:left; font-size:14px;"> Novo</i>
-                   
-                    <button type="button" class="close" id="close-edit"
-                        style="color:white; margin:5px;">&times;</button>
-                </div>
-
-                <div class="">
-                    <div class="input-group input-group-sm p-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Titulo</span>
-                        </div>
-                        <input id="input-title" type="text" id="input-height" class="form-control" placeholder="" aria-label="Titulo" value="Sem Título" aria-describedby="basic-addon1">
-                      </div>
-                    <div class="input-group input-group-sm p-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Largura</span>
-                        </div>
-                        <input type="number" id="input-width" class="form-control" placeholder="" aria-label="Largura" value="800" aria-describedby="basic-addon1">
-                      </div>
-                      <div class="input-group input-group-sm p-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Altura</span>
-                        </div>
-                        <input type="number" id="input-height" class="form-control" placeholder="" aria-label="Altura" value="600" aria-describedby="basic-addon1">
-                      </div>
-                </div>
-                <button id="new-image" class="btn-add-text">Confirmar</button>
-            </div>
-            
-            <div class="text-center widget widget-white" id="resize-stage-prompt">
-                <div class="widget-header">
-                    
-                    <i class="fas fa-arrows-alt" style="margin:10px; float:left; font-size:14px;"> Redimensionar</i>
-                   
-                    <button type="button" class="close" id="close-edit"
-                        style="color:white; margin:5px;">&times;</button>
-                </div>
-
-                <div>
-                    <div class="input-group input-group-sm p-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Largura</span>
-                        </div>
-                        <input type="number" id="resize-input-width" class="form-control" placeholder="" aria-label="Largura" value="800" aria-describedby="basic-addon1">
-                      </div>
-                      <div class="input-group input-group-sm p-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Altura</span>
-                        </div>
-                        <input type="number" id="resize-input-height" class="form-control" placeholder="" aria-label="Altura" value="600" aria-describedby="basic-addon1">
-                      </div>
-                </div>
-                <button id="resize-stage" class="btn-add-text">Confirmar</button>
-            </div>
-
-            <div class="text-center widget-sm p-10 widget-black" id="widget-image">
-                <div class="col-12">
-                    <div class="slidecontainer">
-
-                        <button class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
-                        <button class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
-                        <button class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
-                        <button class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                    <div class="slidecontainer">
-                        <div class="slider2">
-                            <div class="filter-info">
-                                <span class="name">Brilho</span>
-                                <span class="value brightness">0%</span>
-                            </div>
-                            <input type="range" disabled id="brightness" object-id="0" min="-1" max="1" step="0.05"
-                                value="0">
-                        </div>
-                    </div>
-                    <div class="slidecontainer">
-                    <div class="slider2">
-                        <div class="filter-info">
-                            <span class="name">Contraste</span>
-                            <span class="value contrast">0%</span>
-                        </div>
-                        <input type="range" disabled id="contrast" object-id="0" min="-100" max="100" step="1"
-                            value="0">
-                    </div>
-                </div>
-                </div>
-            </div>
-
         </div>
-        <div class="controls">
-            <div class="row2" style="float:left;">
-                <button class="save-img  btn" id="download">Save Image</button>
-            </div>
+
+        <div class="footer-btn">
+            <button id="download" class="btn btn-yellow btn-right">Download</button>
         </div>
     </div>
-    <div class="text-center widget-sm widget-black" id="widget-layers" style="display:block;">
-        <div class="widget-header layers-header">
-            
-            <i class="fas fa-arrows-alt" style="margin:10px; float:left; font-size:14px;"> Camadas</i>
-           
-            <button type="button" class="close minimize" id="close-edit"
-                style="color:black; margin:3px;">&times;<i style="color:white; font-size:14px;" class="fa fa-minus"></i></button>
-
-        </div>
-        <div id="layers-body">
-            <div class="row">
-                <ul class="layers" id="layers">
-    
-                </ul>
-            </div>
-            <div class="row">
-                <button class="btn btn-small btn-left btn-success" id="add-layer"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                <button class="btn btn-small btn-right btn-danger" id="delete-layer"><i class="fa fa-minus" aria-hidden="true"></i></button>
-            </div>
-    
-
-        </div>
-    </div> 
     <div class="text-center widget-sm p-10 widget-black" id="widget-bg">
         <div class="col-12">
             <div class="slidecontainer">
 
                 <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="bg-color-button" class="btn btn-small">
-                      <i class="fa-solid fa-droplet" style="font-size: 20px; color: #555;"></i>
+                      <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
                     <input type="color" id="bgcolor" 
                            value="#ffffff"style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
@@ -392,7 +240,7 @@
 
                 <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="node-color-button" class="btn btn-small">
-                      <i class="fa-solid fa-droplet" style="font-size: 20px; color: #555;"></i>
+                      <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
                     <input type="color" id="draw-color" 
                            style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
@@ -405,31 +253,195 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget-sm p-10 widget-black" id="widget-draw">
-
-        <div class="col-12">
-
+    <div class="text-center widget-sm widget-black widget-fixed" id="widget-figures">
+        <button type="button" class="close"
+        style="color:white; margin-right:2px;">&times;</button>
+        <div class="widget-body">
             <div class="slidecontainer">
-                <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
-                    <button id="brush-color-button" class="btn btn-small btn-color" style="border: 1px white;">
-                    <i class="fa-solid fa-droplet" style="font-size: 20px; color: #555;"></i>
-                    </button>
-                    <input type="color" id="brush-color" name="brush-color" 
-                        style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" value="#000000">
-                </div>
-                <button draw-mode="brush" class="draw-mode btn btn-small btn-left"><i class="fa fa-paint-brush"></i></button>
-                <button draw-mode="eraser" class="draw-mode btn btn-small btn-right"><i class="fa-solid fa-eraser"></i></button>                   
-            </div>
-            <span class="name">Tamanho</span>
-            <span id="brush-size-text">0</span>
-            <div class="slidecontainer">
+                <button class="btn btn-small" id="draw"><i class="mdi mdi-pencil-outline" aria-hidden="true"></i></button>
 
-                <input type="range" min="1" max="500" class="slider" id="brush-size" step="1" value="1">
+                <button class="btn btn-small btn-left" id="add-tri"><i class="mdi mdi-triangle"></i></button>
+                <button class="btn btn-small btn-middle" id="add-rect"><i class="mdi mdi-square"></i></button>
+                <button class="btn btn-small btn-right" id="add-circle"><i class="mdi mdi-circle"></i></button>
             </div>
         </div>
-
-
     </div>
+    <div class="text-center widget-sm widget-black" id="widget-zoom" style="display:block;">
+        <div class="widget-body">
+            <div class="row">
+                <span>Zoom</span>
+                <div class="slidecontainer col-9">
+                    <input class="slider2" original-scale="" type="range" id="zoom-slider" object-id="0" min="0.01"
+                    max="2"
+                    step="0.01" value="1"> 
+                </div>
+                <div class="col-3" style="display:none;">
+                    <button class="btn btn-small" id="reset-zoom"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="text-center widget-sm widget-black widget-fixed" id="widget-draw">
+        <button type="button" class="close"
+        style="color:white; margin-right:2px;">&times;</button>
+        <div class="widget-body">
+            
+            <div class="row">
+                <div class="col-widget">
+                    <div style="position: relative; display: inline-block; width: 45px; height: 45px;">
+                        <button id="brush-color-button" class="btn btn-small btn-color" style="border: 1px white;">
+                        <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
+                        </button>
+                        <input type="color" id="brush-color" name="brush-color" 
+                            style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" value="#000000">
+                    </div>
+                        <button draw-mode="brush" class="draw-mode btn btn-small btn-left"><i class="mdi mdi-brush-outline"></i></button>
+                        <button draw-mode="eraser" class="draw-mode btn btn-small btn-right"><i class="mdi mdi-eraser"></i></button>   
+                </div> 
+                <div class="col-6">
+                    <div class="row">
+                        <span class="name">Tamanho </span>
+                        <span id="brush-size-text"> 0 </span>
+                        <input type="range" min="1" max="500" class="slider" id="brush-size" step="1" value="1">    
+                    </div>                    
+               </div>
+    
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-center widget widget-white" id="add-text-widget">
+        <div class="widget-header">
+            
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Texto</i>
+           
+            <button type="button" class="close" id="close-edit"
+                style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+
+        <div class="col-12">
+            <textarea id="input-text" placeholder="Digite aqui seu texto" row="50" cols="50"
+                style="width:80%;"></textarea>
+        </div>
+        <button id="addText" class="btn-add-text">Adicionar texto</button>
+    </div>
+    <div class="text-center widget-sm widget-black widget-fixed" id="widget-settings">
+        <button type="button" class="close"
+        style="color:white; margin-right:2px;">&times;</button>
+        <div class="widget-body">
+            <div class="slidecontainer">
+                <div class="slider2">
+                    <div class="filter-info">
+                        <span class="name">Brilho</span>
+                        <span class="value brightness">0%</span>
+                    </div>
+                    <input type="range" disabled id="brightness" object-id="0" min="-1" max="1" step="0.05"
+                        value="0">
+                </div>
+            </div>
+            <div class="slidecontainer">
+            <div class="slider2">
+                <div class="filter-info">
+                    <span class="name">Contraste</span>
+                    <span class="value contrast">0%</span>
+                </div>
+                <input type="range" disabled id="contrast" object-id="0" min="-100" max="100" step="1"
+                    value="0">
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="text-center widget-sm p-10 widget-black" id="widget-image">
+        <div class="col-12">
+            <div class="slidecontainer">
+
+                <button class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
+                <button class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
+                <button class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
+                <button class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
+                <button id="btn-settings" class="btn btn-small"><i class="mdi mdi-cog"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="text-center widget widget-white" id="new-image-prompt">
+        <div class="widget-header">
+            
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Novo</i>
+           
+            <button type="button" class="close" id="close-edit"
+                style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+
+        <div class="">
+            <div class="input-group input-group-sm p-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Titulo</span>
+                </div>
+                <input id="input-title" type="text" id="input-height" class="form-control" placeholder="" aria-label="Titulo" value="Sem Título" aria-describedby="basic-addon1">
+              </div>
+            <div class="input-group input-group-sm p-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Largura</span>
+                </div>
+                <input type="number" id="input-width" class="form-control" placeholder="" aria-label="Largura" value="800" aria-describedby="basic-addon1">
+              </div>
+              <div class="input-group input-group-sm p-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Altura</span>
+                </div>
+                <input type="number" id="input-height" class="form-control" placeholder="" aria-label="Altura" value="600" aria-describedby="basic-addon1">
+              </div>
+        </div>
+        <button id="new-image" class="btn-add-text">Confirmar</button>
+    </div>
+    <div class="text-center widget widget-white" id="resize-stage-prompt">
+        <div class="widget-header">
+            
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Redimensionar</i>
+           
+            <button type="button" class="close" id="close-edit"
+                style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+
+        <div>
+            <div class="input-group input-group-sm p-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Largura</span>
+                </div>
+                <input type="number" id="resize-input-width" class="form-control" placeholder="" aria-label="Largura" value="800" aria-describedby="basic-addon1">
+              </div>
+              <div class="input-group input-group-sm p-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Altura</span>
+                </div>
+                <input type="number" id="resize-input-height" class="form-control" placeholder="" aria-label="Altura" value="600" aria-describedby="basic-addon1">
+              </div>
+        </div>
+        <button id="resize-stage" class="btn-add-text">Confirmar</button>
+    </div>
+    <div class="text-center widget-sm widget-black" id="widget-layers" style="display:block;">
+        <div class="widget-header layers-header">
+            
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Camadas</i>
+           
+            <button type="button" class="close minimize" id="close-edit"
+                style="color:black;  margin-right:2px;">&times;<i style="color:white; font-size:14px;" class="mdi mdi-window-minimize"></i></button>
+
+        </div>
+        <div id="layers-body" class="widget-body">
+            <div class="row">
+                <ul class="layers" id="layers">
+    
+                </ul>
+            </div>
+            <div class="row">
+                <button class="btn btn-left btn-manage-layer btn-success" id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
+                <button class="btn btn-right btn-manage-layer btn-danger" id="delete-layer"><i class="mdi mdi-layers-minus" aria-hidden="true"></i></button>
+            </div>
+    
+
+        </div>
+    </div> 
 </body>
 <script src="js/jquery-2.1.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
