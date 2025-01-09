@@ -459,9 +459,8 @@ function generateImageWidget(image){
             
     var imagePosition = image.absolutePosition();
 
-    var stagePosition = $(".preview-img").offset();
+    var stagePosition = $(".konvajs-content").offset();
     var widget = document.getElementById('widget-image');
-    widget.style.display = 'block';
 
     const adjustedTop = (stagePosition.top + (imagePosition.y*zoom));
     const adjustedLeft = (stagePosition.left + (imagePosition.x*zoom));
