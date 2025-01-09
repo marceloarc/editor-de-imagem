@@ -76,9 +76,9 @@ body::after {
   cursor: move; /* Indica que o item pode ser movido */
 
 }
-.row{
-
-  margin: 5px 5px 5px 5px;
+.btn-text{
+  font-size: 10px;
+  margin:5px;
 }
 .layer.active{
   background-color: rgb(66, 67, 68);
@@ -126,14 +126,28 @@ body::after {
 .layers i{
   width: 10px !important;
 }
+
+.col-widget
+{
+  flex: 0 0 auto;
+  width: 136.81px;
+}
+
+.col-span-widget
+{
+  flex: 0 0 auto;
+  width: 162px;
+  height: 48px;
+}
+
 .container2 {
   width: 80vw;
   height: 80vh;
   overflow: hidden; /* Esconde conteúdo que ultrapassa o tamanho */
   justify-content: center;
   align-items: center;
-  padding: 30px 35px 35px;
-  background: rgba(0, 0, 0, 0.4);
+  padding: 25px 25px 25px;
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.095);
@@ -167,28 +181,66 @@ body::after {
   position: absolute;
   z-index: 1;
 }
+.editor-panel::-webkit-scrollbar {
+  width: 3px; /* Largura */
+  height: 3px; /* Altura */
+  background-color: transparent;
+}
+.editor-panel::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.editor-panel::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+.editor-panel::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 216, 67, 0.2); 
+  border-radius: 10px; 
+}
 
-/* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
 .container2 .wrapper {
   display: flex;
   overflow: hidden;
-  height: 80%;
-
+  height: auto;
+  align-items: center;
+  justify-content: center;
   margin:10px 0px 10px 0px;
 }
 
-.wrapper .editor-panel {
-  padding: 15px 20px;
-  width: 280px;
+.editor-panel {
+  margin-top: 10px;
+  display:flex;
+  width: auto;
   border-radius: 5px;
-  border: 0.1px solid rgba(255, 255, 255, 0.095);
   position: relative;
   overflow-x: hidden;
+  align-items: baseline;
+  justify-content:baseline;
   overflow-y: scroll;
-  height: 100%;
+  flex-direction: column;
+  height: 480px;
+}
+#widget-zoom
+{
+  top:0;
+}
+.editor-panel button{
+
+  min-height: 4em;
+  min-width: 4em;
+  max-width: 80px;
+  max-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centralizar horizontalmente o conteúdo */
+  justify-content: center; /* Centralizar verticalmente o conteúdo */
+  margin: 5px;
+  line-height: 1.2; /* Ajustar o espaçamento do texto */
+  min-width: 80px;
+  min-height: 80px;
+  text-align: center; /* Centralizar o texto no botão */
 }
 
 .editor-panel .title {
@@ -207,7 +259,7 @@ body::after {
 .editor-panel .btn {
   outline: none;
   height: 40px;
-  font-size: 16px;
+  font-size: 26px;
   color: #6c757d;
   background: rgba(0, 0, 0, 0.0);
   border-radius: 0.625em;
@@ -293,7 +345,7 @@ body::after {
 .select-font
 {
   width: 100%;
-  margin:5px;
+  margin:5px 0px 5px 0px;
   height: 40px;
   font-size: 14px;
   border-radius: 5px;
@@ -304,21 +356,42 @@ body::after {
   outline: none;
   border: none;
 }
-
+.footer-btn
+{
+  bottom:0px;
+  left:0;
+  padding:20px 20px 20px 20px;
+  margin-left: auto;
+  bottom: 0px;
+  left: 0;
+  bottom: 0px;
+  left: 0;
+  position: absolute;
+  width: 100%; /* Garante que o conteúdo ocupe toda a largura */
+  text-align: right; /* Alinha o botão à direita */
+}
 .btn-small
 {
   border-radius:5px;
   padding:0px;  
-  width: 40px;
-  height:40px;
+  min-width: 38px;
+  min-height:38px;
+  max-width: 40px;
+  max-height:40px;
   line-height: 1;
   margin:5px;
   background-color:rgba(255, 255, 255, 0.3); ;
 }
 
-#layers-body .btn-small{
+
+.btn-manage-layer{
   width: 25px;
   height:25px;
+  border-radius:5px;
+  padding:0px;  
+  line-height: 1;
+  margin:5px;
+  background-color:rgba(255, 255, 255, 0.3); ;
 }
 
 .btn-color
@@ -336,6 +409,7 @@ body::after {
   margin-right:0px !important;
   border:0;
 }
+
 .btn-middle{
   border:0;
   border-radius: 0 0px 0px 0;
@@ -420,7 +494,7 @@ body::after {
   border: 1px solid #6c757d;
 }
 
-.controls .save-img {
+.save-img {
   margin-left: 5px;
   border: none;
   color: black;
@@ -429,7 +503,10 @@ body::after {
 }
 .btn-yellow
 {
-  width:135px;
+  font-size: 12px;
+  width:80px;
+  height: 28;
+  border-radius: 9999em;
   color: black;
   background: #FFD843;
 }
@@ -456,14 +533,29 @@ body::after {
   }
 
   .wrapper .editor-panel {
-    width: 100%;
+    justify-content: flex-start;
+    flex-direction: row;
+    height: 100px;
+    overflow-x: scroll;
+    margin:20px 0px 20px 0px;
+    width: auto;
   }
-
-  .preview-img {
+  .wrapper .editor-panel button{
+    display: flex;
+    flex-direction: column; /* Colocar os elementos em coluna (ícone em cima, texto embaixo) */
+    align-items: center; /* Centralizar horizontalmente o conteúdo */
+    justify-content: center; /* Centralizar verticalmente o conteúdo */
+    margin: 5px;
+    line-height: 1.2; /* Ajustar o espaçamento do texto */
+    min-width: 64px;
+    min-height: 64px;
+    text-align: center; /* Centralizar o texto no botão */
+  }
+  .wrapper .preview-img {
     width: auto;
     height: auto;
-    margin-top:10px;
-    margin-bottom:10px;
+    margin-left: 0px;
+    margin-right: 0px;
     object-fit: contain;
   }
 }
@@ -480,14 +572,19 @@ body::after {
   }
 
   .wrapper .editor-panel {
-    width: 100%;
+    justify-content: flex-start;
+    flex-direction: row;
+    height: 100px;
+    overflow-x: scroll;
+    margin:20px 0px 20px 0px;
+    width: auto;
   }
 
   .wrapper .preview-img {
     width: auto;
     height: auto;
-    margin-top:10px;
-    margin-bottom:10px;
+    margin-left: 0px;
+    margin-right: 0px;
 
   }
 }
@@ -498,12 +595,13 @@ body::after {
     min-height: 90vh;
   }
   .wrapper .editor-panel {
-    width: 350px;;
-    height: 100%;
-    overflow-x: scroll !important;
+    width: auto;
+    height: 450px;
+    overflow-x: hidden !important;
     overflow-y: scroll !important;
-
+    padding: 10px;
   }
+  
   .options .btn {
     min-width: 10px !important;
     min-height: 10px !important;
@@ -533,9 +631,12 @@ body::after {
 
   }
   .wrapper .editor-panel {
-    width: 350px;
-    overflow-x: scroll !important;
-    overflow-y: scroll !important;
+    justify-content: flex-start;
+    flex-direction: column;
+    height: 450px;
+    overflow-x: scroll;
+    margin:20px 0px 20px 0px;
+    width: auto;
 
   }
   .options .btn {
@@ -554,7 +655,8 @@ height: auto;
   .preview-img {
     width: auto;
     height: auto;
-
+    margin-left: 0px;
+    margin-right: 0px;
     object-fit: contain;
   }
   
@@ -593,11 +695,17 @@ height: auto;
   justify-content: space-between;
   margin-top: 1rem;
 }
-.row2{}
+
 .imageResizer .row2 .column2 {
   width: calc(100% - 15px);
 }
-
+.row2{
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  width: 100%;
+  margin-bottom: 10px;
+}
 .imageResizer .column2 label {
   font-size: 1.06rem;
 }
