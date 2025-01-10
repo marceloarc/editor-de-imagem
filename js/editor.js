@@ -12,6 +12,9 @@ const alignmentIcons = {
 };
 const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
+var color;
+var size;
+var copiedShape;
 const ZOOM_SPEED = 0.1;
 let title = "Sem Título";
 var mode = 'brush';
@@ -81,6 +84,8 @@ function restoreImage(image,layer) {
 function restoreState(stack) {
     if (stack.length === 0) return; // Nada para restaurar
 
+    console.log(stack);
+
     const state = stack.pop(); // Obtenha o último estado salvo
     const currentNode = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
@@ -97,6 +102,24 @@ function restoreState(stack) {
             if (obj instanceof Konva.Text) {
                 generateTextEvents(obj,layer);
             } else if (obj instanceof Konva.Circle) {
+                if(obj.id()=="DrawCursorRadius"){
+                    var pointerPosition = stage.getPointerPosition();
+
+                    if (!pointerPosition) return;
+        
+                    var scale = stage.scale();
+                    var stagePosition = stage.position();
+        
+                    var adjustedPosition = {
+                        x: (pointerPosition.x - stagePosition.x) / scale.x,
+                        y: (pointerPosition.y - stagePosition.y) / scale.y
+                    };
+        
+                    obj.x(adjustedPosition.x)
+                    obj.y(adjustedPosition.y)
+                    return;
+                }
+
                 generateNodeEvents(obj,layer);
             } else if (obj instanceof Konva.Image) {
                 restoreImage(obj,layer)
@@ -123,9 +146,10 @@ function restoreState(stack) {
                 }
             }
         });
-        
+        $("#currentLayer").val(layer.id());
         stage.add(layer); // Adicione a layer de volta ao stage
     });
+    
     updateLayerButtons();
     stage.draw(); // Redesenha o stage
 }
@@ -154,6 +178,18 @@ $(document).on('mouseup touchend', function () {
 });
 
 document.addEventListener("keydown", (e) => {
+
+    if((e.ctrlKey && e.key === "c")){
+        if(transformer.nodes().length > 0){
+            copiedShape  = transformer.nodes()[0];
+        }
+    }
+    if((e.ctrlKey && e.key === "v")){
+        if(copiedShape){
+            var layer = stage.findOne("#" + $("#currentLayer").val());
+            copyShape(copiedShape,layer);
+        }
+    }
     if (e.ctrlKey && e.key === "z") {
         undo();
     } else if (e.ctrlKey && e.key === "y") {
@@ -1325,6 +1361,7 @@ $(function () {
         fill: $('#bgcolor').val(),
     });
 
+    layer.draw()
     $('#bgcolor').attr("object-id", background.id());
 
     generateBackgroundEvents(background,layer);
@@ -1333,12 +1370,36 @@ $(function () {
     var lastLine;
     stage.on('mouseover', function () {
         if (drawMode) {
+            var pointerPosition = stage.getPointerPosition();
+            if (!pointerPosition) return;
+
+            var scale = stage.scale();
+            var stagePosition = stage.position();
+            var adjustedPosition = {
+                x: (pointerPosition.x - stagePosition.x) / scale.x,
+                y: (pointerPosition.y - stagePosition.y) / scale.y
+            };
+            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+
+            if(!DrawCursorRadius){
+                $("#draw").click();
+            }
+
+            DrawCursorRadius.x(adjustedPosition.x)
+            DrawCursorRadius.y(adjustedPosition.y)
+            DrawCursorRadius.radius(size/2);
+            DrawCursorRadius.moveToTop();
             if (mode == 'brush') {
+                DrawCursorRadius.fill(color);
+                DrawCursorRadius.strokeWidth(0);
                 $(".editor").css("cursor", "url('images/cursor.cur'), auto")
             } else {
                 $(".editor").css("cursor", "url('images/eraser.cur'), auto")
+                DrawCursorRadius.fill('rgba(0, 0, 0, 0.0)');
+                DrawCursorRadius.strokeWidth(1);
             }
         } else {
+
             $(".editor").css("cursor", "")
         }
     })
@@ -1347,7 +1408,7 @@ $(function () {
         if (drawMode) {
             saveState();
             isPaint = true;
-
+            
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
 
@@ -1360,18 +1421,18 @@ $(function () {
 
             lastLine = new Konva.Line({
                 points: [adjustedPosition.x, adjustedPosition.y],
-                stroke: 'black',
-                strokeWidth: 2,
                 stroke: color,
                 strokeWidth: size,
                 globalCompositeOperation:
                     mode === 'brush' ? 'source-over' : 'destination-out',
                 lineJoin: 'round',
                 lineCap: 'round',
+                listening:false,
             });
-
             var layer = stage.findOne(`#${$("#currentLayer").val()}`);
             layer.add(lastLine);
+            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+            DrawCursorRadius.moveToTop();
             layer.draw();
 
         } else {
@@ -1396,13 +1457,6 @@ $(function () {
     });
     stage.on('mousemove touchmove', function (e) {
         if (drawMode) {
-            stage.draw();
-
-            if (!isPaint) {
-                return;
-            }
-            e.evt.preventDefault();
-
             var pointerPosition = stage.getPointerPosition();
 
             if (!pointerPosition) return;
@@ -1414,6 +1468,19 @@ $(function () {
                 x: (pointerPosition.x - stagePosition.x) / scale.x,
                 y: (pointerPosition.y - stagePosition.y) / scale.y
             };
+
+            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+
+            if(!DrawCursorRadius){
+                $("#draw").click();
+            }
+
+            DrawCursorRadius.x(adjustedPosition.x)
+            DrawCursorRadius.y(adjustedPosition.y)
+            if (!isPaint) {
+                return;
+            }
+            e.evt.preventDefault();
 
             var newPoints = lastLine.points().concat([adjustedPosition.x, adjustedPosition.y]);
             lastLine.points(newPoints);
@@ -1785,8 +1852,6 @@ $("#btn-settings").click(function () {
     $("#widget-figures").fadeOut(100);
 });
 
-var color;
-var size;
 $("#draw").on("click", function () {
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
@@ -1797,6 +1862,7 @@ $("#draw").on("click", function () {
     size = $("#brush-size").val();
     $("#brush-size-text").text(" " + size);
     if (!drawMode) {
+        var layer = stage.findOne("#" + $("#currentLayer").val());
         drawMode = true;
         $("#widget-draw").fadeIn(100);
         if(mode == "brush"){
@@ -1807,7 +1873,20 @@ $("#draw").on("click", function () {
             $(".draw-mode[draw-mode='eraser']").addClass("active");
         }
         const colorButton = document.getElementById("brush-color-button");
-
+        var DrawCursorRadius = new Konva.Circle({
+            id: "DrawCursorRadius",
+            fill: color,
+            radius: size/2,
+            fakeShapeId: 'stage',
+            x: stageWidth  / 2,
+            y: stageHeight/ 2,
+            name: "draw",
+            stroke: 'black',
+            strokeWidth:0,
+            listening:false,
+        });
+        layer.add(DrawCursorRadius);
+        DrawCursorRadius.moveToTop()
         colorButton.style.backgroundColor = color;
         var position = $(".preview-img").offset();
         var widget = document.getElementById('widget-draw');
@@ -1830,6 +1909,8 @@ $("#draw").on("click", function () {
         $(this).css('background', "transparent");
         $("#widget-draw").hide();
         drawMode = false;
+        var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
+        DrawCursorRadius.destroy();
     }
 
 });
@@ -1845,6 +1926,7 @@ $("#brush-color,#brush-size").on('input', function () {
 
     colorButton.style.backgroundColor = this.value;
 })
+
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -1866,6 +1948,24 @@ $("#add-layer").click(function () {
     stage.draw();
     updateLayerButtons();
 });
+
+$("#duplicate-layer").click(function(){
+    if (stage.getLayers().length >= 5) {
+        return;
+    }
+    saveState();
+    var layer = stage.findOne("#"+$("#currentLayer").val())
+    const clonedLayer = layer.clone();
+
+    // Dá um novo ID para a camada clonada
+    clonedLayer.id("layernew" + getRandomInt(1000));
+  
+    // Adiciona a camada clonada ao stage
+    stage.add(clonedLayer);
+
+    $("#currentLayer").val(clonedLayer.id());
+    updateLayerButtons();
+})
 
 $("#delete-layer").click(function () {
     const layers = Array.from(stage.getLayers());
@@ -1926,6 +2026,8 @@ function updateLayerButtons() {
         images.forEach(({ img, layerId }) => {
             const layer = stage.findOne("#" + layerId);
             const imgsrc = img.src;
+
+            if(!layer) return;
 
             const isChecked = layer.visible() ? "checked" : "";
 
@@ -2031,11 +2133,7 @@ $(".btn-delete").click(function () {
     $("#widget-node").fadeOut(100);
 })
 
-$(".btn-copy").click(function () {
-    saveState();
-    var layer = stage.findOne("#" + $("#currentLayer").val());
-    var node = transformer.nodes()[0];
-
+function copyShape(node,layer){
     i++;
     if (node.name() === "image") {
         var NodeClone = node.clone({
@@ -2052,36 +2150,21 @@ $(".btn-copy").click(function () {
         });
     }
 
-    if (node.getAttr('fakeShapeId') != "stage") {
+    layer.add(NodeClone);
 
-
-        var fakeShape = stage.find("#" + node.getAttr('fakeShapeId'))[0];
-
-        var groupImage = new Konva.Group({
-            clipFunc: (ctx) => {
-
-                ctx.save();
-                ctx.translate(fakeShape.x(), fakeShape.y())
-                ctx.rotate(Konva.getAngle(fakeShape.rotation()))
-                ctx.rect(0, 0, fakeShape.width() * fakeShape.scaleX(), fakeShape.height() * fakeShape.scaleY());
-                ctx.restore()
-
-            },
-            textId: NodeClone.id()
-        });
-        groupImage.add(NodeClone);
-        layer.add(groupImage);
-        groupImage.moveUp();
-    } else {
-        var groupImage1 = new Konva.Group({ textId: NodeClone.id() })
-        groupImage1.add(NodeClone);
-        layer.add(NodeClone);
-    }
 
     groupTrans.moveToTop();
     transformer.nodes([NodeClone]);
     NodeClone.zIndex(node.zIndex() + 1);
+    NodeClone.fire("click");
     layer.draw();
+}
+
+$(".btn-copy").click(function () {
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var node = transformer.nodes()[0];
+    copyShape(node,layer);
 
 });
 $(".moveUp").click(function () {
