@@ -1615,11 +1615,19 @@ $(function () {
         text.fontFamily($(this).val());
         text.text("");
         text.text(textContent);
-        transformer.attachTo(text);
         layer.draw();
     });
+    $("#input-text-edit").on('input', function () {
+        saveState();
+        var text = stage.find("#" + $("#input-edit-id").val())[0];
 
-    transformer.nodes([]);
+        text.text($(this).val());
+        layer.draw();
+        var textPosition = text.absolutePosition();
+        $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
+        $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
+
+    });
 
     $(".btn-align").on("click", function () {
         saveState();
@@ -1792,6 +1800,7 @@ $("#draw").on("click", function () {
         drawMode = true;
         $("#widget-draw").fadeIn(100);
         $(".draw-mode[draw-mode='brush']").addClass("active");
+        $(".draw-mode[draw-mode='eraser']").removeClass("active");
         const colorButton = document.getElementById("brush-color-button");
 
         colorButton.style.backgroundColor = color;
