@@ -1,6 +1,8 @@
 let isMousePressed = false;
 const alignments = ["left", "center", "right", "justify"];
 let currentIndex = 0;
+const undoStack = [];
+const redoStack = [];
 const icons = ["fa-align-left", "fa-align-center", "fa-align-right", "fa-align-justify"];
 const alignmentIcons = {
     left: "fa-align-left",
@@ -17,20 +19,233 @@ $(document).on('mousedown touchstart', function () {
     isMousePressed = true;
 });
 
+function saveState() {
+    const MAX_STATES = 50;
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+    const state = userLayers.map(layer => layer.toJSON());
 
+    undoStack.push(state);
+
+    if (undoStack.length > MAX_STATES) {
+        undoStack.shift(); // Remove o estado mais antigo
+    }
+
+    redoStack.length = 0; 
+
+    updateundoRedoBtn();
+}
+
+function updateundoRedoBtn(){
+    if(undoStack.length === 0){
+        $("#undo").attr('disabled',true);
+        $("#undo").addClass('disabled');
+    }else{
+        $("#undo").attr('disabled',false);
+        $("#undo").removeClass('disabled');
+    }
+    if(redoStack.length === 0){
+        $("#redo").attr('disabled',true);
+        $("#redo").addClass('disabled');
+    }else{
+        $("#redo").attr('disabled',false);
+        $("#redo").removeClass('disabled');
+    }
+}
+
+function undo() {
+    if (undoStack.length === 0) return;
+    console.log(undoStack);
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+    const currentState = userLayers.map(layer => layer.toJSON());
+    
+    redoStack.push(currentState);
+
+    // Restaure o último estado salvo
+    restoreState(undoStack);
+    updateundoRedoBtn();
+}
+function restoreImage(image,layer) {
+    const imageSrc = image.getAttr("imageSrc"); // Recuperando o Base64 salvo
+    const restoredImageObj = new Image();
+
+    restoredImageObj.onload = function () {
+        image.image(restoredImageObj);
+        image.cache();
+        image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
+        layer.draw();
+    };
+    restoredImageObj.src = imageSrc; // Define o src da imagem
+}
+function restoreState(stack) {
+    if (stack.length === 0) return; // Nada para restaurar
+
+    const state = stack.pop(); // Obtenha o último estado salvo
+    const currentNode = transformer.nodes()[0];
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+    userLayers.forEach((layer) => {
+        layer.destroy();
+    });
+    state.forEach(layerJSON => {
+        const layer = Konva.Node.create(layerJSON);
+
+        const objects = layer.getChildren();
+
+        objects.forEach(obj => {
+            if (obj instanceof Konva.Text) {
+                generateTextEvents(obj,layer);
+            } else if (obj instanceof Konva.Circle) {
+                generateNodeEvents(obj,layer);
+            } else if (obj instanceof Konva.Image) {
+                restoreImage(obj,layer)
+                generateImageEvents(obj,layer);
+            } else if (obj instanceof Konva.Rect) {
+                if(obj.name()=="background"){
+                    generateBackgroundEvents(obj,layer);
+                }else{
+                    generateNodeEvents(obj,layer); 
+                }
+            } else if (obj instanceof Konva.RegularPolygon) {
+                generateNodeEvents(obj,layer);
+            } 
+            else {
+            }
+            if(currentNode){
+
+                if(obj.id() == currentNode.id()){
+                    stage.fire('click',{target:obj});
+                    obj.fire("click");
+                }else{
+
+                    stage.fire('click');
+                }
+            }
+        });
+        
+        stage.add(layer); // Adicione a layer de volta ao stage
+    });
+    updateLayerButtons();
+    stage.draw(); // Redesenha o stage
+}
+
+function redo() {
+    if (redoStack.length === 0) return;
+    // Adicione o estado atual ao stack de undo
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+    const currentState = userLayers.map(layer => layer.toJSON());
+    undoStack.push(currentState);
+
+    // Restaure o último estado de redo
+    restoreState(redoStack);
+    updateundoRedoBtn();
+}
+
+$("#undo").click(function(){
+    undo();
+})
+$("#redo").click(function(){
+    redo();
+})
 $(document).on('mouseup touchend', function () {
     isMousePressed = false;
 });
+
+document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "z") {
+        undo();
+    } else if (e.ctrlKey && e.key === "y") {
+        redo();
+    }
+});
+
 $(document).ready(function () {
+    let isDragging = false;
+    let isDragging2 = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    const $container = $('.editor-panel');
+
+    $container.on('mousedown', function (e) {
+      isDragging = true;
+      startX = e.pageX - $container.offset().left;
+      startY = e.pageY - $container.offset().top;
+      scrollLeft = $container.scrollLeft();
+      scrollTop = $container.scrollTop();
+      $container.css('cursor', 'grabbing');
+    });
+    const $container2 = $('.slidecontainer2');
+
+    $container2.on('mousedown', function (e) {
+      isDragging2 = true;
+      startX = e.pageX - $container.offset().left;
+      startY = e.pageY - $container.offset().top;
+      scrollLeft = $container.scrollLeft();
+      scrollTop = $container.scrollTop();
+      $container.css('cursor', 'grabbing');
+    });
+
+    $(document).on('mousemove', function (e) {
+        if(isDragging){
+            e.preventDefault(); // Evita a seleção de texto
+            const x = e.pageX - $container.offset().left;
+            const y = e.pageY - $container.offset().top;
+      
+            const walkX = (x - startX) * -1; // Ajusta direção do scroll horizontal
+            const walkY = (y - startY) * -1; // Ajusta direção do scroll vertical
+      
+            $container.scrollLeft(scrollLeft + walkX);
+            $container.scrollTop(scrollTop + walkY);
+        }
+        if(isDragging2){
+            e.preventDefault(); // Evita a seleção de texto
+            const x = e.pageX - $container.offset().left;
+            const y = e.pageY - $container.offset().top;
+      
+            const walkX = (x - startX) * -1; // Ajusta direção do scroll horizontal
+            const walkY = (y - startY) * -1; // Ajusta direção do scroll vertical
+
+            $container2.scrollLeft(scrollLeft + walkX);
+            $container2.scrollTop(scrollTop + walkY);
+        }
+    });
+
+    $(document).on('mouseup', function () {
+      isDragging = false;
+      isDragging2 = false;
+      $container.css('cursor', 'grab');
+      $container2.css('cursor', 'grab');
+    });
+
+
     $(".close").on('click', function (e) {
         $(this).closest(".widget").hide();
         $(this).closest(".widget-fixed").hide();
         var parent = $(this).parent();
-        if (parent.hasClass("widget-fixed")) {
-            drawMode = false;
+        if (parent.attr('id')=="widget-draw") {
+            $("#draw").click();
         }
     });
-
+    $( document ).tooltip({
+        position: {
+          my: "center bottom-10",
+          at: "center top",
+          using: function( position, feedback ) {
+            $( this ).css( position );
+            $( "<div>" )
+              .addClass( "arrow" )
+              .addClass( feedback.vertical )
+              .addClass( feedback.horizontal )
+              .appendTo( this );
+          }
+        },
+        show: {
+            delay: 500,
+            effect: "fade"
+        }
+      });
     var container = $('.container2');
     var widgetLayers = $('#widget-layers');
 
@@ -98,11 +313,14 @@ $(document).ready(function () {
     })
 
     $("#text-font").on('change', function () {
+        saveState();
         $(this).css("font-family", $(this).val());
         $("#input-text").css("font-family", $(this).val());
     })
+    $("#input-color-edit").on('click', function () {
+        saveState();
+    });
     $("#input-color-edit").on('input', function () {
-
         var text = stage.find("#" + $("#input-edit-id").val())[0];
 
         text.fill($(this).val());
@@ -112,6 +330,7 @@ $(document).ready(function () {
         colorButton.style.backgroundColor = this.value;
     });
     $("#input-text-edit").on('input', function () {
+        saveState();
         var text = stage.find("#" + $("#input-edit-id").val())[0];
 
         text.text($(this).val());
@@ -138,11 +357,19 @@ $('#input-image').on('change', function (e) {
 var l = 0;
 function addImage(image, posx, posy, id) {
     l++
-
+    saveState();
     var imageObj = new Image();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     imageObj.src = URL.createObjectURL(image);
     imageObj.onload = function () {
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+    
+        tempCanvas.width = imageObj.width;
+        tempCanvas.height = imageObj.height;
+    
+        tempCtx.drawImage(imageObj, 0, 0);
+        const imageSrc = tempCanvas.toDataURL();
         var image = new Konva.Image({
             x: parseFloat(posx),
             y: parseFloat(posy),
@@ -150,10 +377,9 @@ function addImage(image, posx, posy, id) {
             name: 'image',
             id: 'image' + l,
             draggable: true,
-            fakeShapeId: id
-
+            fakeShapeId: id,
+            imageSrc:imageSrc
         });
-
         image.cache();
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
         if (id != 'stage') {
@@ -179,222 +405,119 @@ function addImage(image, posx, posy, id) {
             });
             camera.hide();
             groupImage.add(image);
-            layer.add(groupImage);
+            layer.add(image);
         } else {
             image.x((stageWidth / 2) - image.width() / 2);
             image.y((stageHeight / 2) - image.height() / 2);
             var groupImage = new Konva.Group({ textId: 'image' + l });
             groupImage.add(image)
-            layer.add(groupImage);
+            layer.add(image);
         }
 
 
+        generateImageEvents(image,layer);
 
 
 
+        // function getCrop(image, size, clipPosition) {
+        //     const width = size.width;
+        //     const height = size.height;
+        //     const aspectRatio = width / height;
 
-        function getCrop(image, size, clipPosition) {
-            const width = size.width;
-            const height = size.height;
-            const aspectRatio = width / height;
+        //     let newWidth;
+        //     let newHeight;
 
-            let newWidth;
-            let newHeight;
+        //     const imageRatio = image.width / image.height;
 
-            const imageRatio = image.width / image.height;
+        //     if (aspectRatio >= imageRatio) {
+        //         newWidth = image.width;
+        //         newHeight = image.width / aspectRatio;
+        //     } else {
+        //         newWidth = image.height * aspectRatio;
+        //         newHeight = image.height;
+        //     }
 
-            if (aspectRatio >= imageRatio) {
-                newWidth = image.width;
-                newHeight = image.width / aspectRatio;
-            } else {
-                newWidth = image.height * aspectRatio;
-                newHeight = image.height;
-            }
+        //     let x = 0;
+        //     let y = 0;
+        //     if (clipPosition === 'left-top') {
+        //         x = 0;
+        //         y = 0;
+        //     } else if (clipPosition === 'left-middle') {
+        //         x = 0;
+        //         y = (image.height - newHeight) / 2;
+        //     } else if (clipPosition === 'left-bottom') {
+        //         x = 0;
+        //         y = image.height - newHeight;
+        //     } else if (clipPosition === 'center-top') {
+        //         x = (image.width - newWidth) / 2;
+        //         y = 0;
+        //     } else if (clipPosition === 'center-middle') {
+        //         x = (image.width - newWidth) / 2;
+        //         y = (image.height - newHeight) / 2;
+        //     } else if (clipPosition === 'center-bottom') {
+        //         x = (image.width - newWidth) / 2;
+        //         y = image.height - newHeight;
+        //     } else if (clipPosition === 'right-top') {
+        //         x = image.width - newWidth;
+        //         y = 0;
+        //     } else if (clipPosition === 'right-middle') {
+        //         x = image.width - newWidth;
+        //         y = (image.height - newHeight) / 2;
+        //     } else if (clipPosition === 'right-bottom') {
+        //         x = image.width - newWidth;
+        //         y = image.height - newHeight;
+        //     } else if (clipPosition === 'scale') {
+        //         x = 0;
+        //         y = 0;
+        //         newWidth = width;
+        //         newHeight = height;
+        //     } else {
+        //         console.error(
+        //             new Error('Unknown clip position property - ' + clipPosition)
+        //         );
+        //     }
 
-            let x = 0;
-            let y = 0;
-            if (clipPosition === 'left-top') {
-                x = 0;
-                y = 0;
-            } else if (clipPosition === 'left-middle') {
-                x = 0;
-                y = (image.height - newHeight) / 2;
-            } else if (clipPosition === 'left-bottom') {
-                x = 0;
-                y = image.height - newHeight;
-            } else if (clipPosition === 'center-top') {
-                x = (image.width - newWidth) / 2;
-                y = 0;
-            } else if (clipPosition === 'center-middle') {
-                x = (image.width - newWidth) / 2;
-                y = (image.height - newHeight) / 2;
-            } else if (clipPosition === 'center-bottom') {
-                x = (image.width - newWidth) / 2;
-                y = image.height - newHeight;
-            } else if (clipPosition === 'right-top') {
-                x = image.width - newWidth;
-                y = 0;
-            } else if (clipPosition === 'right-middle') {
-                x = image.width - newWidth;
-                y = (image.height - newHeight) / 2;
-            } else if (clipPosition === 'right-bottom') {
-                x = image.width - newWidth;
-                y = image.height - newHeight;
-            } else if (clipPosition === 'scale') {
-                x = 0;
-                y = 0;
-                newWidth = width;
-                newHeight = height;
-            } else {
-                console.error(
-                    new Error('Unknown clip position property - ' + clipPosition)
-                );
-            }
+        //     return {
+        //         cropX: x,
+        //         cropY: y,
+        //         cropWidth: newWidth,
+        //         cropHeight: newHeight,
+        //     };
+        // }
 
-            return {
-                cropX: x,
-                cropY: y,
-                cropWidth: newWidth,
-                cropHeight: newHeight,
-            };
-        }
+        // function applyCrop(pos, image) {
+        //     const img = image;
+        //     img.setAttr('lastCropUsed', pos);
+        //     const crop = getCrop(
+        //         img.image(),
+        //         { width: img.width(), height: img.height() },
+        //         'center-middle'
+        //     );
+        //     img.setAttrs(crop);
+        //     layer.draw();
+        // }
+        // var crop1 = "center-middle";
+        // stage.on('mousedown touchstart', function (e) {
+        //     transformer.centeredScaling(false);
+        //     if (e.target == transformer.findOne('.middle-left')) {
 
-        function applyCrop(pos, image) {
-            const img = image;
-            img.setAttr('lastCropUsed', pos);
-            const crop = getCrop(
-                img.image(),
-                { width: img.width(), height: img.height() },
-                'center-middle'
-            );
-            img.setAttrs(crop);
-            layer.draw();
-        }
-        var crop1 = "center-middle";
-        stage.on('mousedown touchstart', function (e) {
-            transformer.centeredScaling(false);
-            if (e.target == transformer.findOne('.middle-left')) {
+        //         crop1 = 'right-bottom';
 
-                crop1 = 'right-bottom';
+        //     } else if (e.target == transformer.findOne('.middle-right')) {
+        //         crop1 = 'left-bottom';
 
-            } else if (e.target == transformer.findOne('.middle-right')) {
-                crop1 = 'left-bottom';
+        //     } else if (e.target == transformer.findOne('.bottom-center')) {
+        //         crop1 = 'center-top';
 
-            } else if (e.target == transformer.findOne('.bottom-center')) {
-                crop1 = 'center-top';
+        //     } else if (e.target == transformer.findOne('.top-center')) {
+        //         crop1 = 'center-bottom';
 
-            } else if (e.target == transformer.findOne('.top-center')) {
-                crop1 = 'center-bottom';
+        //     } else if (e.target == transformer.findOne('.bottom-right')) {
+        //         transformer.centeredScaling(true);
+        //     }
 
-            } else if (e.target == transformer.findOne('.bottom-right')) {
-                transformer.centeredScaling(true);
-            }
-
-        });
-        image.on('mousedown touchstart', (e) => {
-            const parentLayer = e.target.getLayer();
-
-            if (parentLayer.id() !== $("#currentLayer").val()) {
-                return;
-            }
-            transformer.nodes([e.target]);
-            $("#widget-image").fadeIn(100);
-
-            generateImageWidget(e.target)
-            layer.draw();
-        });
-        image.on('dragstart transformstart', (e) => {
-            const parentLayer = e.target.getLayer();
-
-            if (parentLayer.id() !== $("#currentLayer").val()) {
-                return;
-            }
-            transformer.nodes([e.target]);
-            $("#widget-image").fadeOut(100);
-            layer.draw();
-        });
-
-
-        image.on('transformend', (e) => {
-
-            if (e.target.getAttr('fakeShapeId') != "stage") {
-
-                var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
-                var shapexright = shape.x() + (shape.width() * shape.scaleX());
-                var shapeybottom = shape.y() + (shape.height() * shape.scaleY());
-                var shapeytop = shape.y();
-                var shapexleft = shape.x();
-                var imageright = e.target.x() + (e.target.width() * e.target.scaleX());
-                var imagebottom = e.target.y() + (e.target.height() * e.target.scaleX());
-
-                if ((e.target.x() + 200 > shapexright) || (imageright - 200 < shapexleft)) {
-                    e.target.rotation(0);
-                    e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
-                    e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
-                }
-                if ((e.target.y() + 200 > shapeybottom) || (imagebottom - 200 < shapeytop)) {
-                    e.target.rotation(0);
-                    e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
-                    e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
-                }
-
-            }
-            sliders.forEach(function (attr) {
-                $("#" + attr).attr("object-id", e.target.id())
-                $("#" + attr).val(e.target[attr]())
-                const porcentagem = (e.target[attr]() / $("#" + attr).attr("max")) * 100;
-                $("." + attr).text(parseInt(porcentagem) + "%");
-                if (e.target.name() === 'image') {
-                    $("#" + attr).prop("disabled", false);
-                } else {
-                    $("#" + attr).prop("disabled", true);
-                }
-            });
-            $("#widget-image").fadeIn(100);
-
-            generateImageWidget(e.target)
-            layer.draw();
-        });
-
-        image.on('dragend', (e) => {
-            const parentLayer = e.target.getLayer();
-
-            if (parentLayer.id() !== $("#currentLayer").val()) {
-                return;
-            }
-            if (e.target.getAttr('fakeShapeId') != "stage") {
-
-                var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
-                var shapexright = shape.x() + (shape.width() * shape.scaleX());
-                var shapeybottom = shape.y() + (shape.height() * shape.scaleY());
-                var shapeytop = shape.y();
-                var shapexleft = shape.x();
-                var imageright = e.target.x() + (e.target.width() * e.target.scaleX());
-                var imagebottom = e.target.y() + (e.target.height() * e.target.scaleX());
-                if ((e.target.x() + 200 > shapexright) || (imageright - 200 < shapexleft)) {
-                    e.target.rotation(0);
-                    e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
-                    e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
-
-                }
-                if ((e.target.y() + 200 > shapeybottom) || (imagebottom - 200 < shapeytop)) {
-                    e.target.rotation(0);
-                    e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
-                    e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
-
-                }
-            }
-            generateImageWidget(e.target)
-            layer.draw();
-        });
-
-
-
-        image.on('mouseover', function () {
-
-
-        });
-
+        // });
+    
         var background = stage.find(".background")[0];
         if (background) {
 
@@ -410,7 +533,6 @@ function addImage(image, posx, posy, id) {
         }
 
         stage.draw();
-        $("#modalImagem").modal("hide");
         transformer.nodes([image]);
         sliders.forEach(function (attr) {
             $("#" + attr).attr("object-id", image.id())
@@ -443,6 +565,83 @@ $("#vazio").click(function () {
     $("[name2=Deitado]").next("span").show();
     $('[name2="Em pé"]').next("span").show();
 });
+
+function generateImageEvents(image,layer){
+    image.on('click', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        transformer.nodes([e.target]);
+        $("#widget-image").fadeIn(100);
+
+        generateImageWidget(e.target)
+        layer.draw();
+    });
+    image.on('dragstart transformstart', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        saveState();
+        transformer.nodes([e.target]);
+        $("#widget-image").fadeOut(100);
+        layer.draw();
+    });
+
+
+    image.on('transformend dragend', (e) => {
+
+        $("#widget-image").fadeIn(100);
+
+        generateImageWidget(e.target)
+        layer.draw();
+    });
+
+    image.on('dragend', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        if (e.target.getAttr('fakeShapeId') != "stage") {
+
+            var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
+            var shapexright = shape.x() + (shape.width() * shape.scaleX());
+            var shapeybottom = shape.y() + (shape.height() * shape.scaleY());
+            var shapeytop = shape.y();
+            var shapexleft = shape.x();
+            var imageright = e.target.x() + (e.target.width() * e.target.scaleX());
+            var imagebottom = e.target.y() + (e.target.height() * e.target.scaleX());
+            if ((e.target.x() + 200 > shapexright) || (imageright - 200 < shapexleft)) {
+                e.target.rotation(0);
+                e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
+                e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
+
+            }
+            if ((e.target.y() + 200 > shapeybottom) || (imagebottom - 200 < shapeytop)) {
+                e.target.rotation(0);
+                e.target.x(shape.x() + (shape.width() / 2 * shape.scaleX()) - ((e.target.width() * e.target.scaleX()) / 2));
+                e.target.y(shape.y() + (shape.height() / 2 * shape.scaleY()) - ((e.target.height() * e.target.scaleY()) / 2));
+
+            }
+        }
+        generateImageWidget(e.target)
+        layer.draw();
+    });
+
+
+
+    image.on('mouseover', function () {
+
+
+    });
+
+}
+
+
 function generateImageWidget(image) {
     $("#widget-image").fadeIn(100);
 
@@ -564,6 +763,7 @@ var m = 0;
 var i = 0;
 
 $("#addText").click(function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     i++;
     if (!$("#input-text").val()) {
@@ -591,66 +791,11 @@ $("#addText").click(function () {
     Text.y((stageHeight / 2) - Text.height() / 2)
     var groupText = new Konva.Group({ textId: i.toString() + 'text' });
     groupText.add(Text);
-    layer.add(groupText);
+    layer.add(Text);
     transformer.nodes([Text]);
     groupTrans.moveToTop();
 
-    Text.on('transformstart', function (e) {
-        $("#draggable").fadeOut(100);
-        generateTextWidget(e.target);
-    })
-
-    Text.on('transformend', function (e) {
-        $("#draggable").fadeIn(100);
-        generateTextWidget(e.target);
-    })
-
-
-    Text.on('mouseover', function (e) {
-
-    });
-
-
-    Text.on('mousedown touchstart', (e) => {
-
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        $("#draggable").fadeIn(100);
-        generateTextWidget(e.target);
-    });
-
-    Text.on('dblclick dbltap', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        textAreaPosition(e.target)
-    });
-    Text.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        transformer.nodes([e.target]);
-        groupTrans.moveToTop();
-        layer.draw();
-        $("#draggable").fadeOut(100);
-    });
-    Text.on('dragend', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        $("#draggable").fadeIn(100);
-        generateTextWidget(e.target)
-
-    })
+    generateTextEvents(Text,layer)
     sliders.forEach(function (attr) {
         $("#" + attr).attr("object-id", Text.id())
     });
@@ -659,12 +804,72 @@ $("#addText").click(function () {
     $("#add-text-widget").fadeOut(100);
     $("#draggable").fadeIn(100);
     generateTextWidget(Text);
-
 });
 
 $("#editText").click(function () {
     $("#draggable").fadeOut(100);
 });
+
+function generateTextEvents(text,layer){
+    text.on('transformstart', function (e) {
+        saveState();
+        $("#draggable").fadeOut(100);
+        generateTextWidget(e.target);
+    })
+
+    text.on('transformend', function (e) {
+        $("#draggable").fadeIn(100);
+        generateTextWidget(e.target);
+    })
+
+
+    text.on('mouseover', function (e) {
+
+    });
+
+
+    text.on('click tap', (e) => {
+
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        $("#draggable").fadeIn(100);
+        generateTextWidget(e.target);
+    });
+
+    text.on('dblclick dbltap', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        saveState();
+        textAreaPosition(e.target)
+    });
+    text.on('dragstart', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        saveState();
+        transformer.nodes([e.target]);
+        groupTrans.moveToTop();
+        layer.draw();
+        $("#draggable").fadeOut(100);
+    });
+    text.on('dragend', (e) => {
+        const parentLayer = e.target.getLayer();
+
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        $("#draggable").fadeIn(100);
+        generateTextWidget(e.target)
+    })
+}
 
 function generateTextWidget(Text) {
 
@@ -706,7 +911,7 @@ function generateTextWidget(Text) {
 
     var textPosition = Text.absolutePosition();
 
-    var position = $(".konvajs-content").position();
+    var position = $(".konvajs-content").offset();
 
     var toolbox = document.getElementById('draggable');
     const adjustedTop = (position.top + (textPosition.y * zoom));
@@ -727,7 +932,6 @@ function generateTextWidget(Text) {
 function textAreaPosition(Text) {
     var textPosition = Text.absolutePosition();
     var position = $(".konvajs-content").position();
-    console.log(textPosition.y * zoom)
     const adjustedTop = (position.top + (textPosition.y * zoom));
     const adjustedLeft = (position.left + textPosition.x * zoom);
     $("#input-text-edit").css("position", "absolute");
@@ -785,7 +989,8 @@ function textAreaPosition(Text) {
         window.addEventListener('touchstart', handleOutsideClick);
     });
     textarea.focus();
-}
+}$('#bgcolor').on('click',saveState)
+
 $('#bgcolor').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -801,12 +1006,15 @@ $('#bgcolor').on('input',
     });
 $('#bg-remove').on('click',
     function () {
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var node = layer.findOne("#" + $('#bgcolor').attr("object-id"))
         node.destroy()
         $("#widget-bg").fadeOut(100);
         layer.draw();
     });
+    $('#draw-color').on('click',saveState)
+
 $('#draw-color').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -821,6 +1029,9 @@ $('#draw-color').on('input',
         colorButton.style.backgroundColor = this.value;
     });
 sliders.forEach(function (attr) {
+
+    $('#' + attr).on('mousedown touchstart',saveState);
+
     $('#' + attr).on('input',
         function () {
             value = $('#' + attr).val();
@@ -835,6 +1046,7 @@ sliders.forEach(function (attr) {
 });
 
 $("#add-tri").on('click', function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
@@ -846,63 +1058,24 @@ $("#add-tri").on('click', function () {
         fakeShapeId: 'stage',
         sides: 3,
         radius: 200,
-        x: stage.getWidth() / 2,
-        y: stage.getHeight() / 2,
+        x: stageWidth / 2,
+        y: stageHeight / 2,
         name: "draw",
         draggable: true,
     });
-    node.x((stageWidth / 2) - node.width() / 2)
-    node.y((stageHeight / 2) - node.height() / 2)
+
     var groupRect = new Konva.Group({ textId: i.toString() + 'tri' });
     groupRect.add(node);
-    layer.add(groupRect);
+    layer.add(node);
     transformer.nodes([node]);
     layer.draw();
 
-    generateNodeWidget(node)
-
-    node.on('transformstart', function () {
-        $("#widget-node").fadeOut(100);
-    })
-
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target);
-
-    })
-
-    node.on('mouseover', function () {
-
-    });
-
-    node.on('mousedown touchstart', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        generateNodeWidget(e.target);
-
-    });
-
-    node.on('dragend', (e) => {
-        generateNodeWidget(e.target);
-    });
-
-    node.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        $("#widget-node").fadeOut(100);
-        transformer.nodes([e.target]);
-        groupTrans.moveToTop();
-        layer.draw();
-    });
+    generateNodeWidget(node);
+    generateNodeEvents(node,layer);
     groupTrans.moveToTop();
-
 })
 $("#add-rect").on('click', function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
@@ -923,25 +1096,29 @@ $("#add-rect").on('click', function () {
     node.y((stageHeight / 2) - node.height() / 2)
     var groupRect = new Konva.Group({ textId: i.toString() + 'rect' });
     groupRect.add(node);
-    layer.add(groupRect);
+    layer.add(node);
     transformer.nodes([node]);
     layer.draw();
+    generateNodeEvents(node,layer);
+    generateNodeWidget(node);
 
-    generateNodeWidget(node)
+})
+
+function generateNodeEvents(node,layer){
     node.on('transformstart', function () {
+        saveState();
         $("#widget-node").fadeOut(100);
     })
 
     node.on('transformend', function (e) {
         generateNodeWidget(e.target)
-
     })
 
     node.on('mouseover', function () {
 
     });
 
-    node.on('mousedown touchstart', (e) => {
+    node.on('click tap', (e) => {
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
@@ -956,6 +1133,7 @@ $("#add-rect").on('click', function () {
     });
 
     node.on('dragstart', (e) => {
+        saveState();
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
@@ -966,8 +1144,8 @@ $("#add-rect").on('click', function () {
         groupTrans.moveToTop();
         layer.draw();
     });
+}
 
-})
 function generateNodeWidget(node) {
     var nodePosition = node.getAbsolutePosition();
     var stagePosition = $(".konvajs-content").offset();
@@ -990,7 +1168,6 @@ function generateNodeWidget(node) {
         var positionTop = adjustedTop + ((200 * node.getAbsoluteScale().y));
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
     } else {
-        console.log('Outro tipo:', className);
     }
     if ($(window).outerWidth() < 450) {
         widget.style.position = 'fixed';
@@ -1012,6 +1189,7 @@ function generateNodeWidget(node) {
     $("#draw-color").attr("object-id", node.id());
 }
 $("#add-bg").on('click', function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var background = layer.findOne('.background');
 
@@ -1029,29 +1207,7 @@ $("#add-bg").on('click', function () {
         fill: $('#bgcolor').val(),
     });
 
-    bg.on("mousedown touchstart", function () {
-        if (!drawMode) {
-            $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
-            var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() + 10;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-
-            if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
-                widget.style.left = '0px';
-                widget.style.width = "100%";
-            } else {
-                widget.style.position = 'absolute';
-                widget.style.top = positionTop + 'px';
-                widget.style.left = positionLeft + 'px';
-            }
-
-
-        }
-
-    });
+    generateBackgroundEvents(bg,layer)
 
     layer.add(bg);
     bg.moveToBottom();
@@ -1059,6 +1215,7 @@ $("#add-bg").on('click', function () {
 })
 
 $("#add-circle").on('click', function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
@@ -1070,62 +1227,23 @@ $("#add-circle").on('click', function () {
         radius: 100 + Math.random() * 20,
         shadowBlur: 10,
         fakeShapeId: 'stage',
-        x: stage.getWidth() / 2,
-        y: stage.getHeight() / 2,
+        x: stageWidth  / 2,
+        y: stageHeight/ 2,
         name: "draw",
         draggable: true,
     });
 
-    node.x((stageWidth / 2) - node.width() / 2)
-    node.y((stageHeight / 2) - node.height() / 2)
     var groupCircle = new Konva.Group({ textId: i.toString() + 'circle' });
     groupCircle.add(node);
-    layer.add(groupCircle);
+    layer.add(node);
     transformer.nodes([node]);
 
     layer.draw();
 
     generateNodeWidget(node)
-
-    node.on('transformstart', function () {
-        $("#widget-node").fadeOut(100);
-    })
-
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target);
-    })
-
-    node.on('mouseover', function () {
-
-    });
-
-    node.on('mousedown touchstart', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        generateNodeWidget(e.target);
-    });
-
-
-    node.on('dragend', (e) => {
-        generateNodeWidget(e.target);
-    });
-
-    node.on('dragstart', (e) => {
-        const parentLayer = e.target.getLayer();
-
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
-        $("#widget-node").fadeOut(100);
-        transformer.nodes([e.target]);
-        groupTrans.moveToTop();
-        layer.draw();
-    });
+    generateNodeEvents(node,layer);
+    
     groupTrans.moveToTop();
-
 })
 
 function cleanStage() {
@@ -1159,7 +1277,7 @@ var originalStageHeight;
 var layerIndex;
 $(function () {
 
-
+    $( document ).tooltip();
     $("#stage-parent").show();
 
     stageWidth = 800;
@@ -1209,34 +1327,7 @@ $(function () {
 
     $('#bgcolor').attr("object-id", background.id());
 
-    background.on('mouseover', function () {
-
-    });
-
-    background.on("mousedown touchstart", function () {
-        if (!drawMode) {
-            $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
-            var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() + 10;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-
-            if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
-                widget.style.left = '0px';
-                widget.style.width = "100%";
-            } else {
-                widget.style.position = 'absolute';
-                widget.style.top = positionTop + 'px';
-                widget.style.left = positionLeft + 'px';
-            }
-
-
-        }
-    });
-
-
+    generateBackgroundEvents(background,layer);
     var isPaint = false;
     var mode = 'brush';
     var lastLine;
@@ -1254,7 +1345,7 @@ $(function () {
     stage.on('mousedown touchstart', function (e) {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         if (drawMode) {
-
+            saveState();
             isPaint = true;
 
             var pointerPosition = stage.getPointerPosition();
@@ -1300,7 +1391,6 @@ $(function () {
     let isHandlingEvent = false;
 
     stage.on('mouseup touchend', function (e) {
-
         isPaint = false;
 
     });
@@ -1332,7 +1422,6 @@ $(function () {
             layer.draw();
         }
     });
-
     $(".draw-mode").on('click', function () {
         mode = $(this).attr("draw-mode")
         $(".draw-mode").removeClass("active");
@@ -1347,7 +1436,7 @@ $(function () {
 
 
     stage.on('click tap dragstart', function (e) {
-
+        console.log("ter")
         if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')) {
 
             $("#draggable").fadeOut(100);
@@ -1432,14 +1521,41 @@ $(function () {
     adjustContainerToFitStage('#stage-parent', stageWidth, stageHeight);
     fitStageIntoParentContainer();
 
-
     window.addEventListener('resize', fitStageIntoParentContainer);
-
 
     stage.draw();
 
-
 });
+
+function generateBackgroundEvents(background,layer){
+    background.on('mouseover', function () {
+
+    });
+
+    background.on("click tap", function () {
+        if (!drawMode) {
+            $("#widget-bg").fadeIn(100);
+            var position = $(".preview-img").offset();
+            var widget = document.getElementById('widget-bg');
+            var positionTop = position.top + $(".preview-img").height() + 10;
+            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+
+            if ($(window).outerWidth() < 450) {
+                widget.style.position = 'fixed';
+                widget.style.bottom = '0px';
+                widget.style.left = '0px';
+                widget.style.width = "100%";
+            } else {
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop + 'px';
+                widget.style.left = positionLeft + 'px';
+            }
+
+
+        }
+    });
+
+}
 
 function fitStageIntoParentContainer() {
     stageParent = document.getElementById('preview');
@@ -1458,6 +1574,7 @@ function fitStageIntoParentContainer() {
 
 $(function () {
     $(".btn-style").on('click', function () {
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         if ($(this).hasClass("selected")) {
@@ -1478,6 +1595,9 @@ $(function () {
         }
         layer.draw();
     });
+    $("#opacity").on('mousedown touchstart', function () {
+        saveState();
+    });
     $("#opacity").on('input', function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
@@ -1487,10 +1607,14 @@ $(function () {
     });
 
     $("#text-font-edit").on('change', function () {
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         $(this).css("font-family", '"' + $(this).val() + '"');
+        var textContent = text.text();
         text.fontFamily($(this).val());
+        text.text("");
+        text.text(textContent);
         transformer.attachTo(text);
         layer.draw();
     });
@@ -1498,6 +1622,7 @@ $(function () {
     transformer.nodes([]);
 
     $(".btn-align").on("click", function () {
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         const currentIcon = icons[currentIndex];
         $(this).find("i").attr("class", `fa ${currentIcon}`);
@@ -1512,6 +1637,7 @@ $(function () {
 
     });
     $(".btn-decoration").on('click', function () {
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         if ($(this).hasClass("selected")) {
@@ -1669,10 +1795,10 @@ $("#draw").on("click", function () {
         const colorButton = document.getElementById("brush-color-button");
 
         colorButton.style.backgroundColor = color;
-        var position = $("#widget-figures").offset();
+        var position = $(".preview-img").offset();
         var widget = document.getElementById('widget-draw');
-        var positionTop = position.top - $("#widget-figures").height();
-        var positionLeft = position.left + ($("#widget-figures").width() / 2 - (widget.offsetWidth / 2));
+        var positionTop = position.top + $(".preview-img").height()+10;
+        var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
             widget.style.position = 'fixed';
@@ -1685,7 +1811,6 @@ $("#draw").on("click", function () {
             widget.style.left = positionLeft + 'px';
         }
 
-        $("#widget-figures").fadeOut(100);
         var widget = document.getElementById('widget-draw');
     } else {
         $(this).css('background', "transparent");
@@ -1694,6 +1819,8 @@ $("#draw").on("click", function () {
     }
 
 });
+$("#brush-color,#brush-size").on('mousedown touchstart',saveState)
+
 $("#brush-color,#brush-size").on('input', function () {
     color = $("#brush-color").val();
     size = $("#brush-size").val();
@@ -1713,6 +1840,7 @@ $("#add-layer").click(function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
+    saveState();
     var layer2 = new Konva.Layer({
         id: "layernew" + getRandomInt(1000),
         name: "Camada " + layerIndex++
@@ -1731,6 +1859,7 @@ $("#delete-layer").click(function () {
     let nextLayerId = userLayers[0].id();
     userLayers.forEach((layer) => {
         if (layer.id() !== "transformerLayer" && layer.id() === $("#currentLayer").val() && userLayers.length > 1) {
+            saveState();
             layer.remove();
             stage.remove(layer);
             layer.destroy();
@@ -1850,6 +1979,7 @@ $('#layers').on('click', '.layer', function (e) {
 });
 
 $('#layers').on('change', '.check-visible', function () {
+    saveState();
     const layer_id = $(this).attr('layer-id');
     const layer = stage.findOne('#' + layer_id);
 
@@ -1872,6 +2002,7 @@ function downloadURI(uri, name) {
 }
 
 $(".btn-delete").click(function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
 
@@ -1887,6 +2018,7 @@ $(".btn-delete").click(function () {
 })
 
 $(".btn-copy").click(function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
 
@@ -1929,7 +2061,7 @@ $(".btn-copy").click(function () {
     } else {
         var groupImage1 = new Konva.Group({ textId: NodeClone.id() })
         groupImage1.add(NodeClone);
-        layer.add(groupImage1);
+        layer.add(NodeClone);
     }
 
     groupTrans.moveToTop();
@@ -1939,6 +2071,7 @@ $(".btn-copy").click(function () {
 
 });
 $(".moveUp").click(function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
 
@@ -1946,15 +2079,17 @@ $(".moveUp").click(function () {
         return nd.getAttr("textId") === node.id();
     });
 
-    if (textGroup) {
-        node = textGroup[0];
-    }
+    // if (textGroup) {
+    //     node = textGroup[0];
+    // }
 
     node.moveUp();
     groupTrans.moveToTop();
     layer.draw();
+
 });
 $(".moveDown").click(function () {
+    saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
 
@@ -1962,9 +2097,9 @@ $(".moveDown").click(function () {
         return nd.getAttr("textId") === node.id();
     });
 
-    if (textGroup) {
-        node = textGroup[0];
-    }
+    // if (textGroup) {
+    //     node = textGroup[0];
+    // }
 
     node.moveDown();
     groupTrans.moveToTop();

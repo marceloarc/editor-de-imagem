@@ -36,8 +36,6 @@ body {
     text-transform: uppercase;
     width: 150px;
     margin: 10px;
-    background-color: #4CAF50;
-    /* Green */
     border: none;
     color: white;
     padding: 5px 5px;
@@ -45,12 +43,17 @@ body {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    font-family: Oswald;
     border-radius: 2px;
 }
 
 
 .slidecontainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+.slidecontainer2 {
     overflow-x: scroll;
     overflow-y: hidden;
     display: flex;
@@ -59,21 +62,21 @@ body {
     width: 100%;
 }
 
-.slidecontainer::-webkit-scrollbar {
+.slidecontainer2::-webkit-scrollbar {
     width: 3px;
     height: 3px;
     background-color: transparent;
 }
 
-.slidecontainer::-webkit-scrollbar-track {
+.slidecontainer2::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
-.slidecontainer::-webkit-scrollbar-corner {
+.slidecontainer2::-webkit-scrollbar-corner {
     background-color: transparent;
 }
 
-.slidecontainer::-webkit-scrollbar-thumb {
+.slidecontainer2::-webkit-scrollbar-thumb {
     background-color: rgba(255, 216, 67, 0.2);
     border-radius: 10px;
 }
@@ -83,7 +86,7 @@ body {
     margin: 5px;
     color: #FFD843;
     background-color: #FFD843;
-    ;
+
 }
 
 .selected i {

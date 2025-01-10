@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Editor and Resizer</title>
+    <title>Canvas Editor</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" />
     <script src="https://kit.fontawesome.com/f8abb678a6.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         type="text/css">
@@ -15,23 +14,14 @@
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-solid.css">
-
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-regular.css">
 
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-light.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/duotone.css" />
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/brands.css" />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
     <link href="https://fonts.cdnfonts.com/css/amethyst-2" rel="stylesheet">
-    <script src="js/jquery-2.1.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script src="js/jquery.ui.touch-punch.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-    <script src="https://unpkg.com/konva@9.3.18/konva.min.js"></script>
-    <link href="https://unpkg.com/simplebar@latest/dist/simplebar.css" rel="stylesheet">
-    <script src="https://unpkg.com/simplebar@latest/dist/simplebar.min.js"></script>
 
     <link
         href="https://fonts.googleapis.com/css?family=Abel|Abril Fatface|Alex Brush|Great Vibes|Acme|Allerta|Bungee Shade|Press Start 2P|Italiana|Mountains of Christmas|Pattaya|Petit Formal Script|Pinyon Script|Sarina|Sofia|Special Elite|Ultra|Permanent Marker|Caesar Dressing|Chewy|Cinzel|Courgette|Dynalight|Fontdiner Swanky|Holtwood One SC|Megrim|Artifika|Barrio|Berkshire Swash|Bigelow Rules|Margarine|Modak|Monofett|Monoton|Alegreya|Alegreya Sans|Anton|Archivo|Archivo Black|Archivo Narrow|Arimo|Arvo|Asap|Asap Condensed|Bitter|Bowlby One SC|Bree Serif|Cabin|Cairo|Catamaran|Crete Round|Crimson Text|Cuprum|Dancing Script|Dosis|Droid Sans|Droid Serif|EB Garamond|Exo|Exo 2|Faustina|Fira Sans|Fjalla One|Francois One|Gloria Hallelujah|Hind|Inconsolata|Indie Flower|Josefin Sans|Julee|Karla|Lato|Libre Baskerville|Libre Franklin|Lobster|Lora|Mada|Manuale|Maven Pro|Merriweather|Merriweather Sans|Montserrat|Montserrat Subrayada|Mukta Vaani|Muli|Noto Sans|Noto Serif|Nunito|Open Sans|Open Sans Condensed:300|Oswald|Oxygen|PT Sans|PT Sans Caption|PT Sans Narrow|PT Serif|Pacifico|Passion One|Pathway Gothic One|Play|Playfair Display|Poppins|Questrial|Quicksand|Raleway|Roboto|Roboto Condensed|Roboto Mono|Roboto Slab|Ropa Sans|Rubik|Saira|Saira Condensed|Saira Extra Condensed|Saira Semi Condensed|Sedgwick Ave|Sedgwick Ave Display|Shadows Into Light|Signika|Slabo 27px|Source Code Pro|Source Sans Pro|Spectral|Titillium Web|Ubuntu|Ubuntu Condensed|Varela Round|Vollkorn|Work Sans|Yanone Kaffeesatz|Zilla Slab|Zilla Slab Highlight"
@@ -39,35 +29,40 @@
     <link
         href="https://fonts.googleapis.com/css?family=Abel|Abril Fatface|Alex Brush|Great Vibes|Acme|Allerta|Bungee Shade|Press Start 2P|Italiana|Mountains of Christmas|Pattaya|Petit Formal Script|Pinyon Script|Sarina|Sofia|Special Elite|Ultra|Permanent Marker|Caesar Dressing|Chewy|Cinzel|Courgette|Dynalight|Fontdiner Swanky|Holtwood One SC|Megrim|Artifika|Barrio|Berkshire Swash|Bigelow Rules|Margarine|Modak|Monofett|Monoton|Alegreya|Alegreya Sans|Anton|Archivo|Archivo Black|Archivo Narrow|Arimo|Arvo|Asap|Asap Condensed|Bitter|Bowlby One SC|Bree Serif|Cabin|Cairo|Catamaran|Crete Round|Crimson Text|Cuprum|Dancing Script|Dosis|Droid Sans|Droid Serif|EB Garamond|Exo|Exo 2|Faustina|Fira Sans|Fjalla One|Francois One|Gloria Hallelujah|Hind|Inconsolata|Indie Flower|Josefin Sans|Julee|Karla|Lato|Libre Baskerville|Libre Franklin|Lobster|Lora|Mada|Manuale|Maven Pro|Merriweather|Merriweather Sans|Montserrat|Montserrat Subrayada|Mukta Vaani|Muli|Noto Sans|Noto Serif|Nunito|Open Sans|Open Sans Condensed:300|Oswald|Oxygen|PT Sans|PT Sans Caption|PT Sans Narrow|PT Serif|Pacifico|Passion One|Pathway Gothic One|Play|Playfair Display|Poppins|Questrial|Quicksand|Raleway|Roboto|Roboto Condensed|Roboto Mono|Roboto Slab|Ropa Sans|Rubik|Saira|Saira Condensed|Saira Extra Condensed|Saira Semi Condensed|Sedgwick Ave|Sedgwick Ave Display|Shadows Into Light|Signika|Slabo 27px|Source Code Pro|Source Sans Pro|Spectral|Titillium Web|Ubuntu|Ubuntu Condensed|Varela Round|Vollkorn|Work Sans|Yanone Kaffeesatz|Zilla Slab|Zilla Slab Highlight"
         rel="stylesheet" type='text/css'>
-
 </head>
 
 <body>
     <div class="container2">
         <div class="row2">
-            <button id="new-image-prompt-btn" class="btn btn-yellow">Novo</button>
-            <h5 class="header">Easy Image Editor</h5> <button id="resize-stage-prompt-btn"
-                class="btn btn-small btn-yellow"><i class="mdi mdi-resize"></i></button>
+            <button id="new-image-prompt-btn" title="Inicie um novo projeto" class="btn btn-editor btn-yellow">Novo</button>
+            <div>
+                <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span class="mdi mdi-arrow-u-left-top"></span></button>
+                <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span class="mdi mdi-arrow-u-right-top"></span></button>
+            </div> <button title="Redimensionar projeto" id="resize-stage-prompt-btn"
+                class="btn btn-yellow btn-editor"><i class="mdi mdi-resize"></i></button>
         </div>
         <div class="wrapper">
+            <div class="teste"></div>
             <div class="editor-panel">
 
-                <button class="btn" id="add-image"><i class="mdi mdi-file-image-plus"></i><span
+                <button class="btn" id="add-image" title="Adicione uma imagem"><i class="mdi mdi-file-image-plus"></i><span
                         class="btn-text">Imagem</span></button>
-                <button class="btn" id="widget-text"><i class="mdi mdi-format-textbox"></i> <span
+                <button class="btn" id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i> <span
                         class="btn-text">Texto</span></button>
 
+                <button class="btn" id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
+                            aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
 
-                <button class="btn" id="btn-widget-figures"><i class="mdi mdi-pencil-outline"
-                        aria-hidden="true"></i><span class="btn-text">Desenhos</span></button>
+                <button class="btn" title="Adicione uma figura geometrica" id="btn-widget-figures"><i class="mdi mdi-drawing"
+                        aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
 
-                <button class="btn" id="add-bg"><i class="mdi mdi-image-album" aria-hidden="true"></i><span
+                <button class="btn" title="Plano de fundo com cor sólida" id="add-bg"><i class="mdi mdi-image-album" aria-hidden="true"></i><span
                         class="btn-text">Background</span></button>
-                <button class="btn" id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
-                <button class="btn" id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
-                <button class="btn" id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
-                <button class="btn" id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
 
             </div>
@@ -89,174 +84,25 @@
             <br>
             <br>
             <input style="display:none;" id="input-image" type="file" name="file" posx="" posy="" idshape="stage" />
-            <div class="text-center widget-lg widget-black" id="draggable">
-                <div class="widget-body">
-                    <div class="row">
-
-                        <div class="col-2" style="position: relative; display: inline-block;">
-                            <button id="text-color-button" class="btn btn-small">
-                                <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
-                            </button>
-                            <input type="color" id="input-color-edit"
-                                style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                        </div>
-                        <div class="col-10">
-                            <select id="text-font-edit" class="select-font">
-                                <option class="fpd-item" value="Alex Brush"
-                                    style="font-family: &quot;Alex Brush&quot;; display: block;">Alex Brush</option>
-                                <option class="fpd-item" value="Allerta" style="font-family: Allerta; display: block;">
-                                    Allerta
-                                </option>
-                                <option value="Amethyst Regular" style="font-family: Amethyst Regular; display: block;">
-                                    Amethyst
-                                    Regular</option>
-                                <option value="Arial" style="font-family: Arial; display: block;">Arial</option>
-                                <option value="Artifika" style="font-family: Artifika; display: block;">Artifika
-                                </option>
-                                <option value="Barrio" style="font-family: Barrio; display: block;">Barrio</option>
-                                <option value="Berkshire Swash"
-                                    style="font-family: &quot;Berkshire Swash&quot;; display: block;">
-                                    Berkshire Swash</option>
-                                <option value="Bigelow Rules"
-                                    style="font-family: &quot;Bigelow Rules&quot;; display: block;">
-                                    Bigelow Rules</option>
-                                <option value="Bungee Shade"
-                                    style="font-family: &quot;Bungee Shade&quot;; display: block;">
-                                    Bungee
-                                    Shade</option>
-                                <option value="Caesar Dressing"
-                                    style="font-family: &quot;Caesar Dressing&quot;; display: block;">
-                                    Caesar Dressing</option>
-                                <option value="Chewy" style="font-family: Chewy; display: block;">Chewy</option>
-                                <option value="Cinzel" style="font-family: Cinzel; display: block;">Cinzel</option>
-                                <option value="Courgette" style="font-family: Courgette; display: block;">Courgette
-                                </option>
-                                <option value="Crimson Text"
-                                    style="font-family:&quot;Crimson Text&quot;; display: block;">
-                                    Crimson
-                                    Text</option>
-                                <option value="Dynalight" style="font-family: Dynalight; display: block;">Dynalight
-                                </option>
-                                <option value="Fontdiner Swanky"
-                                    style="font-family: &quot;Fontdiner Swanky&quot;; display: block;">
-                                    Fontdiner Swanky</option>
-                                <option value="Great Vibes"
-                                    style="font-family: &quot;Great Vibes&quot;; display: block;">
-                                    Great
-                                    Vibes</option>
-                                <option value="Holtwood One SC"
-                                    style="font-family: &quot;Holtwood One SC&quot;; display: block;">
-                                    Holtwood One SC</option>
-                                <option value="Italiana" style="font-family: Italiana; display: block;">Italiana
-                                </option>
-                                <option value="Margarine" style="font-family: Margarine; display: block;">Margarine
-                                </option>
-                                <option value="Megrim" style="font-family: Megrim; display: block;">Megrim</option>
-                                <option value="Modak" style="font-family: Modak; display: block;">Modak</option>
-                                <option value="Monofett" style="font-family: Monofett; display: block;">Monofett
-                                </option>
-                                <option value="Monoton" style="font-family: Monoton; display: block;">Monoton</option>
-                                <option value="Montserrat Subrayada"
-                                    style="font-family: &quot;Montserrat Subrayada&quot;; display: block;">Montserrat
-                                    Subrayada
-                                </option>
-                                <option value="Mountains of Christmas"
-                                    style="font-family: &quot;Mountains of Christmas&quot;; display: block;">Mountains
-                                    of
-                                    Christmas
-                                </option>
-                                <option value="Oswald" style="font-family: Oswald; display: block;">Oswald</option>
-                                <option value="Pacifico" style="font-family: Pacifico; display: block;">Pacifico
-                                </option>
-                                <option value="Pattaya" style="font-family: Pattaya; display: block;">Pattaya</option>
-                                <option value="Permanent Marker"
-                                    style="font-family: &quot;Permanent Marker&quot;; display: block;">
-                                    Permanent Marker</option>
-                                <option value="Petit Formal Script"
-                                    style="font-family: &quot;Petit Formal Script&quot;; display: block;">Petit Formal
-                                    Script
-                                </option>
-                                <option value="Pinyon Script"
-                                    style="font-family: &quot;Pinyon Script&quot;; display: block;">Pinyon
-                                    Script</option>
-                                <option value="Press Start 2P"
-                                    style="font-family:&quot;Press Start 2P&quot;; display: block;">Press
-                                    Start 2P</option>
-                                <option value="Sarina" style="font-family: Sarina; display: block;">Sarina</option>
-                                <option value="Shadows Into Light"
-                                    style="font-family: &quot;Shadows Into Light&quot;; display: block;">Shadows Into
-                                    Light
-                                </option>
-                                <option value="Sofia" style="font-family: Sofia; display: block;">Sofia</option>
-                                <option value="Special Elite"
-                                    style="font-family: &quot;Special Elite&quot;; display: block;">
-                                    Special Elite</option>
-                                <option value="Ultra" style="font-family: Ultra; display: block;">Ultra</option>
-                                <option value="Vacation Planner Regular"
-                                    style="font-family: &quot;Vacation Planner Regular&quot;; display: block;">Vacation
-                                    Planner
-                                    Regular</option>
-                                <option value="Zilla Slab Highlight"
-                                    style="font-family: &quot;Zilla Slab Highlight&quot;; display: block;">Zilla Slab
-                                    Highlight
-                                </option>
-                            </select>
-
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="widget-row">
-                            <div class="slidecontainer">
-
-                                <button class="btn btn-small btn-left btn-style" value="bold"><i
-                                        class="fas fa-bold"></i></button>
-                                <button class="btn btn-small btn-middle btn-style" value="italic"><i
-                                        class="fas fa-italic"></i></button>
-                                <button class="btn btn-small btn-middle btn-decoration " value="line-through"><i
-                                        class="fas fa-strikethrough"></i></button>
-                                <button class="btn btn-small btn-right btn-decoration" value="underline"><i
-                                        class="fas fa-underline"></i></button>
-                                <button class="btn btn-small btn-align" value="left"><i
-                                        class="fas fa-align-left"></i></button>
-                                <button class="moveUp btn btn-small btn-left"><i
-                                        class="fa-solid fa-arrow-up-to-line"></i></button>
-                                <button class="moveDown btn btn-small btn-right"><i
-                                        class="fa-solid fa-arrow-down-to-line"></i></button>
-                                <button class="btn-copy btn btn-small btn-left"><i
-                                        class="fa-solid fa-copy"></i></button>
-                                <button class="btn-delete btn btn-small btn-right"><i
-                                        class="fa-solid fa-trash-can"></i></button>
-                                <input type="text" id="input-edit-id" style="display:none;">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="slidecontainer">
-                            <span>Transparencia </span>
-                            <input type="range" min="0" max="1" class="slider" id="opacity" step="0.01">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="footer-btn">
-            <button id="download" class="btn btn-yellow btn-right">Download</button>
+            <button id="download" title="Baixar projeto em imagem" class="btn btn-editor btn-yellow btn-right">Download</button>
         </div>
     </div>
-    <div class="text-center widget-sm p-10 widget-black" id="widget-bg">
-        <div class="col-12">
+    <div class="text-center widget-sm widget-black" id="widget-bg">
+        <div class="widget-body">
             <div class="slidecontainer">
 
-                <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                <div title="Troque a cor do fundo" style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="bg-color-button" class="btn btn-small">
                         <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
                     <input type="color" id="bgcolor" value="#ffffff"
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
-                <button id="bg-remove" class="btn btn-small">
-                    <i class="fa-solid fa-trash-can" style="font-size: 20px; color: white;"></i>
+                <button title="Apagar fundo" id="bg-remove" class="btn btn-small btn-danger">
+                    <i class="mdi mdi-close" style="font-size: 20px; color: white;"></i>
                 </button>
 
             </div>
@@ -264,11 +110,11 @@
 
 
     </div>
-    <div class="text-center widget-sm p-10 widget-black" id="widget-node">
-        <div class="col-12">
+    <div class="text-center widget-sm widget-black" id="widget-node">
+        <div class="widget-body">
             <div class="slidecontainer">
 
-                <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                <div title="Troque a cor do objeto" style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="node-color-button" class="btn btn-small">
                         <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
@@ -276,10 +122,10 @@
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
 
-                <button class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
-                <button class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
-                <button class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
-                <button class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
+                <button title="Trazer pra frente" class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
+                <button title="Enviar pra trás" class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
+                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
+                <button title="Deletar objeto" class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
             </div>
         </div>
     </div>
@@ -287,12 +133,9 @@
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
             <div class="slidecontainer">
-                <button class="btn btn-small" id="draw"><i class="mdi mdi-pencil-outline"
-                        aria-hidden="true"></i></button>
-
-                <button class="btn btn-small btn-left" id="add-tri"><i class="mdi mdi-triangle"></i></button>
-                <button class="btn btn-small btn-middle" id="add-rect"><i class="mdi mdi-square"></i></button>
-                <button class="btn btn-small btn-right" id="add-circle"><i class="mdi mdi-circle"></i></button>
+                <button title="Adicione um triangulo" class="btn btn-small btn-left" id="add-tri"><i class="mdi mdi-triangle"></i></button>
+                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-rect"><i class="mdi mdi-square"></i></button>
+                <button title="Adicione um circulo" class="btn btn-small btn-right" id="add-circle"><i class="mdi mdi-circle"></i></button>
             </div>
         </div>
     </div>
@@ -300,15 +143,14 @@
         <div class="widget-body">
             <div class="row">
                 <span>Zoom</span>
-                <div class="slidecontainer col-9">
+                <div class="slidecontainer col-12">
                     <input class="slider2" original-scale="" type="range" id="zoom-slider" object-id="0" min="0.01"
                         max="2" step="0.01" value="1">
+                        <div class="col-2">
+                            <i id="reset-zoom" title="Resetar valor padrão" class="fa fa-refresh"
+                            aria-hidden="true"></i>
+                        </div>
                 </div>
-                <div class="col-3" style="display:none;">
-                    <button class="btn btn-small" id="reset-zoom"><i class="fa fa-refresh"
-                            aria-hidden="true"></i></button>
-                </div>
-
             </div>
         </div>
     </div>
@@ -322,13 +164,13 @@
                         <button id="brush-color-button" class="btn btn-small btn-color" style="border: 1px white;">
                             <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                         </button>
-                        <input type="color" id="brush-color" name="brush-color"
+                        <input type="color" title="Cor do Pincel" id="brush-color" name="brush-color"
                             style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
                             value="#000000">
                     </div>
-                    <button draw-mode="brush" class="draw-mode btn btn-small btn-left"><i
+                    <button draw-mode="brush" title="Pincel" class="draw-mode btn btn-small btn-left"><i
                             class="mdi mdi-brush-outline"></i></button>
-                    <button draw-mode="eraser" class="draw-mode btn btn-small btn-right"><i
+                    <button draw-mode="eraser" title="Borracha" class="draw-mode btn btn-small btn-right"><i
                             class="mdi mdi-eraser"></i></button>
                 </div>
                 <div class="col-6">
@@ -342,19 +184,20 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 text-center widget widget-white" id="add-text-widget">
+    <div class="text-center widget widget-fixed widget-black" id="add-text-widget">
         <div class="widget-header">
 
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Texto</i>
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> TEXTO</i>
 
             <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
         </div>
+        <div class="widget-body">
 
-        <div class="col-12">
-            <textarea id="input-text" placeholder="Digite aqui seu texto" row="50" cols="50"
-                style="width:80%;"></textarea>
+                <textarea class="form-control" id="input-text" placeholder="Adicionar um texto" row="50" cols="50"
+                ></textarea>
+
         </div>
-        <button id="addText" class="btn-add-text">Adicionar texto</button>
+        <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
     <div class="text-center widget-sm widget-black widget-fixed" id="widget-settings">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
@@ -379,30 +222,29 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget widget-white" id="new-image-prompt">
+    <div class="text-center widget-sm widget-black widget-fixed" id="new-image-prompt">
         <div class="widget-header">
 
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Novo</i>
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> NOVO</i>
 
             <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
         </div>
-
-        <div class="">
-            <div class="input-group input-group-sm p-3">
+        <div class="widget-body">
+            <div class="input-group input-group-sm p-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Titulo</span>
                 </div>
                 <input id="input-title" type="text" id="input-height" class="form-control" placeholder=""
                     aria-label="Titulo" value="Sem Título" aria-describedby="basic-addon1">
             </div>
-            <div class="input-group input-group-sm p-3">
+            <div class="input-group input-group-sm p-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Largura</span>
                 </div>
                 <input type="number" id="input-width" class="form-control" placeholder="" aria-label="Largura"
                     value="800" aria-describedby="basic-addon1">
             </div>
-            <div class="input-group input-group-sm p-3">
+            <div class="input-group input-group-sm p-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Altura</span>
                 </div>
@@ -410,25 +252,24 @@
                     value="600" aria-describedby="basic-addon1">
             </div>
         </div>
-        <button id="new-image" class="btn-add-text">Confirmar</button>
+        <button id="new-image" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
-    <div class="text-center widget widget-white" id="resize-stage-prompt">
+    <div class="text-center widget-sm widget-black widget-fixed" id="resize-stage-prompt">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Redimensionar</i>
 
             <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
         </div>
-
-        <div>
-            <div class="input-group input-group-sm p-3">
+        <div class="widget-body">
+            <div class="input-group input-group-sm p-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Largura</span>
                 </div>
                 <input type="number" id="resize-input-width" class="form-control" placeholder="" aria-label="Largura"
                     value="800" aria-describedby="basic-addon1">
             </div>
-            <div class="input-group input-group-sm p-3">
+            <div class="input-group input-group-sm p-2">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Altura</span>
                 </div>
@@ -436,12 +277,13 @@
                     value="600" aria-describedby="basic-addon1">
             </div>
         </div>
-        <button id="resize-stage" class="btn-add-text">Confirmar</button>
+        <button id="resize-stage" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
+    
     <div class="text-center widget-sm widget-black" id="widget-layers" style="display:block;">
         <div class="widget-header layers-header">
 
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Camadas</i>
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> CAMADAS</i>
 
             <button type="button" class="close minimize" id="close-edit"
                 style="color:black;  margin-right:2px;">&times;<i style="color:white; font-size:14px;"
@@ -455,35 +297,182 @@
                 </ul>
             </div>
             <div class="row">
-                <button class="btn btn-left btn-manage-layer btn-success" id="add-layer"><i class="mdi mdi-layers-plus"
+                <button class="btn btn-left btn-manage-layer btn-success" title="Adicionar nova camada" id="add-layer"><i class="mdi mdi-layers-plus"
                         aria-hidden="true"></i></button>
-                <button class="btn btn-right btn-manage-layer btn-danger" id="delete-layer"><i
-                        class="mdi mdi-layers-minus" aria-hidden="true"></i></button>
+                <button class="btn btn-right btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
+                        class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
             </div>
 
 
         </div>
     </div>
-    <div class="text-center widget-sm p-10 widget-black" id="widget-image">
-        <div class="col-12">
+    <div class="text-center widget-sm widget-black" id="widget-image">
+        <div class="widget-body">
             <div class="slidecontainer">
 
-                <button class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
-                <button class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
-                <button class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
-                <button class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
-                <button id="btn-settings" class="btn btn-small"><i class="mdi mdi-cog"></i></button>
+                <button title="Trazer para frente" class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
+                <button title="Enviar para trás" class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
+                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
+                <button title="Deletar Imagem" class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
+                <button title="Ajustar brilho e contraste" id="btn-settings" class="btn btn-small"><i class="mdi mdi-cog"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="text-center widget-lg widget-black" id="draggable">
+        <div class="widget-body">
+            <div class="row">
+
+                <div title="Cor do texto" class="col-2" style="position: relative; display: inline-block;">
+                    <button id="text-color-button" class="btn btn-small">
+                        <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
+                    </button>
+                    <input type="color" id="input-color-edit"
+                        style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+                </div>
+                <div class="col-10">
+                    <select title="Selecione a fonte" id="text-font-edit" class="select-font">
+                        <option class="fpd-item" value="Alex Brush"
+                            style="font-family: &quot;Alex Brush&quot;; display: block;">Alex Brush</option>
+                        <option class="fpd-item" value="Allerta" style="font-family: Allerta; display: block;">
+                            Allerta
+                        </option>
+                        <option value="Amethyst Regular" style="font-family: Amethyst Regular; display: block;">
+                            Amethyst
+                            Regular</option>
+                        <option value="Arial" style="font-family: Arial; display: block;">Arial</option>
+                        <option value="Artifika" style="font-family: Artifika; display: block;">Artifika
+                        </option>
+                        <option value="Barrio" style="font-family: Barrio; display: block;">Barrio</option>
+                        <option value="Berkshire Swash"
+                            style="font-family: &quot;Berkshire Swash&quot;; display: block;">
+                            Berkshire Swash</option>
+                        <option value="Bigelow Rules"
+                            style="font-family: &quot;Bigelow Rules&quot;; display: block;">
+                            Bigelow Rules</option>
+                        <option value="Bungee Shade"
+                            style="font-family: &quot;Bungee Shade&quot;; display: block;">
+                            Bungee
+                            Shade</option>
+                        <option value="Caesar Dressing"
+                            style="font-family: &quot;Caesar Dressing&quot;; display: block;">
+                            Caesar Dressing</option>
+                        <option value="Chewy" style="font-family: Chewy; display: block;">Chewy</option>
+                        <option value="Cinzel" style="font-family: Cinzel; display: block;">Cinzel</option>
+                        <option value="Courgette" style="font-family: Courgette; display: block;">Courgette
+                        </option>
+                        <option value="Crimson Text"
+                            style="font-family:&quot;Crimson Text&quot;; display: block;">
+                            Crimson
+                            Text</option>
+                        <option value="Dynalight" style="font-family: Dynalight; display: block;">Dynalight
+                        </option>
+                        <option value="Fontdiner Swanky"
+                            style="font-family: &quot;Fontdiner Swanky&quot;; display: block;">
+                            Fontdiner Swanky</option>
+                        <option value="Great Vibes"
+                            style="font-family: &quot;Great Vibes&quot;; display: block;">
+                            Great
+                            Vibes</option>
+                        <option value="Holtwood One SC"
+                            style="font-family: &quot;Holtwood One SC&quot;; display: block;">
+                            Holtwood One SC</option>
+                        <option value="Italiana" style="font-family: Italiana; display: block;">Italiana
+                        </option>
+                        <option value="Margarine" style="font-family: Margarine; display: block;">Margarine
+                        </option>
+                        <option value="Megrim" style="font-family: Megrim; display: block;">Megrim</option>
+                        <option value="Modak" style="font-family: Modak; display: block;">Modak</option>
+                        <option value="Monofett" style="font-family: Monofett; display: block;">Monofett
+                        </option>
+                        <option value="Monoton" style="font-family: Monoton; display: block;">Monoton</option>
+                        <option value="Montserrat Subrayada"
+                            style="font-family: &quot;Montserrat Subrayada&quot;; display: block;">Montserrat
+                            Subrayada
+                        </option>
+                        <option value="Mountains of Christmas"
+                            style="font-family: &quot;Mountains of Christmas&quot;; display: block;">Mountains
+                            of
+                            Christmas
+                        </option>
+                        <option value="Oswald" style="font-family: Oswald; display: block;">Oswald</option>
+                        <option value="Pacifico" style="font-family: Pacifico; display: block;">Pacifico
+                        </option>
+                        <option value="Pattaya" style="font-family: Pattaya; display: block;">Pattaya</option>
+                        <option value="Permanent Marker"
+                            style="font-family: &quot;Permanent Marker&quot;; display: block;">
+                            Permanent Marker</option>
+                        <option value="Petit Formal Script"
+                            style="font-family: &quot;Petit Formal Script&quot;; display: block;">Petit Formal
+                            Script
+                        </option>
+                        <option value="Pinyon Script"
+                            style="font-family: &quot;Pinyon Script&quot;; display: block;">Pinyon
+                            Script</option>
+                        <option value="Press Start 2P"
+                            style="font-family:&quot;Press Start 2P&quot;; display: block;">Press
+                            Start 2P</option>
+                        <option value="Sarina" style="font-family: Sarina; display: block;">Sarina</option>
+                        <option value="Shadows Into Light"
+                            style="font-family: &quot;Shadows Into Light&quot;; display: block;">Shadows Into
+                            Light
+                        </option>
+                        <option value="Sofia" style="font-family: Sofia; display: block;">Sofia</option>
+                        <option value="Special Elite"
+                            style="font-family: &quot;Special Elite&quot;; display: block;">
+                            Special Elite</option>
+                        <option value="Ultra" style="font-family: Ultra; display: block;">Ultra</option>
+                        <option value="Vacation Planner Regular"
+                            style="font-family: &quot;Vacation Planner Regular&quot;; display: block;">Vacation
+                            Planner
+                            Regular</option>
+                        <option value="Zilla Slab Highlight"
+                            style="font-family: &quot;Zilla Slab Highlight&quot;; display: block;">Zilla Slab
+                            Highlight
+                        </option>
+                    </select>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="widget-row">
+                    <div class="slidecontainer2">
+
+                        <button title="Negrito" class="btn btn-small btn-left btn-style" value="bold"><i
+                                class="fas fa-bold"></i></button>
+                        <button title="Itálico" class="btn btn-small btn-middle btn-style" value="italic"><i
+                                class="fas fa-italic"></i></button>
+                        <button title="Riscar" class="btn btn-small btn-middle btn-decoration " value="line-through"><i
+                                class="fas fa-strikethrough"></i></button>
+                        <button title="Sublinhar" class="btn btn-small btn-right btn-decoration" value="underline"><i
+                                class="fas fa-underline"></i></button>
+                        <button title="Alinhar" class="btn btn-small btn-align" value="left"><i
+                                class="fas fa-align-left"></i></button>
+                        <button title="Trazer para frente" class="moveUp btn btn-small btn-left"><i
+                                class="fa-solid fa-arrow-up-to-line"></i></button>
+                        <button title="Enviar para trás" class="moveDown btn btn-small btn-right"><i
+                                class="fa-solid fa-arrow-down-to-line"></i></button>
+                        <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i
+                                class="fa-solid fa-copy"></i></button>
+                        <button title="Apagar texto" class="btn-delete btn btn-small btn-right"><i
+                                class="fa-solid fa-trash-can"></i></button>
+                        <input type="text" id="input-edit-id" style="display:none;">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="slidecontainer">
+                    <span>Transparencia </span>
+                    <input type="range" title="stefd" min="0" max="1" class="slider" id="opacity" step="0.01">
+                </div>
             </div>
         </div>
     </div>
 </body>
-<script src="js/jquery-2.1.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 <script src="js/jquery.ui.touch-punch.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+
 <script src="https://unpkg.com/konva@9.3.18/konva.min.js"></script>
 <script src="js/editor.js"></script>
 
