@@ -14,7 +14,7 @@ const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
 const ZOOM_SPEED = 0.1;
 let title = "Sem Título";
-
+var mode = 'brush';
 $(document).on('mousedown touchstart', function () {
     isMousePressed = true;
 });
@@ -1329,7 +1329,7 @@ $(function () {
 
     generateBackgroundEvents(background,layer);
     var isPaint = false;
-    var mode = 'brush';
+
     var lastLine;
     stage.on('mouseover', function () {
         if (drawMode) {
@@ -1799,8 +1799,13 @@ $("#draw").on("click", function () {
     if (!drawMode) {
         drawMode = true;
         $("#widget-draw").fadeIn(100);
-        $(".draw-mode[draw-mode='brush']").addClass("active");
-        $(".draw-mode[draw-mode='eraser']").removeClass("active");
+        if(mode == "brush"){
+            $(".draw-mode[draw-mode='brush']").addClass("active");
+            $(".draw-mode[draw-mode='eraser']").removeClass("active"); 
+        }else{
+            $(".draw-mode[draw-mode='brush']").removeClass("active");
+            $(".draw-mode[draw-mode='eraser']").addClass("active");
+        }
         const colorButton = document.getElementById("brush-color-button");
 
         colorButton.style.backgroundColor = color;
