@@ -301,7 +301,7 @@ body::after {
 }
 
 .project-info{
-  z-index: 9999999999999999999999;
+  z-index: 2;
   bottom:5px;
   font-size: 11px;
   color:white;
