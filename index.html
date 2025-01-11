@@ -29,16 +29,25 @@
 
 <body>
     <div class="container2">
+        <div class="project-info" id="resize-stage-prompt-btn">
+            <span id="project-info"> Sem Título - 800 x 600 </span>
+            <span class="mdi mdi-resize" style="color:#3E78B1; margin-left:5px; font-size: 16px;"></span>
+        </div>
         <div class="row2">
-            <button id="new-image-prompt-btn" title="Inicie um novo projeto"
-                class="btn btn-editor btn-yellow">Novo</button>
+            <div>
+                <button id="new-image-prompt-btn" title="Inicie um novo projeto"
+                class="btn-mini btn-mini-yellow"><span class="mdi mdi-new-box"></span></button>
+                <button id="download" title="Exportar"
+                class="btn-mini btn-mini-yellow"><span class="mdi mdi-export"></span></button> 
+            </div>            
             <div>
                 <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
                         class="mdi mdi-arrow-u-left-top"></span></button>
                 <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span
                         class="mdi mdi-arrow-u-right-top"></span></button>
-            </div> <button title="Redimensionar projeto" id="resize-stage-prompt-btn"
-                class="btn btn-yellow btn-editor"><i class="mdi mdi-resize"></i></button>
+            </div>
+            <button id="open-layers-btn" title="Camadas"
+            class="btn-mini"><span class="mdi mdi-layers"></span></button>
         </div>
         <div class="wrapper">
             <div class="teste"></div>
@@ -88,8 +97,7 @@
         </div>
 
         <div class="footer-btn">
-            <button id="download" title="Baixar projeto em imagem"
-                class="btn btn-editor btn-yellow btn-right">Download</button>
+
         </div>
     </div>
     <div class="text-center widget-sm widget-black" id="widget-bg">
@@ -332,14 +340,12 @@
         <button id="resize-stage" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
 
-    <div class="text-center widget-sm widget-black" id="widget-layers" style="display:block;">
+    <div class="text-center widget-sm widget-fixed widget-black" id="widget-layers">
         <div class="widget-header layers-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> CAMADAS</i>
 
-            <button type="button" class="close minimize" id="close-edit"
-                style="color:black;  margin-right:2px;">&times;<i style="color:white; font-size:14px;"
-                    class="mdi mdi-window-minimize"></i></button>
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
 
         </div>
         <div id="layers-body" class="widget-body">
@@ -522,6 +528,7 @@
                 </div>
             </div>
         </div>
+        
     </div>
 </body>
 

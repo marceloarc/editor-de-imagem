@@ -262,11 +262,16 @@ $(document).ready(function () {
 
 
     $(".close").on('click', function (e) {
-        $(this).closest(".widget").hide();
-        $(this).closest(".widget-fixed").hide();
+        $(this).closest(".widget").fadeOut(100);
+        $(this).closest(".widget-fixed").fadeOut(100);
         var parent = $(this).parent();
         if (parent.attr('id') == "widget-draw") {
             $("#draw").click();
+        }
+        if (parent.hasClass('layers-header')) {
+            if($("#open-layers-btn").hasClass('active')){
+                $("#open-layers-btn").removeClass('active')
+            }
         }
     });
     $(document).tooltip({
@@ -344,7 +349,7 @@ $(document).ready(function () {
     });
 
     $("#models-category").click(function () {
-        $("#widget-products").show();
+        $("#widget-products").fadeIn(100);
     })
     $("#add-image").click(function () {
         if (drawMode) {
@@ -586,7 +591,7 @@ function addImage(imageSrc) {
 
 
 $("#widget-bg-btn").click(function () {
-    $("#widget-background").hide();
+    $("#widget-background").fadeOut(100);
     var editor = $(".preview-img");
     $("#widget-bg2").css("top", editor.position().top + editor.height() / 2 - $("#widget-bg2").height() / 2);
     $("#widget-bg2").css("left", editor.position().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
@@ -594,19 +599,6 @@ $("#widget-bg-btn").click(function () {
 
 });
 
-$("#vazio").click(function () {
-    cleanStage()
-    background.setAttrs({
-        fill: "#FFFFFF"
-    });
-    layer.draw();
-    $("#widget-image").show();
-    $("#widget-bg2").hide();
-    $("[name2=Deitado]").next("span").removeClass("active");
-    $('[name2="Em pé"]').next("span").removeClass("active");
-    $("[name2=Deitado]").next("span").show();
-    $('[name2="Em pé"]').next("span").show();
-});
 
 function generateImageEvents(image, layer) {
     image.on('click', (e) => {
@@ -1057,6 +1049,16 @@ $('#bg-remove').on('click',
     });
 $('#draw-color').on('click', saveState)
 
+$("#open-layers-btn").click(function(){
+    if($(this).hasClass('active')){
+        $("#widget-layers").fadeOut(100);
+        $(this).removeClass('active');
+    }else{
+        $("#widget-layers").fadeIn(100);
+        $(this).addClass('active')
+    }
+})
+
 $('#draw-color').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -1357,7 +1359,7 @@ var layerIndex;
 $(function () {
 
     $(document).tooltip();
-    $("#stage-parent").show();
+    $("#stage-parent").fadeIn(100);
 
     stageWidth = 800;
     stageHeight = 600;
@@ -1961,7 +1963,7 @@ $("#draw").on("click", function () {
         var widget = document.getElementById('widget-draw');
     } else {
         $(this).css('background', "transparent");
-        $("#widget-draw").hide();
+        $("#widget-draw").fadeOut(100);
         drawMode = false;
         var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
         DrawCursorRadius.destroy();
@@ -2321,7 +2323,8 @@ $("#resize-stage-prompt-btn").click(function () {
 
     const left = (windowWidth - elementWidth) / 2;
     const top = (windowHeight - elementHeight) / 2;
-
+    $("#resize-input-width").val(stageWidth);
+    $("#resize-input-height").val(stageHeight);
     $("#resize-stage-prompt").css({
         position: 'absolute',
         left: left + 'px',
@@ -2372,7 +2375,7 @@ function setNewCanvasSize(userWidth, userHeight) {
     stageHeight = userHeight;
     stage.width(userWidth);
     stage.height(userHeight);
-
+    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
     stage.batchDraw();
@@ -2411,7 +2414,7 @@ function setNewCanvas(userWidth, userHeight) {
     cleanStage();
     $(".item-background").click();
     stage.batchDraw();
-
+    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
 
