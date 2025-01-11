@@ -34,7 +34,7 @@ body {
 
 .btn-add-text {
     text-transform: uppercase;
-    width: 150px;
+    width: auto;
     margin: 10px;
     border: none;
     color: white;
@@ -65,10 +65,6 @@ body {
     border-radius: 0;
     background: transparent;
     font-size: 22px;
-}
-
-.btn-mini-yellow{
-    color: #FFD843;;
 }
 
 
@@ -242,10 +238,7 @@ textarea:focus {
         linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
         linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
     background-size: 20px 20px;
-    /* Ajuste o tamanho do quadrado */
     background-position: 0 0, 10px 10px;
-    /* Offset para criar o xadrez */
-    box-shadow: 0 0 0 px black;
 
 }
 

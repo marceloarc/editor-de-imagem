@@ -1421,13 +1421,14 @@ $(function () {
                 DrawCursorRadius.visible(true);
             }
             DrawCursorRadius.visible(false);
+            stage.listening(true);
         }
     })
     stage.on('mouseover', function () {
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
-
+            stage.listening(false);
             var scale = stage.scale();
             var stagePosition = stage.position();
             var adjustedPosition = {
@@ -1454,7 +1455,7 @@ $(function () {
                 DrawCursorRadius.strokeWidth(1);
             }
         } else {
-
+            
             $(".editor").css("cursor", "")
         }
     })
@@ -1463,7 +1464,7 @@ $(function () {
         if (drawMode) {
             saveState();
             isPaint = true;
-
+            
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
 
@@ -1674,6 +1675,31 @@ function generateBackgroundEvents(background, layer) {
             }
 
 
+        }
+    });
+
+    background.on('dragstart', function(){
+        $("#widget-bg").fadeOut(100);
+    })
+
+    background.on("dragend", function () {
+        if (!drawMode) {
+            $("#widget-bg").fadeIn(100);
+            var position = $(".preview-img").offset();
+            var widget = document.getElementById('widget-bg');
+            var positionTop = position.top + $(".preview-img").height() + 10;
+            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+
+            if ($(window).outerWidth() < 450) {
+                widget.style.position = 'fixed';
+                widget.style.bottom = '0px';
+                widget.style.left = '0px';
+                widget.style.width = "100%";
+            } else {
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop + 'px';
+                widget.style.left = positionLeft + 'px';
+            }
         }
     });
 
@@ -2307,7 +2333,6 @@ $("#resize-stage").click(function () {
 
 
     if (userWidth > 0 && userHeight > 0) {
-        $(".header").text(title + " - " + userWidth + "x" + userHeight)
         setNewCanvasSize(userWidth, userHeight);
         $("#resize-stage-prompt").fadeOut(100);
     }
@@ -2337,7 +2362,6 @@ $("#new-image").click(function () {
 
     const userWidth = $("#input-width").val();
     const userHeight = $("#input-height").val();
-    title = $("#input-title").val();
 
     if (userWidth > 0 && userHeight > 0) {
         setNewCanvas(userWidth, userHeight);
@@ -2368,14 +2392,15 @@ $("#new-image-prompt-btn").click(function () {
 
 function setNewCanvasSize(userWidth, userHeight) {
     $("#reset-zoom").click();
-
+    title = $("#input-title").val();
     originalStageWidth = userWidth;
     originalStageHeight = userHeight;
     stageWidth = userWidth
     stageHeight = userHeight;
     stage.width(userWidth);
     stage.height(userHeight);
-    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
+    $("#project-title").text(title)
+    $("#project-info").text(userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
     stage.batchDraw();
@@ -2404,7 +2429,7 @@ function readjustBackground() {
 
 function setNewCanvas(userWidth, userHeight) {
     $("#reset-zoom").click();
-
+    title = $("#input-title").val();
     originalStageWidth = userWidth;
     originalStageHeight = userHeight;
     stageWidth = userWidth
@@ -2414,7 +2439,8 @@ function setNewCanvas(userWidth, userHeight) {
     cleanStage();
     $(".item-background").click();
     stage.batchDraw();
-    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
+    $("#project-title").text(title)
+    $("#project-info").text(userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
 

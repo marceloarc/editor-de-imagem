@@ -29,16 +29,9 @@
 
 <body>
     <div class="container2">
-        <div class="project-info" id="resize-stage-prompt-btn">
-            <span id="project-info"> Sem Título - 800 x 600 </span>
-            <span class="mdi mdi-resize" style="color:#3E78B1; margin-left:5px; font-size: 16px;"></span>
-        </div>
         <div class="row2">
-            <div>
-                <button id="new-image-prompt-btn" title="Inicie um novo projeto"
-                class="btn-mini btn-mini-yellow"><span class="mdi mdi-new-box"></span></button>
-                <button id="download" title="Exportar"
-                class="btn-mini btn-mini-yellow"><span class="mdi mdi-export"></span></button> 
+            <div class="logo">
+                <img  src="images/logo.png" id="project-title" class="project-title"></img>
             </div>            
             <div>
                 <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
@@ -55,27 +48,28 @@
         <div class="wrapper">
             <div class="teste"></div>
             <div class="editor-panel">
-
-                <button class="btn" id="add-image" title="Adicione uma imagem"><i
+                <button id="new-image-prompt-btn" title="Inicie um novo projeto"><i
+                    class="mdi mdi-file-plus"></i><span class="btn-text">Novo</span></button>
+                <button id="add-image" title="Adicione uma imagem"><i
                         class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
-                <button class="btn" id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i>
+                <button id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i>
                     <span class="btn-text">Texto</span></button>
 
-                <button class="btn" id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
+                <button id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
                         aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
 
-                <button class="btn" title="Adicione uma figura geometrica" id="btn-widget-figures"><i
+                <button title="Adicione uma figura geometrica" id="btn-widget-figures"><i
                         class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
 
-                <button class="btn" title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
-                        aria-hidden="true"></i><span class="btn-text">Background</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
+                <button title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
+                        aria-hidden="true"></i><span class="btn-text">Plano de fundo</span></button>
+                <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
                         class="btn-text">Soon</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
+                <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
                         class="btn-text">Soon</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
+                <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
+                <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
 
             </div>
@@ -99,8 +93,13 @@
 
         </div>
 
-        <div class="footer-btn">
-
+        <div class="row2">
+            <div class="project-info" id="resize-stage-prompt-btn">
+                <span class="mdi mdi-resize" style="color:#FFD843; margin-left:5px; font-size: 22px;"></span>
+                <span id="project-info">800 x 600</span>
+            </div>
+            <button id="download" title="Exportar"
+            class="btn-mini btn-mini-yellow"><span class="mdi mdi-export"></span></button> 
         </div>
     </div>
     <div class="text-center widget-sm widget-black" id="widget-bg">
@@ -248,7 +247,7 @@
     <div class="text-center widget widget-fixed widget-black" id="add-background-widget">
         <div class="widget-header">
 
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Planos de fundo</i>
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Plano de fundo</i>
 
             <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
         </div>
