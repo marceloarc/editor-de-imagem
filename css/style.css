@@ -410,8 +410,8 @@ body::after {
 }
 
 .logo{
-  width: 150px;
-  height: 50px;
+  width: 100px;
+  height: 26px;
 }
 
 .logo img{
@@ -752,6 +752,11 @@ body::after {
     height: auto;
   }
 
+  .logo{
+    width: 70px;
+    height: 18px;
+  }
+
   .row2{
     padding:0px !important;
   }
@@ -837,7 +842,7 @@ body::after {
     height: 100px;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
-    width: auto;
+    width: 100%;
   }
 
   .wrapper .preview-img {
