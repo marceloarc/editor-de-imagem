@@ -30,10 +30,13 @@
 <body>
     <div class="container2">
         <div class="row2">
-            <button id="new-image-prompt-btn" title="Inicie um novo projeto" class="btn btn-editor btn-yellow">Novo</button>
+            <button id="new-image-prompt-btn" title="Inicie um novo projeto"
+                class="btn btn-editor btn-yellow">Novo</button>
             <div>
-                <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span class="mdi mdi-arrow-u-left-top"></span></button>
-                <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span class="mdi mdi-arrow-u-right-top"></span></button>
+                <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
+                        class="mdi mdi-arrow-u-left-top"></span></button>
+                <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span
+                        class="mdi mdi-arrow-u-right-top"></span></button>
             </div> <button title="Redimensionar projeto" id="resize-stage-prompt-btn"
                 class="btn btn-yellow btn-editor"><i class="mdi mdi-resize"></i></button>
         </div>
@@ -41,21 +44,23 @@
             <div class="teste"></div>
             <div class="editor-panel">
 
-                <button class="btn" id="add-image" title="Adicione uma imagem"><i class="mdi mdi-file-image-plus"></i><span
-                        class="btn-text">Imagem</span></button>
-                <button class="btn" id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i> <span
-                        class="btn-text">Texto</span></button>
+                <button class="btn" id="add-image" title="Adicione uma imagem"><i
+                        class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
+                <button class="btn" id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i>
+                    <span class="btn-text">Texto</span></button>
 
                 <button class="btn" id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
-                            aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
+                        aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
 
-                <button class="btn" title="Adicione uma figura geometrica" id="btn-widget-figures"><i class="mdi mdi-drawing"
-                        aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
+                <button class="btn" title="Adicione uma figura geometrica" id="btn-widget-figures"><i
+                        class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
 
-                <button class="btn" title="Plano de fundo com cor sólida" id="add-bg"><i class="mdi mdi-image-album" aria-hidden="true"></i><span
-                        class="btn-text">Background</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
-                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span class="btn-text">Soon</span></button>
+                <button class="btn" title="Plano de fundo com cor sólida" id="add-bg"><i class="mdi mdi-image-album"
+                        aria-hidden="true"></i><span class="btn-text">Background</span></button>
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
+                        class="btn-text">Soon</span></button>
+                <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
+                        class="btn-text">Soon</span></button>
                 <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
                 <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
@@ -79,18 +84,20 @@
             <br>
             <br>
             <br>
-            <input style="display:none;" id="input-image" type="file" name="file" posx="" posy="" idshape="stage" />
+
         </div>
 
         <div class="footer-btn">
-            <button id="download" title="Baixar projeto em imagem" class="btn btn-editor btn-yellow btn-right">Download</button>
+            <button id="download" title="Baixar projeto em imagem"
+                class="btn btn-editor btn-yellow btn-right">Download</button>
         </div>
     </div>
     <div class="text-center widget-sm widget-black" id="widget-bg">
         <div class="widget-body">
             <div class="slidecontainer">
 
-                <div title="Troque a cor do fundo" style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                <div title="Troque a cor do fundo"
+                    style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="bg-color-button" class="btn btn-small">
                         <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
@@ -110,7 +117,8 @@
         <div class="widget-body">
             <div class="slidecontainer">
 
-                <div title="Troque a cor do objeto" style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                <div title="Troque a cor do objeto"
+                    style="position: relative; display: inline-block; width: 50px; height: 50px;">
                     <button id="node-color-button" class="btn btn-small">
                         <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
@@ -118,10 +126,14 @@
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
 
-                <button title="Trazer pra frente" class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
-                <button title="Enviar pra trás" class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
-                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
-                <button title="Deletar objeto" class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
+                <button title="Trazer pra frente" class="moveUp btn btn-small btn-left"><i
+                        class="fa-solid fa-arrow-up-to-line"></i></button>
+                <button title="Enviar pra trás" class="moveDown btn btn-small btn-right"><i
+                        class="fa-solid fa-arrow-down-to-line"></i></button>
+                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i
+                        class="fa-solid fa-copy"></i></button>
+                <button title="Deletar objeto" class="btn-delete btn btn-small btn-right"><i
+                        class="fa-solid fa-trash-can"></i></button>
             </div>
         </div>
     </div>
@@ -129,9 +141,12 @@
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
             <div class="slidecontainer">
-                <button title="Adicione um triangulo" class="btn btn-small btn-left" id="add-tri"><i class="mdi mdi-triangle"></i></button>
-                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-rect"><i class="mdi mdi-square"></i></button>
-                <button title="Adicione um circulo" class="btn btn-small btn-right" id="add-circle"><i class="mdi mdi-circle"></i></button>
+                <button title="Adicione um triangulo" class="btn btn-small btn-left" id="add-tri"><i
+                        class="mdi mdi-triangle"></i></button>
+                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-rect"><i
+                        class="mdi mdi-square"></i></button>
+                <button title="Adicione um circulo" class="btn btn-small btn-right" id="add-circle"><i
+                        class="mdi mdi-circle"></i></button>
             </div>
         </div>
     </div>
@@ -142,10 +157,9 @@
                 <div class="slidecontainer col-12">
                     <input class="slider2" original-scale="" type="range" id="zoom-slider" object-id="0" min="0.01"
                         max="2" step="0.01" value="1">
-                        <div class="col-2">
-                            <i id="reset-zoom" title="Resetar valor padrão" class="fa fa-refresh"
-                            aria-hidden="true"></i>
-                        </div>
+                    <div class="col-2">
+                        <i id="reset-zoom" title="Resetar valor padrão" class="fa fa-refresh" aria-hidden="true"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -180,7 +194,7 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget widget-fixed widget-black" id="add-text-widget">
+    <div class="text-center widget-sm widget-fixed widget-black" id="add-text-widget">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> TEXTO</i>
@@ -189,11 +203,32 @@
         </div>
         <div class="widget-body">
 
-                <textarea class="form-control" id="input-text" placeholder="Adicionar um texto" row="50" cols="50"
-                ></textarea>
+            <textarea class="text-input" id="input-text" placeholder="Adicionar um texto" row="50" cols="30"></textarea>
 
         </div>
         <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
+    </div>
+    <div class="text-center widget widget-fixed widget-black" id="add-image-widget">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> IMAGEM</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+        <div class="widget-body">
+
+            <div class="upload-div">
+                <div>
+                    <input id="input-image" multiple type="file" name="file" posx="" posy="" idshape="stage" />
+                    <i class="mdi mdi-upload-box"></i>
+                    <span data-defaulttext="Click or drop images here">Clique ou arraste imagens aqui</span>
+                    <span class="fpd-price"></span>
+                </div>
+            </div>
+            <div class="images-btn-area" id="images-btn-area">
+
+            </div>
+        </div>
     </div>
     <div class="text-center widget-sm widget-black widget-fixed" id="widget-settings">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
@@ -275,7 +310,7 @@
         </div>
         <button id="resize-stage" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
-    
+
     <div class="text-center widget-sm widget-black" id="widget-layers" style="display:block;">
         <div class="widget-header layers-header">
 
@@ -293,12 +328,12 @@
                 </ul>
             </div>
             <div class="row">
-                <button class="btn btn-left btn-manage-layer btn-success" title="Adicionar nova camada" id="add-layer"><i class="mdi mdi-layers-plus"
-                        aria-hidden="true"></i></button>
+                <button class="btn btn-left btn-manage-layer btn-success" title="Adicionar nova camada"
+                    id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
                 <button class="btn btn-middle btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
                         class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
-                <button class="btn btn-right btn-manage-layer btn-danger" title="Duplicar camada" id="duplicate-layer"><i
-                        class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
+                <button class="btn btn-right btn-manage-layer btn-danger" title="Duplicar camada"
+                    id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
             </div>
 
 
@@ -308,11 +343,16 @@
         <div class="widget-body">
             <div class="slidecontainer">
 
-                <button title="Trazer para frente" class="moveUp btn btn-small btn-left"><i class="fa-solid fa-arrow-up-to-line"></i></button>
-                <button title="Enviar para trás" class="moveDown btn btn-small btn-right"><i class="fa-solid fa-arrow-down-to-line"></i></button>
-                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i class="fa-solid fa-copy"></i></button>
-                <button title="Deletar Imagem" class="btn-delete btn btn-small btn-right"><i class="fa-solid fa-trash-can"></i></button>
-                <button title="Ajustar brilho e contraste" id="btn-settings" class="btn btn-small"><i class="mdi mdi-cog"></i></button>
+                <button title="Trazer para frente" class="moveUp btn btn-small btn-left"><i
+                        class="fa-solid fa-arrow-up-to-line"></i></button>
+                <button title="Enviar para trás" class="moveDown btn btn-small btn-right"><i
+                        class="fa-solid fa-arrow-down-to-line"></i></button>
+                <button title="Crie uma cópia" class="btn-copy btn btn-small btn-left"><i
+                        class="fa-solid fa-copy"></i></button>
+                <button title="Deletar Imagem" class="btn-delete btn btn-small btn-right"><i
+                        class="fa-solid fa-trash-can"></i></button>
+                <button title="Ajustar brilho e contraste" id="btn-settings" class="btn btn-small"><i
+                        class="mdi mdi-cog"></i></button>
             </div>
         </div>
     </div>
@@ -344,11 +384,9 @@
                         <option value="Berkshire Swash"
                             style="font-family: &quot;Berkshire Swash&quot;; display: block;">
                             Berkshire Swash</option>
-                        <option value="Bigelow Rules"
-                            style="font-family: &quot;Bigelow Rules&quot;; display: block;">
+                        <option value="Bigelow Rules" style="font-family: &quot;Bigelow Rules&quot;; display: block;">
                             Bigelow Rules</option>
-                        <option value="Bungee Shade"
-                            style="font-family: &quot;Bungee Shade&quot;; display: block;">
+                        <option value="Bungee Shade" style="font-family: &quot;Bungee Shade&quot;; display: block;">
                             Bungee
                             Shade</option>
                         <option value="Caesar Dressing"
@@ -358,8 +396,7 @@
                         <option value="Cinzel" style="font-family: Cinzel; display: block;">Cinzel</option>
                         <option value="Courgette" style="font-family: Courgette; display: block;">Courgette
                         </option>
-                        <option value="Crimson Text"
-                            style="font-family:&quot;Crimson Text&quot;; display: block;">
+                        <option value="Crimson Text" style="font-family:&quot;Crimson Text&quot;; display: block;">
                             Crimson
                             Text</option>
                         <option value="Dynalight" style="font-family: Dynalight; display: block;">Dynalight
@@ -367,8 +404,7 @@
                         <option value="Fontdiner Swanky"
                             style="font-family: &quot;Fontdiner Swanky&quot;; display: block;">
                             Fontdiner Swanky</option>
-                        <option value="Great Vibes"
-                            style="font-family: &quot;Great Vibes&quot;; display: block;">
+                        <option value="Great Vibes" style="font-family: &quot;Great Vibes&quot;; display: block;">
                             Great
                             Vibes</option>
                         <option value="Holtwood One SC"
@@ -403,11 +439,11 @@
                             style="font-family: &quot;Petit Formal Script&quot;; display: block;">Petit Formal
                             Script
                         </option>
-                        <option value="Pinyon Script"
-                            style="font-family: &quot;Pinyon Script&quot;; display: block;">Pinyon
+                        <option value="Pinyon Script" style="font-family: &quot;Pinyon Script&quot;; display: block;">
+                            Pinyon
                             Script</option>
-                        <option value="Press Start 2P"
-                            style="font-family:&quot;Press Start 2P&quot;; display: block;">Press
+                        <option value="Press Start 2P" style="font-family:&quot;Press Start 2P&quot;; display: block;">
+                            Press
                             Start 2P</option>
                         <option value="Sarina" style="font-family: Sarina; display: block;">Sarina</option>
                         <option value="Shadows Into Light"
@@ -415,8 +451,7 @@
                             Light
                         </option>
                         <option value="Sofia" style="font-family: Sofia; display: block;">Sofia</option>
-                        <option value="Special Elite"
-                            style="font-family: &quot;Special Elite&quot;; display: block;">
+                        <option value="Special Elite" style="font-family: &quot;Special Elite&quot;; display: block;">
                             Special Elite</option>
                         <option value="Ultra" style="font-family: Ultra; display: block;">Ultra</option>
                         <option value="Vacation Planner Regular"
