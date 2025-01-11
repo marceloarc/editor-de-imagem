@@ -292,16 +292,6 @@ $(document).ready(function () {
             effect: "fade"
         }
     });
-    var container = $('.container2');
-    var widgetLayers = $('#widget-layers');
-
-    var containerOffset = container.offset();
-
-    widgetLayers.css({
-        position: 'absolute',
-        top: containerOffset.top,
-        left: containerOffset.left + (container.outerWidth() - widgetLayers.width() * 2),
-    });
 
     $(".minimize").on('click', function (e) {
         var width = $(this).closest(".widget-header").width();
@@ -1055,6 +1045,16 @@ $("#open-layers-btn").click(function(){
         $(this).removeClass('active');
     }else{
         $("#widget-layers").fadeIn(100);
+        var container = $(this)
+        var widgetLayers = $('#widget-layers');
+    
+        var containerOffset = container.offset();
+    
+        widgetLayers.css({
+            position: 'absolute',
+            top: containerOffset.top+10,
+            left: containerOffset.left - $('#widget-layers').width()+10,
+        });
         $(this).addClass('active')
     }
 })
