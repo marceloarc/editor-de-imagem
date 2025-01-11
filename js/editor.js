@@ -84,7 +84,7 @@ function restoreState(stack) {
 
 
     const state = stack.pop();
-    const currentNode = transformer.nodes()[0];
+    const currentShape = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     userLayers.forEach((layer) => {
@@ -118,7 +118,7 @@ function restoreState(stack) {
                     return;
                 }
 
-                generateNodeEvents(obj, layer);
+                generateShapeEvents(obj, layer);
             } else if (obj instanceof Konva.Image) {
                 restoreImage(obj, layer)
                 generateImageEvents(obj, layer);
@@ -126,16 +126,16 @@ function restoreState(stack) {
                 if (obj.name() == "background") {
                     generateBackgroundEvents(obj, layer);
                 } else {
-                    generateNodeEvents(obj, layer);
+                    generateShapeEvents(obj, layer);
                 }
             } else if (obj instanceof Konva.RegularPolygon) {
-                generateNodeEvents(obj, layer);
+                generateShapeEvents(obj, layer);
             }
             else {
             }
-            if (currentNode) {
+            if (currentShape) {
 
-                if (obj.id() == currentNode.id()) {
+                if (obj.id() == currentShape.id()) {
                     stage.fire('click', { target: obj });
                     obj.fire("click");
                 } else {
@@ -262,11 +262,16 @@ $(document).ready(function () {
 
 
     $(".close").on('click', function (e) {
-        $(this).closest(".widget").hide();
-        $(this).closest(".widget-fixed").hide();
+        $(this).closest(".widget").fadeOut(100);
+        $(this).closest(".widget-fixed").fadeOut(100);
         var parent = $(this).parent();
         if (parent.attr('id') == "widget-draw") {
             $("#draw").click();
+        }
+        if (parent.hasClass('layers-header')) {
+            if($("#open-layers-btn").hasClass('active')){
+                $("#open-layers-btn").removeClass('active')
+            }
         }
     });
     $(document).tooltip({
@@ -344,7 +349,7 @@ $(document).ready(function () {
     });
 
     $("#models-category").click(function () {
-        $("#widget-products").show();
+        $("#widget-products").fadeIn(100);
     })
     $("#add-image").click(function () {
         if (drawMode) {
@@ -416,6 +421,11 @@ $('#images-btn-area').on('click', '.item-image', function (e) {
 
     var imageSrc = $(this).attr("src");
     addImage(imageSrc);
+});
+
+$('#background-btn-area').on('click', '.item-background', function (e) {
+
+    $("#add-bg").click();
 });
 var l = 0;
 function addImage(imageSrc) {
@@ -581,7 +591,7 @@ function addImage(imageSrc) {
 
 
 $("#widget-bg-btn").click(function () {
-    $("#widget-background").hide();
+    $("#widget-background").fadeOut(100);
     var editor = $(".preview-img");
     $("#widget-bg2").css("top", editor.position().top + editor.height() / 2 - $("#widget-bg2").height() / 2);
     $("#widget-bg2").css("left", editor.position().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
@@ -589,19 +599,6 @@ $("#widget-bg-btn").click(function () {
 
 });
 
-$("#vazio").click(function () {
-    cleanStage()
-    background.setAttrs({
-        fill: "#FFFFFF"
-    });
-    layer.draw();
-    $("#widget-image").show();
-    $("#widget-bg2").hide();
-    $("[name2=Deitado]").next("span").removeClass("active");
-    $('[name2="Em pé"]').next("span").removeClass("active");
-    $("[name2=Deitado]").next("span").show();
-    $('[name2="Em pé"]').next("span").show();
-});
 
 function generateImageEvents(image, layer) {
     image.on('click', (e) => {
@@ -1032,8 +1029,8 @@ $('#bgcolor').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         cor = $('#bgcolor').val();
-        var node = layer.findOne("#" + $('#bgcolor').attr("object-id"))
-        node.setAttrs({
+        var shape = layer.findOne("#" + $('#bgcolor').attr("object-id"))
+        shape.setAttrs({
             fill: $('#bgcolor').val()
         });
         layer.draw();
@@ -1045,23 +1042,33 @@ $('#bg-remove').on('click',
     function () {
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var node = layer.findOne("#" + $('#bgcolor').attr("object-id"))
-        node.destroy()
+        var shape = layer.findOne("#" + $('#bgcolor').attr("object-id"))
+        shape.destroy()
         $("#widget-bg").fadeOut(100);
         layer.draw();
     });
 $('#draw-color').on('click', saveState)
 
+$("#open-layers-btn").click(function(){
+    if($(this).hasClass('active')){
+        $("#widget-layers").fadeOut(100);
+        $(this).removeClass('active');
+    }else{
+        $("#widget-layers").fadeIn(100);
+        $(this).addClass('active')
+    }
+})
+
 $('#draw-color').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         cor = $('#draw-color').val();
-        var node = transformer.nodes()[0];
-        node.setAttrs({
+        var shape = transformer.nodes()[0];
+        shape.setAttrs({
             fill: $('#draw-color').val()
         });
         layer.draw();
-        const colorButton = document.getElementById("node-color-button");
+        const colorButton = document.getElementById("shape-color-button");
 
         colorButton.style.backgroundColor = this.value;
     });
@@ -1072,11 +1079,11 @@ sliders.forEach(function (attr) {
     $('#' + attr).on('input',
         function () {
             value = $('#' + attr).val();
-            var node = transformer.nodes()[0];
+            var shape = transformer.nodes()[0];
             const porcentagem = (value / $("#" + attr).attr("max")) * 100;
             $("." + attr).text(parseInt(porcentagem) + "%");
-            if (node) {
-                node[attr](parseFloat(value));
+            if (shape) {
+                shape[attr](parseFloat(value));
                 layer.batchDraw();
             }
         });
@@ -1089,7 +1096,7 @@ $("#add-tri").on('click', function () {
         $("#" + attr).prop("disabled", true);
     });
     i++;
-    var node = new Konva.RegularPolygon({
+    var shape = new Konva.RegularPolygon({
         id: i.toString() + 'tri',
         fill: Konva.Util.getRandomColor(),
         fakeShapeId: 'stage',
@@ -1101,16 +1108,47 @@ $("#add-tri").on('click', function () {
         draggable: true,
     });
 
-    var groupRect = new Konva.Group({ textId: i.toString() + 'tri' });
-    groupRect.add(node);
-    layer.add(node);
-    transformer.nodes([node]);
+    layer.add(shape);
+    transformer.nodes([shape]);
     layer.draw();
 
-    generateNodeWidget(node);
-    generateNodeEvents(node, layer);
+    generateShapeWidget(shape);
+    generateShapeEvents(shape, layer);
     groupTrans.moveToTop();
 })
+
+$("#add-star").on("click", function(){
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    sliders.forEach(function (attr) {
+        $("#" + attr).prop("disabled", true);
+    });
+    i++;
+    var shape = new Konva.Star({
+        id: i.toString() + 'star',
+        x: stage.width() / 2,
+        y: stage.height() / 2,
+        numPoints: 6,
+        innerRadius: 40,
+        outerRadius: 70,
+        name: "draw",
+        fakeShapeId: 'stage',
+        fill: 'yellow',
+        stroke: 'black',
+        strokeWidth: 4,
+        draggable:true
+      });
+      layer.add(shape);
+      transformer.nodes([shape]);
+      layer.draw();
+      shape.x((stageWidth / 2) - shape.innerRadius() / 2)
+      shape.y((stageHeight / 2) - shape.innerRadius() / 2)
+      generateShapeWidget(shape);
+      generateShapeEvents(shape, layer);
+      groupTrans.moveToTop();
+})
+
+
 $("#add-rect").on('click', function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -1118,7 +1156,7 @@ $("#add-rect").on('click', function () {
         $("#" + attr).prop("disabled", true);
     });
     i++;
-    var node = new Konva.Rect({
+    var shape = new Konva.Rect({
         id: i.toString() + 'rect',
         fill: Konva.Util.getRandomColor(),
         fakeShapeId: 'stage',
@@ -1129,82 +1167,84 @@ $("#add-rect").on('click', function () {
         name: "draw",
         draggable: true,
     });
-    node.x((stageWidth / 2) - node.width() / 2)
-    node.y((stageHeight / 2) - node.height() / 2)
+    shape.x((stageWidth / 2) - shape.width() / 2)
+    shape.y((stageHeight / 2) - shape.height() / 2)
     var groupRect = new Konva.Group({ textId: i.toString() + 'rect' });
-    groupRect.add(node);
-    layer.add(node);
-    transformer.nodes([node]);
+    groupRect.add(shape);
+    layer.add(shape);
+    transformer.nodes([shape]);
     layer.draw();
-    generateNodeEvents(node, layer);
-    generateNodeWidget(node);
+    generateShapeEvents(shape, layer);
+    generateShapeWidget(shape);
 
 })
 
-function generateNodeEvents(node, layer) {
-    node.on('transformstart', function () {
+function generateShapeEvents(shape, layer) {
+    shape.on('transformstart', function () {
         saveState();
-        $("#widget-node").fadeOut(100);
+        $("#widget-shape").fadeOut(100);
     })
 
-    node.on('transformend', function (e) {
-        generateNodeWidget(e.target)
+    shape.on('transformend', function (e) {
+        generateShapeWidget(e.target)
     })
 
-    node.on('mouseover', function () {
+    shape.on('mouseover', function () {
 
     });
 
-    node.on('click tap', (e) => {
+    shape.on('click tap', (e) => {
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        generateNodeWidget(e.target)
+        generateShapeWidget(e.target)
     });
 
 
-    node.on('dragend', (e) => {
-        generateNodeWidget(e.target);
+    shape.on('dragend', (e) => {
+        generateShapeWidget(e.target);
     });
 
-    node.on('dragstart', (e) => {
+    shape.on('dragstart', (e) => {
         saveState();
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        $("#widget-node").fadeOut(100);
+        $("#widget-shape").fadeOut(100);
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
         layer.draw();
     });
 }
 
-function generateNodeWidget(node) {
-    var nodePosition = node.getAbsolutePosition();
+function generateShapeWidget(shape) {
+    var nodePosition = shape.getAbsolutePosition();
     var stagePosition = $(".konvajs-content").offset();
-    $("#widget-node").fadeIn(100);
-    var widget = document.getElementById('widget-node');
+    $("#widget-shape").fadeIn(100);
+    var widget = document.getElementById('widget-shape');
     widget.style.position = 'absolute';
 
     const adjustedTop = (stagePosition.top + (nodePosition.y * zoom));
     const adjustedLeft = (stagePosition.left + (nodePosition.x * zoom));
 
-    const className = node.getClassName();
+    const className = shape.getClassName();
 
     if (className === 'Rect') {
-        var positionTop = adjustedTop + (((node.height() * zoom) * node.getAbsoluteScale().y) + 20);
-        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - ((node.width() * zoom) / 2) * node.getAbsoluteScale().x);
+        var positionTop = adjustedTop + (((shape.height() * zoom) * shape.getAbsoluteScale().y) + widget.offsetHeight);
+        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - ((shape.width() * zoom) / 2) * shape.getAbsoluteScale().x);
     } else if (className === 'Circle') {
-        var positionTop = adjustedTop + (((node.height() * zoom) * node.getAbsoluteScale().y));
+        var positionTop = adjustedTop + (((shape.radius() * zoom) * shape.getAbsoluteScale().y)+ widget.offsetHeight);
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
     } else if (className === 'RegularPolygon') {
-        var positionTop = adjustedTop + ((200 * node.getAbsoluteScale().y));
+        var positionTop = adjustedTop + (((shape.radius() * zoom) * shape.getAbsoluteScale().y));
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
     } else {
+        var positionTop = adjustedTop + (((shape.outerRadius()* zoom) * shape.getAbsoluteScale().y) + widget.offsetHeight);
+        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - (((shape.innerRadius()/2) * zoom) / 2) * shape.getAbsoluteScale().x);
     }
     if ($(window).outerWidth() < 450) {
         widget.style.position = 'fixed';
@@ -1219,13 +1259,13 @@ function generateNodeWidget(node) {
 
 
     $("#draw-color").attr("disabled", false);
-    $("#draw-color").val(node.fill());
-    const colorButton = document.getElementById("node-color-button");
+    $("#draw-color").val(shape.fill());
+    const colorButton = document.getElementById("shape-color-button");
     $("#widget-figures").fadeOut(100);
-    colorButton.style.backgroundColor = node.fill();
-    $("#draw-color").attr("object-id", node.id());
+    colorButton.style.backgroundColor = shape.fill();
+    $("#draw-color").attr("object-id", shape.id());
 }
-$("#add-bg").on('click', function () {
+$(".item-background").on('click', function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var background = layer.findOne('.background');
@@ -1241,7 +1281,7 @@ $("#add-bg").on('click', function () {
         height: stageHeight,
         id: "background" + layerIndex,
         name: "background",
-        fill: $('#bgcolor').val(),
+        fill: 'white',
     });
 
     generateBackgroundEvents(bg, layer)
@@ -1251,6 +1291,10 @@ $("#add-bg").on('click', function () {
     layer.draw();
 })
 
+$("#background-widget-btn").click(function(){
+    $("#add-background-widget").fadeIn(100);
+})
+
 $("#add-circle").on('click', function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -1258,7 +1302,7 @@ $("#add-circle").on('click', function () {
         $("#" + attr).prop("disabled", true);
     });
     i++;
-    var node = new Konva.Circle({
+    var shape = new Konva.Circle({
         id: i.toString() + 'circle',
         fill: Konva.Util.getRandomColor(),
         radius: 100 + Math.random() * 20,
@@ -1271,14 +1315,14 @@ $("#add-circle").on('click', function () {
     });
 
     var groupCircle = new Konva.Group({ textId: i.toString() + 'circle' });
-    groupCircle.add(node);
-    layer.add(node);
-    transformer.nodes([node]);
+    groupCircle.add(shape);
+    layer.add(shape);
+    transformer.nodes([shape]);
 
     layer.draw();
 
-    generateNodeWidget(node)
-    generateNodeEvents(node, layer);
+    generateShapeWidget(shape)
+    generateShapeEvents(shape, layer);
 
     groupTrans.moveToTop();
 })
@@ -1315,7 +1359,7 @@ var layerIndex;
 $(function () {
 
     $(document).tooltip();
-    $("#stage-parent").show();
+    $("#stage-parent").fadeIn(100);
 
     stageWidth = 800;
     stageHeight = 600;
@@ -1369,6 +1413,16 @@ $(function () {
     var isPaint = false;
 
     var lastLine;
+    stage.on('mouseout', function(){
+        if (drawMode) {
+            var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
+
+            if (DrawCursorRadius) {
+                DrawCursorRadius.visible(true);
+            }
+            DrawCursorRadius.visible(false);
+        }
+    })
     stage.on('mouseover', function () {
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
@@ -1385,7 +1439,7 @@ $(function () {
             if (!DrawCursorRadius) {
                 $("#draw").click();
             }
-
+            DrawCursorRadius.visible(true);
             DrawCursorRadius.x(adjustedPosition.x)
             DrawCursorRadius.y(adjustedPosition.y)
             DrawCursorRadius.radius(size / 2);
@@ -1508,7 +1562,7 @@ $(function () {
         if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')) {
 
             $("#draggable").fadeOut(100);
-            $("#widget-node").fadeOut(100);
+            $("#widget-shape").fadeOut(100);
 
             $("#widget-image").fadeOut(100);
             $("#widget-figures").fadeOut(100);
@@ -1548,7 +1602,7 @@ $(function () {
                 $("#widget-figures").fadeOut(100);
             }
             if (e.target.name() != 'draw') {
-                $("#widget-node").fadeOut(100);
+                $("#widget-shape").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
             }
             if (e.target.name() != 'image') {
@@ -1773,7 +1827,7 @@ $('#info-widget').on('click', function () {
 
 });
 $(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-node").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
@@ -1782,7 +1836,7 @@ $(document).on('mousedown touchstart', function (e) {
             layer.draw();
             $("#draggable").fadeOut(100);
             $("#widget-bg").fadeOut(100);
-            $("#widget-node").fadeOut(100);
+            $("#widget-shape").fadeOut(100);
             $("#widget-image").fadeOut(100);
         }
 
@@ -1885,6 +1939,7 @@ $("#draw").on("click", function () {
             stroke: 'black',
             strokeWidth: 0,
             listening: false,
+            visible:false
         });
         layer.add(DrawCursorRadius);
         DrawCursorRadius.moveToTop()
@@ -1908,7 +1963,7 @@ $("#draw").on("click", function () {
         var widget = document.getElementById('widget-draw');
     } else {
         $(this).css('background', "transparent");
-        $("#widget-draw").hide();
+        $("#widget-draw").fadeOut(100);
         drawMode = false;
         var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
         DrawCursorRadius.destroy();
@@ -2119,66 +2174,66 @@ function downloadURI(uri, name) {
 $(".btn-delete").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
-    var node = transformer.nodes()[0];
+    var shape = transformer.nodes()[0];
 
-    deleteShape(node, layer);
+    deleteShape(shape, layer);
 })
 
-function deleteShape(node, layer) {
-    node.destroy();
+function deleteShape(shape, layer) {
+    shape.destroy();
 
     stage.fire('click');
     layer.draw();
 }
 
-function copyShape(node, layer) {
+function copyShape(shape, layer) {
     i++;
-    if (node.name() === "image") {
-        var NodeClone = node.clone({
+    if (shape.name() === "image") {
+        var ShapeClone = shape.clone({
             id: 'imagecopy' + i.toString(),
-            y: node.position().y - 100,
-            name: node.name(),
+            y: shape.position().y - 100,
+            name: shape.name(),
         });
-        NodeClone.cache();
+        ShapeClone.cache();
     } else {
-        var NodeClone = node.clone({
+        var ShapeClone = shape.clone({
             id: i.toString() + "copy",
-            y: node.position().y - 100,
-            name: node.name(),
+            y: shape.position().y - 100,
+            name: shape.name(),
         });
     }
 
-    layer.add(NodeClone);
+    layer.add(ShapeClone);
 
 
     groupTrans.moveToTop();
-    transformer.nodes([NodeClone]);
-    NodeClone.zIndex(node.zIndex() + 1);
-    NodeClone.fire("click");
+    transformer.nodes([ShapeClone]);
+    ShapeClone.zIndex(shape.zIndex() + 1);
+    ShapeClone.fire("click");
     layer.draw();
 }
 
 $(".btn-copy").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
-    var node = transformer.nodes()[0];
-    copyShape(node, layer);
+    var shape = transformer.nodes()[0];
+    copyShape(shape, layer);
 
 });
 $(".moveUp").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
-    var node = transformer.nodes()[0];
+    var shape = transformer.nodes()[0];
 
     var textGroup = layer.find(nd => {
-        return nd.getAttr("textId") === node.id();
+        return nd.getAttr("textId") === shape.id();
     });
 
     // if (textGroup) {
-    //     node = textGroup[0];
+    //     shape = textGroup[0];
     // }
 
-    node.moveUp();
+    shape.moveUp();
     groupTrans.moveToTop();
     layer.draw();
 
@@ -2186,17 +2241,17 @@ $(".moveUp").click(function () {
 $(".moveDown").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
-    var node = transformer.nodes()[0];
+    var shape = transformer.nodes()[0];
 
     var textGroup = layer.find(nd => {
-        return nd.getAttr("textId") === node.id();
+        return nd.getAttr("textId") === shape.id();
     });
 
     // if (textGroup) {
-    //     node = textGroup[0];
+    //     shape = textGroup[0];
     // }
 
-    node.moveDown();
+    shape.moveDown();
     groupTrans.moveToTop();
     layer.draw();
 });
@@ -2268,7 +2323,8 @@ $("#resize-stage-prompt-btn").click(function () {
 
     const left = (windowWidth - elementWidth) / 2;
     const top = (windowHeight - elementHeight) / 2;
-
+    $("#resize-input-width").val(stageWidth);
+    $("#resize-input-height").val(stageHeight);
     $("#resize-stage-prompt").css({
         position: 'absolute',
         left: left + 'px',
@@ -2285,7 +2341,7 @@ $("#new-image").click(function () {
 
     if (userWidth > 0 && userHeight > 0) {
         setNewCanvas(userWidth, userHeight);
-        $(".header").text(title + " - " + userWidth + "x" + userHeight)
+        // $(".header").text(title + " - " + userWidth + "x" + userHeight)
         $("#new-image-prompt").fadeOut(100);
     }
 })
@@ -2319,7 +2375,7 @@ function setNewCanvasSize(userWidth, userHeight) {
     stageHeight = userHeight;
     stage.width(userWidth);
     stage.height(userHeight);
-
+    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
     stage.batchDraw();
@@ -2356,9 +2412,9 @@ function setNewCanvas(userWidth, userHeight) {
     stage.width(userWidth);
     stage.height(userHeight);
     cleanStage();
-    $("#add-bg").click();
+    $(".item-background").click();
     stage.batchDraw();
-
+    $("#project-info").text(title+" - "+userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
 

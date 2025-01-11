@@ -54,6 +54,35 @@ body {
     width: 100%;
 }
 
+.btn-mini{
+
+    margin:3px;
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    border:0;
+    color:white;
+    border-radius: 0;
+    background: transparent;
+    font-size: 22px;
+}
+
+.btn-mini-yellow{
+    color: #FFD843;;
+}
+
+
+.btn-mini.active{
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    border:0;
+    border-radius: 5px;
+    background: #003C6C;
+    font-size: 22px;
+    border:5px #0078D6;
+}
+
 .slidecontainer2 {
     overflow-x: scroll;
     overflow-y: hidden;
@@ -157,11 +186,11 @@ select {
 }
 
 .widget-sm span {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .widget-lg span {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .widget-models {
@@ -202,6 +231,7 @@ textarea:focus {
     background: rgba(0, 0, 0, 0.9);
     margin: 0px;
     padding: 0px;
+    text-transform: uppercase;
     color: white
 }
 
