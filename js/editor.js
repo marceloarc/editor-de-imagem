@@ -1139,7 +1139,8 @@ $("#add-star").on("click", function(){
       layer.add(shape);
       transformer.nodes([shape]);
       layer.draw();
-  
+      shape.x((stageWidth / 2) - shape.innerRadius() / 2)
+      shape.y((stageHeight / 2) - shape.innerRadius() / 2)
       generateShapeWidget(shape);
       generateShapeEvents(shape, layer);
       groupTrans.moveToTop();
@@ -1410,6 +1411,16 @@ $(function () {
     var isPaint = false;
 
     var lastLine;
+    stage.on('mouseout', function(){
+        if (drawMode) {
+            var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
+
+            if (DrawCursorRadius) {
+                DrawCursorRadius.visible(true);
+            }
+            DrawCursorRadius.visible(false);
+        }
+    })
     stage.on('mouseover', function () {
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
@@ -1426,7 +1437,7 @@ $(function () {
             if (!DrawCursorRadius) {
                 $("#draw").click();
             }
-
+            DrawCursorRadius.visible(true);
             DrawCursorRadius.x(adjustedPosition.x)
             DrawCursorRadius.y(adjustedPosition.y)
             DrawCursorRadius.radius(size / 2);
@@ -1926,6 +1937,7 @@ $("#draw").on("click", function () {
             stroke: 'black',
             strokeWidth: 0,
             listening: false,
+            visible:false
         });
         layer.add(DrawCursorRadius);
         DrawCursorRadius.moveToTop()
