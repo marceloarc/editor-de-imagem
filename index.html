@@ -55,7 +55,7 @@
                 <button class="btn" title="Adicione uma figura geometrica" id="btn-widget-figures"><i
                         class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
 
-                <button class="btn" title="Plano de fundo com cor sólida" id="add-bg"><i class="mdi mdi-image-album"
+                <button class="btn" title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
                         aria-hidden="true"></i><span class="btn-text">Background</span></button>
                 <button class="btn" title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
                         class="btn-text">Soon</span></button>
@@ -68,7 +68,7 @@
 
             </div>
             <input id="currentLayer" style="display:none;" value="0">
-            <input id="selectedNode" style="display:none;" value="0">
+            <input id="selectedShape" style="display:none;" value="0">
             <div class="preview-img" id="preview">
                 <div class="editor zoom" id="stage-parent">
                     <div class="" id="container">
@@ -113,13 +113,13 @@
 
 
     </div>
-    <div class="text-center widget-sm widget-black" id="widget-node">
+    <div class="text-center widget-sm widget-black" id="widget-shape">
         <div class="widget-body">
             <div class="slidecontainer">
 
                 <div title="Troque a cor do objeto"
                     style="position: relative; display: inline-block; width: 50px; height: 50px;">
-                    <button id="node-color-button" class="btn btn-small">
+                    <button id="shape-color-button" class="btn btn-small">
                         <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                     </button>
                     <input type="color" id="draw-color"
@@ -145,8 +145,10 @@
                         class="mdi mdi-triangle"></i></button>
                 <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-rect"><i
                         class="mdi mdi-square"></i></button>
-                <button title="Adicione um circulo" class="btn btn-small btn-right" id="add-circle"><i
+                <button title="Adicione um circulo" class="btn btn-small btn-middle" id="add-circle"><i
                         class="mdi mdi-circle"></i></button>
+                        <button title="Adicione uma estrela" class="btn btn-small btn-right" id="add-star"><i
+                            class="mdi mdi-star"></i></button>
             </div>
         </div>
     </div>
@@ -208,6 +210,7 @@
         </div>
         <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
+
     <div class="text-center widget widget-fixed widget-black" id="add-image-widget">
         <div class="widget-header">
 
@@ -230,6 +233,24 @@
             </div>
         </div>
     </div>
+
+    <div class="text-center widget widget-fixed widget-black" id="add-background-widget">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Planos de fundo</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+        <div class="widget-body">
+
+            <div class="background-btn-area" id="background-btn-area">
+                <div class="item">
+                    <img class="item-background" src="images/bg-white.jpg" alt="" />
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="text-center widget-sm widget-black widget-fixed" id="widget-settings">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
@@ -332,13 +353,14 @@
                     id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
                 <button class="btn btn-middle btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
                         class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
-                <button class="btn btn-right btn-manage-layer btn-danger" title="Duplicar camada"
+                <button class="btn btn-right btn-manage-layer btn-info" title="Duplicar camada"
                     id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
             </div>
 
 
         </div>
     </div>
+
     <div class="text-center widget-sm widget-black" id="widget-image">
         <div class="widget-body">
             <div class="slidecontainer">
@@ -356,6 +378,7 @@
             </div>
         </div>
     </div>
+    
     <div class="text-center widget-lg widget-black" id="draggable">
         <div class="widget-body">
             <div class="row">
