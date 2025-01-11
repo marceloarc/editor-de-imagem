@@ -13,8 +13,8 @@ body {
   min-height: 100vh;
   align-items: center;
   justify-content: center;
-  background: #2A2B2D;
-  font: "Helvetica Neue", Sans-Serif;
+  background: #2F3336;
+  font-family: "Helvetica Neue", Sans-Serif;;
 }
 body::after {
   content: "";
@@ -23,7 +23,7 @@ body::after {
   top: 0;
   left: 0;
   bottom: 0;
-  background-position: center;;
+  background-position: center;
   right: 0;
   align-items: center;
   position: absolute;
@@ -302,24 +302,32 @@ body::after {
 
 .project-info{
   z-index: 2;
-  bottom:5px;
+  display: flex;
   font-size: 11px;
   color:white;
-  position:absolute;
-  right:8px;
+  justify-content: center;
+  align-items: center;
   color:white;
-
   cursor: pointer;
 }
 
+
+.project-info span{
+  margin:2px;
+}
+
+.btn-mini-yellow{
+  color: #FFD843;
+}
+
+
 .container2 {
   width: 80vw;
-  height: 80vh;
+  height: auto;
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  padding: 25px 25px 25px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(47, 51, 54, 0.5);
   border-radius: 5px;
   color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.095);
@@ -355,6 +363,7 @@ body::after {
   width: 3px;
   height: 3px;
   background-color: transparent;
+  display: none;
 }
 
 .editor-panel::-webkit-scrollbar-track {
@@ -378,44 +387,60 @@ body::after {
   display: flex;
   overflow: hidden;
   height: auto;
-  align-items: center;
-  justify-content: center;
-  margin: 10px 0px 10px 0px;
+  border: 1px solid rgba(255, 255, 255, 0.095);
+  border-left: 0;
+  border-right: 0;
+
 }
 
 .editor-panel {
-  margin-top: 10px;
   display: flex;
-  width: auto;
-  border-radius: 5px;
+  width: 70px;
   position: relative;
   overflow-x: hidden;
-  align-items: baseline;
-  justify-content: baseline;
   overflow-y: scroll;
+  border:1px;
   flex-direction: column;
-  height: 480px;
+  height: 500px;
+  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
 }
 
 #widget-zoom {
   top: 0;
 }
 
-.editor-panel button {
+.logo{
+  width: 150px;
+  height: 50px;
+}
 
-  min-height: 4em;
-  min-width: 4em;
-  max-width: 80px;
-  max-height: 80px;
+.logo img{
+  width: 100%;
+  height: 100%;
+}
+
+.editor-panel button {
+  background: transparent;
+  color: rgb(169, 173, 177);
+  outline: 0;
+  border: 0;
+  width: 100%;
   display: flex;
+  font-size:18px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 5px;
   line-height: 1.2;
-  min-width: 80px;
   min-height: 80px;
   text-align: center;
+}
+
+.editor-panel button:active {
+  background-color: rgb(66, 67, 68);
+}
+
+.editor-panel button:focus{
+  background-color: rgb(66, 67, 68);
 }
 
 .editor-panel .title {
@@ -431,23 +456,11 @@ body::after {
   justify-content: right;
 }
 
-.editor-panel .btn {
-  outline: none;
-  height: 40px;
-  font-size: 22px;
-  color: #6c757d;
-  background: rgba(0, 0, 0, 0.0);
-  border-radius: 0.625em;
-  margin-bottom: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.095);
-}
 
 .editor-panel .btn:hover {
-
-  color: #6c757d;
   background: rgba(0, 0, 0, 0.0);
   border-radius: 0.625em;
-  border: 0.1px solid rgba(255, 255, 255, 0.3);
+
 }
 
 .editor-panel .btn i {
@@ -642,10 +655,9 @@ body::after {
   z-index: 0;
   display: flex;
   overflow: scroll;
-  margin-left: 10px;
-  margin-right: 10px;
   align-items: center;
   justify-content: center;
+  background: #232527;
 }
 
 .preview-img::-webkit-scrollbar {
@@ -687,7 +699,6 @@ body::after {
 .controls .resizeImage.active {
   color: #fff;
   background: #5372f0;
-  border: 1px solid #5372f0;
   transform: translateY(0);
   transition: all 0.3s;
   pointer-events: auto;
@@ -741,6 +752,9 @@ body::after {
     height: auto;
   }
 
+  .row2{
+    padding:0px !important;
+  }
   .container2 .wrapper {
     flex-wrap: wrap-reverse;
 
@@ -753,6 +767,7 @@ body::after {
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
     width: auto;
+    -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent);
   }
 
   .wrapper .editor-panel button {
@@ -838,15 +853,15 @@ body::after {
 
   .container2 {
     min-width: 90vw;
-    min-height: 90vh;
+    min-height: auto;
   }
 
   .wrapper .editor-panel {
-    width: auto;
+    min-width: 70px;
+    max-width: 70px;
     height: 450px;
     overflow-x: hidden !important;
     overflow-y: scroll !important;
-    padding: 10px;
   }
 
   .options .btn {
@@ -891,7 +906,8 @@ body::after {
     height: 300px;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
-    width: auto;
+    min-width: 70px;
+    max-width: 70px;
 
   }
 
@@ -965,7 +981,7 @@ body::after {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 10px;
+  padding:10px 10px 10px 10px;
 }
 
 .imageResizer .column2 label {
