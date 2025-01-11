@@ -31,46 +31,44 @@ function saveState() {
     undoStack.push(state);
 
     if (undoStack.length > MAX_STATES) {
-        undoStack.shift(); // Remove o estado mais antigo
+        undoStack.shift();
     }
 
-    redoStack.length = 0; 
+    redoStack.length = 0;
 
     updateundoRedoBtn();
 }
 
-function updateundoRedoBtn(){
-    if(undoStack.length === 0){
-        $("#undo").attr('disabled',true);
+function updateundoRedoBtn() {
+    if (undoStack.length === 0) {
+        $("#undo").attr('disabled', true);
         $("#undo").addClass('disabled');
-    }else{
-        $("#undo").attr('disabled',false);
+    } else {
+        $("#undo").attr('disabled', false);
         $("#undo").removeClass('disabled');
     }
-    if(redoStack.length === 0){
-        $("#redo").attr('disabled',true);
+    if (redoStack.length === 0) {
+        $("#redo").attr('disabled', true);
         $("#redo").addClass('disabled');
-    }else{
-        $("#redo").attr('disabled',false);
+    } else {
+        $("#redo").attr('disabled', false);
         $("#redo").removeClass('disabled');
     }
 }
 
 function undo() {
     if (undoStack.length === 0) return;
-    console.log(undoStack);
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     const currentState = userLayers.map(layer => layer.toJSON());
-    
+
     redoStack.push(currentState);
 
-    // Restaure o último estado salvo
     restoreState(undoStack);
     updateundoRedoBtn();
 }
-function restoreImage(image,layer) {
-    const imageSrc = image.getAttr("imageSrc"); // Recuperando o Base64 salvo
+function restoreImage(image, layer) {
+    const imageSrc = image.getAttr("imageSrc");
     const restoredImageObj = new Image();
 
     restoredImageObj.onload = function () {
@@ -79,14 +77,13 @@ function restoreImage(image,layer) {
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
         layer.draw();
     };
-    restoredImageObj.src = imageSrc; // Define o src da imagem
+    restoredImageObj.src = imageSrc;
 }
 function restoreState(stack) {
-    if (stack.length === 0) return; // Nada para restaurar
+    if (stack.length === 0) return;
 
-    console.log(stack);
 
-    const state = stack.pop(); // Obtenha o último estado salvo
+    const state = stack.pop();
     const currentNode = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
@@ -100,77 +97,77 @@ function restoreState(stack) {
 
         objects.forEach(obj => {
             if (obj instanceof Konva.Text) {
-                generateTextEvents(obj,layer);
+                generateTextEvents(obj, layer);
             } else if (obj instanceof Konva.Circle) {
-                if(obj.id()=="DrawCursorRadius"){
+                if (obj.id() == "DrawCursorRadius") {
+                    if (!drawMode) obj.destroy();
                     var pointerPosition = stage.getPointerPosition();
 
                     if (!pointerPosition) return;
-        
+
                     var scale = stage.scale();
                     var stagePosition = stage.position();
-        
+
                     var adjustedPosition = {
                         x: (pointerPosition.x - stagePosition.x) / scale.x,
                         y: (pointerPosition.y - stagePosition.y) / scale.y
                     };
-        
+
                     obj.x(adjustedPosition.x)
                     obj.y(adjustedPosition.y)
                     return;
                 }
 
-                generateNodeEvents(obj,layer);
+                generateNodeEvents(obj, layer);
             } else if (obj instanceof Konva.Image) {
-                restoreImage(obj,layer)
-                generateImageEvents(obj,layer);
+                restoreImage(obj, layer)
+                generateImageEvents(obj, layer);
             } else if (obj instanceof Konva.Rect) {
-                if(obj.name()=="background"){
-                    generateBackgroundEvents(obj,layer);
-                }else{
-                    generateNodeEvents(obj,layer); 
+                if (obj.name() == "background") {
+                    generateBackgroundEvents(obj, layer);
+                } else {
+                    generateNodeEvents(obj, layer);
                 }
             } else if (obj instanceof Konva.RegularPolygon) {
-                generateNodeEvents(obj,layer);
-            } 
+                generateNodeEvents(obj, layer);
+            }
             else {
             }
-            if(currentNode){
+            if (currentNode) {
 
-                if(obj.id() == currentNode.id()){
-                    stage.fire('click',{target:obj});
+                if (obj.id() == currentNode.id()) {
+                    stage.fire('click', { target: obj });
                     obj.fire("click");
-                }else{
+                } else {
 
                     stage.fire('click');
                 }
             }
         });
         $("#currentLayer").val(layer.id());
-        stage.add(layer); // Adicione a layer de volta ao stage
+        stage.add(layer);
     });
-    
+
     updateLayerButtons();
-    stage.draw(); // Redesenha o stage
+    stage.draw();
 }
 
 function redo() {
     if (redoStack.length === 0) return;
-    // Adicione o estado atual ao stack de undo
+
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     const currentState = userLayers.map(layer => layer.toJSON());
     undoStack.push(currentState);
 
-    // Restaure o último estado de redo
     restoreState(redoStack);
     updateundoRedoBtn();
 }
 
-$("#undo").click(function(){
+$("#undo").click(function () {
     undo();
 })
-$("#redo").click(function(){
+$("#redo").click(function () {
     redo();
 })
 $(document).on('mouseup touchend', function () {
@@ -178,16 +175,24 @@ $(document).on('mouseup touchend', function () {
 });
 
 document.addEventListener("keydown", (e) => {
-
-    if((e.ctrlKey && e.key === "c")){
-        if(transformer.nodes().length > 0){
-            copiedShape  = transformer.nodes()[0];
+    if ((e.key === "Delete")) {
+        if (transformer.nodes().length > 0) {
+            saveState();
+            var layer = stage.findOne("#" + $("#currentLayer").val());
+            var shape = transformer.nodes()[0];
+            deleteShape(shape, layer);
         }
     }
-    if((e.ctrlKey && e.key === "v")){
-        if(copiedShape){
+    if ((e.ctrlKey && e.key === "c")) {
+        if (transformer.nodes().length > 0) {
+            copiedShape = transformer.nodes()[0];
+        }
+    }
+    if ((e.ctrlKey && e.key === "v")) {
+        if (copiedShape) {
+            saveState();
             var layer = stage.findOne("#" + $("#currentLayer").val());
-            copyShape(copiedShape,layer);
+            copyShape(copiedShape, layer);
         }
     }
     if (e.ctrlKey && e.key === "z") {
@@ -205,43 +210,43 @@ $(document).ready(function () {
     const $container = $('.editor-panel');
 
     $container.on('mousedown', function (e) {
-      isDragging = true;
-      startX = e.pageX - $container.offset().left;
-      startY = e.pageY - $container.offset().top;
-      scrollLeft = $container.scrollLeft();
-      scrollTop = $container.scrollTop();
-      $container.css('cursor', 'grabbing');
+        isDragging = true;
+        startX = e.pageX - $container.offset().left;
+        startY = e.pageY - $container.offset().top;
+        scrollLeft = $container.scrollLeft();
+        scrollTop = $container.scrollTop();
+        $container.css('cursor', 'grabbing');
     });
     const $container2 = $('.slidecontainer2');
 
     $container2.on('mousedown', function (e) {
-      isDragging2 = true;
-      startX = e.pageX - $container.offset().left;
-      startY = e.pageY - $container.offset().top;
-      scrollLeft = $container.scrollLeft();
-      scrollTop = $container.scrollTop();
-      $container.css('cursor', 'grabbing');
+        isDragging2 = true;
+        startX = e.pageX - $container.offset().left;
+        startY = e.pageY - $container.offset().top;
+        scrollLeft = $container.scrollLeft();
+        scrollTop = $container.scrollTop();
+        $container.css('cursor', 'grabbing');
     });
 
     $(document).on('mousemove', function (e) {
-        if(isDragging){
-            e.preventDefault(); // Evita a seleção de texto
+        if (isDragging) {
+            e.preventDefault();
             const x = e.pageX - $container.offset().left;
             const y = e.pageY - $container.offset().top;
-      
-            const walkX = (x - startX) * -1; // Ajusta direção do scroll horizontal
-            const walkY = (y - startY) * -1; // Ajusta direção do scroll vertical
-      
+
+            const walkX = (x - startX) * -1;
+            const walkY = (y - startY) * -1;
+
             $container.scrollLeft(scrollLeft + walkX);
             $container.scrollTop(scrollTop + walkY);
         }
-        if(isDragging2){
-            e.preventDefault(); // Evita a seleção de texto
+        if (isDragging2) {
+            e.preventDefault();
             const x = e.pageX - $container.offset().left;
             const y = e.pageY - $container.offset().top;
-      
-            const walkX = (x - startX) * -1; // Ajusta direção do scroll horizontal
-            const walkY = (y - startY) * -1; // Ajusta direção do scroll vertical
+
+            const walkX = (x - startX) * -1;
+            const walkY = (y - startY) * -1;
 
             $container2.scrollLeft(scrollLeft + walkX);
             $container2.scrollTop(scrollTop + walkY);
@@ -249,10 +254,10 @@ $(document).ready(function () {
     });
 
     $(document).on('mouseup', function () {
-      isDragging = false;
-      isDragging2 = false;
-      $container.css('cursor', 'grab');
-      $container2.css('cursor', 'grab');
+        isDragging = false;
+        isDragging2 = false;
+        $container.css('cursor', 'grab');
+        $container2.css('cursor', 'grab');
     });
 
 
@@ -260,28 +265,28 @@ $(document).ready(function () {
         $(this).closest(".widget").hide();
         $(this).closest(".widget-fixed").hide();
         var parent = $(this).parent();
-        if (parent.attr('id')=="widget-draw") {
+        if (parent.attr('id') == "widget-draw") {
             $("#draw").click();
         }
     });
-    $( document ).tooltip({
+    $(document).tooltip({
         position: {
-          my: "center bottom-10",
-          at: "center top",
-          using: function( position, feedback ) {
-            $( this ).css( position );
-            $( "<div>" )
-              .addClass( "arrow" )
-              .addClass( feedback.vertical )
-              .addClass( feedback.horizontal )
-              .appendTo( this );
-          }
+            my: "center bottom-10",
+            at: "center top",
+            using: function (position, feedback) {
+                $(this).css(position);
+                $("<div>")
+                    .addClass("arrow")
+                    .addClass(feedback.vertical)
+                    .addClass(feedback.horizontal)
+                    .appendTo(this);
+            }
         },
         show: {
             delay: 500,
             effect: "fade"
         }
-      });
+    });
     var container = $('.container2');
     var widgetLayers = $('#widget-layers');
 
@@ -345,7 +350,7 @@ $(document).ready(function () {
         if (drawMode) {
             $("#draw").click();
         }
-        $("#input-image").click();
+        $("#add-image-widget").fadeIn(100);
     })
 
     $("#text-font").on('change', function () {
@@ -379,79 +384,75 @@ $(document).ready(function () {
 });
 var sliders = ['brightness', 'contrast'];
 var drawMode = false;
-var imagem4;
 $('#input-image').on('change', function (e) {
-    var posx = $(this).attr("posx");
-    var posy = $(this).attr("posy");
-    var shape = $(this).attr("idshape");
-    var imagens = e.target.files;
+    var imagens = $("#input-image")[0].files;
     $(imagens).each(function (index, value) {
-        addImage(value, posx, posy, shape);
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const base64String = event.target.result;
+            var src = URL.createObjectURL(value);
+            const pictureElement = `
+                <div class="item">
+                        <img class="item-image" src="${src}" alt="Image ${index + 1}" />
+                        <div class="remove-image-btn" ><i class="mdi mdi-close-circle-outline"></i></div>
+                </div>
+            `;
+
+            $('#images-btn-area').append(pictureElement);
+            addImage(src);
+        };
+        reader.readAsDataURL(value);
     });
     $(this).val('');
 });
+
+$('#images-btn-area').on('click', '.remove-image-btn', function (e) {
+    var item = $(this).parent();
+
+    item.remove();
+})
+
+$('#images-btn-area').on('click', '.item-image', function (e) {
+
+    var imageSrc = $(this).attr("src");
+    addImage(imageSrc);
+});
 var l = 0;
-function addImage(image, posx, posy, id) {
+function addImage(imageSrc) {
     l++
     saveState();
     var imageObj = new Image();
     var layer = stage.findOne("#" + $("#currentLayer").val());
-    imageObj.src = URL.createObjectURL(image);
+    imageObj.src = imageSrc;
     imageObj.onload = function () {
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
-    
+
         tempCanvas.width = imageObj.width;
         tempCanvas.height = imageObj.height;
-    
+
         tempCtx.drawImage(imageObj, 0, 0);
         const imageSrc = tempCanvas.toDataURL();
         var image = new Konva.Image({
-            x: parseFloat(posx),
-            y: parseFloat(posy),
+            x: 1,
+            y: 1,
             image: imageObj,
             name: 'image',
             id: 'image' + l,
             draggable: true,
-            fakeShapeId: id,
-            imageSrc:imageSrc
+            fakeShapeId: "stage",
+            imageSrc: imageSrc
         });
         image.cache();
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
-        if (id != 'stage') {
-            var fakeShape = stage.find("#" + id)[0];
-            var groupImage = new Konva.Group({
-                clipFunc: (ctx) => {
-                    ctx.save();
-                    ctx.translate(fakeShape.x(), fakeShape.y())
-                    ctx.rotate(Konva.getAngle(fakeShape.rotation()))
-                    ctx.rect(0, 0, fakeShape.width() * fakeShape.scaleX(), fakeShape.height() * fakeShape.scaleY());
-                    ctx.restore()
-                },
-                draggable: true,
-                textId: 'image' + l
-            })
-            var setx = fakeShape.x() + ((fakeShape.width() * fakeShape.scaleX() / 2) - (image.width() / 2));
-            var sety = fakeShape.y() + ((fakeShape.height() * fakeShape.scaleY() / 2) - (image.height() / 2));
-            image.setAttrs({ x: setx, y: sety, rotation: fakeShape.rotation() })
-            fakeShape.listening(false);
-            fakeShape.hide();
-            var camera = layer.find(nd => {
-                return nd.getAttr("camerafakeShapeId") === id;
-            });
-            camera.hide();
-            groupImage.add(image);
-            layer.add(image);
-        } else {
-            image.x((stageWidth / 2) - image.width() / 2);
-            image.y((stageHeight / 2) - image.height() / 2);
-            var groupImage = new Konva.Group({ textId: 'image' + l });
-            groupImage.add(image)
-            layer.add(image);
-        }
 
+        image.x((stageWidth / 2) - image.width() / 2);
+        image.y((stageHeight / 2) - image.height() / 2);
+        var groupImage = new Konva.Group({ textId: 'image' + l });
+        groupImage.add(image)
+        layer.add(image);
 
-        generateImageEvents(image,layer);
+        generateImageEvents(image, layer);
 
 
 
@@ -553,7 +554,7 @@ function addImage(image, posx, posy, id) {
         //     }
 
         // });
-    
+
         var background = stage.find(".background")[0];
         if (background) {
 
@@ -602,7 +603,7 @@ $("#vazio").click(function () {
     $('[name2="Em pé"]').next("span").show();
 });
 
-function generateImageEvents(image,layer){
+function generateImageEvents(image, layer) {
     image.on('click', (e) => {
         const parentLayer = e.target.getLayer();
 
@@ -831,7 +832,7 @@ $("#addText").click(function () {
     transformer.nodes([Text]);
     groupTrans.moveToTop();
 
-    generateTextEvents(Text,layer)
+    generateTextEvents(Text, layer)
     sliders.forEach(function (attr) {
         $("#" + attr).attr("object-id", Text.id())
     });
@@ -846,7 +847,7 @@ $("#editText").click(function () {
     $("#draggable").fadeOut(100);
 });
 
-function generateTextEvents(text,layer){
+function generateTextEvents(text, layer) {
     text.on('transformstart', function (e) {
         saveState();
         $("#draggable").fadeOut(100);
@@ -1025,7 +1026,7 @@ function textAreaPosition(Text) {
         window.addEventListener('touchstart', handleOutsideClick);
     });
     textarea.focus();
-}$('#bgcolor').on('click',saveState)
+} $('#bgcolor').on('click', saveState)
 
 $('#bgcolor').on('input',
     function () {
@@ -1049,7 +1050,7 @@ $('#bg-remove').on('click',
         $("#widget-bg").fadeOut(100);
         layer.draw();
     });
-    $('#draw-color').on('click',saveState)
+$('#draw-color').on('click', saveState)
 
 $('#draw-color').on('input',
     function () {
@@ -1066,7 +1067,7 @@ $('#draw-color').on('input',
     });
 sliders.forEach(function (attr) {
 
-    $('#' + attr).on('mousedown touchstart',saveState);
+    $('#' + attr).on('mousedown touchstart', saveState);
 
     $('#' + attr).on('input',
         function () {
@@ -1107,7 +1108,7 @@ $("#add-tri").on('click', function () {
     layer.draw();
 
     generateNodeWidget(node);
-    generateNodeEvents(node,layer);
+    generateNodeEvents(node, layer);
     groupTrans.moveToTop();
 })
 $("#add-rect").on('click', function () {
@@ -1135,12 +1136,12 @@ $("#add-rect").on('click', function () {
     layer.add(node);
     transformer.nodes([node]);
     layer.draw();
-    generateNodeEvents(node,layer);
+    generateNodeEvents(node, layer);
     generateNodeWidget(node);
 
 })
 
-function generateNodeEvents(node,layer){
+function generateNodeEvents(node, layer) {
     node.on('transformstart', function () {
         saveState();
         $("#widget-node").fadeOut(100);
@@ -1243,7 +1244,7 @@ $("#add-bg").on('click', function () {
         fill: $('#bgcolor').val(),
     });
 
-    generateBackgroundEvents(bg,layer)
+    generateBackgroundEvents(bg, layer)
 
     layer.add(bg);
     bg.moveToBottom();
@@ -1263,8 +1264,8 @@ $("#add-circle").on('click', function () {
         radius: 100 + Math.random() * 20,
         shadowBlur: 10,
         fakeShapeId: 'stage',
-        x: stageWidth  / 2,
-        y: stageHeight/ 2,
+        x: stageWidth / 2,
+        y: stageHeight / 2,
         name: "draw",
         draggable: true,
     });
@@ -1277,8 +1278,8 @@ $("#add-circle").on('click', function () {
     layer.draw();
 
     generateNodeWidget(node)
-    generateNodeEvents(node,layer);
-    
+    generateNodeEvents(node, layer);
+
     groupTrans.moveToTop();
 })
 
@@ -1313,7 +1314,7 @@ var originalStageHeight;
 var layerIndex;
 $(function () {
 
-    $( document ).tooltip();
+    $(document).tooltip();
     $("#stage-parent").show();
 
     stageWidth = 800;
@@ -1364,7 +1365,7 @@ $(function () {
     layer.draw()
     $('#bgcolor').attr("object-id", background.id());
 
-    generateBackgroundEvents(background,layer);
+    generateBackgroundEvents(background, layer);
     var isPaint = false;
 
     var lastLine;
@@ -1379,15 +1380,15 @@ $(function () {
                 x: (pointerPosition.x - stagePosition.x) / scale.x,
                 y: (pointerPosition.y - stagePosition.y) / scale.y
             };
-            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+            var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
 
-            if(!DrawCursorRadius){
+            if (!DrawCursorRadius) {
                 $("#draw").click();
             }
 
             DrawCursorRadius.x(adjustedPosition.x)
             DrawCursorRadius.y(adjustedPosition.y)
-            DrawCursorRadius.radius(size/2);
+            DrawCursorRadius.radius(size / 2);
             DrawCursorRadius.moveToTop();
             if (mode == 'brush') {
                 DrawCursorRadius.fill(color);
@@ -1408,7 +1409,7 @@ $(function () {
         if (drawMode) {
             saveState();
             isPaint = true;
-            
+
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
 
@@ -1427,11 +1428,11 @@ $(function () {
                     mode === 'brush' ? 'source-over' : 'destination-out',
                 lineJoin: 'round',
                 lineCap: 'round',
-                listening:false,
+                listening: false,
             });
             var layer = stage.findOne(`#${$("#currentLayer").val()}`);
             layer.add(lastLine);
-            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+            var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
             DrawCursorRadius.moveToTop();
             layer.draw();
 
@@ -1469,10 +1470,11 @@ $(function () {
                 y: (pointerPosition.y - stagePosition.y) / scale.y
             };
 
-            var DrawCursorRadius=stage.findOne("#DrawCursorRadius");
+            var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
 
-            if(!DrawCursorRadius){
+            if (!DrawCursorRadius) {
                 $("#draw").click();
+                return;
             }
 
             DrawCursorRadius.x(adjustedPosition.x)
@@ -1503,7 +1505,6 @@ $(function () {
 
 
     stage.on('click tap dragstart', function (e) {
-        console.log("ter")
         if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')) {
 
             $("#draggable").fadeOut(100);
@@ -1594,7 +1595,7 @@ $(function () {
 
 });
 
-function generateBackgroundEvents(background,layer){
+function generateBackgroundEvents(background, layer) {
     background.on('mouseover', function () {
 
     });
@@ -1841,7 +1842,7 @@ $("#btn-settings").click(function () {
     $("#widget-settings").toggle();
     var position = $("#widget-image").position();
     var widget = document.getElementById('widget-settings');
-    var positionTop = position.top - $("#widget-image").height() -60;
+    var positionTop = position.top - $("#widget-image").height() - 60;
     var positionLeft = position.left + ($("#widget-image").width() / 2 - (widget.offsetWidth / 2));
 
 
@@ -1865,10 +1866,10 @@ $("#draw").on("click", function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         drawMode = true;
         $("#widget-draw").fadeIn(100);
-        if(mode == "brush"){
+        if (mode == "brush") {
             $(".draw-mode[draw-mode='brush']").addClass("active");
-            $(".draw-mode[draw-mode='eraser']").removeClass("active"); 
-        }else{
+            $(".draw-mode[draw-mode='eraser']").removeClass("active");
+        } else {
             $(".draw-mode[draw-mode='brush']").removeClass("active");
             $(".draw-mode[draw-mode='eraser']").addClass("active");
         }
@@ -1876,21 +1877,21 @@ $("#draw").on("click", function () {
         var DrawCursorRadius = new Konva.Circle({
             id: "DrawCursorRadius",
             fill: color,
-            radius: size/2,
+            radius: size / 2,
             fakeShapeId: 'stage',
-            x: stageWidth  / 2,
-            y: stageHeight/ 2,
+            x: stageWidth / 2,
+            y: stageHeight / 2,
             name: "draw",
             stroke: 'black',
-            strokeWidth:0,
-            listening:false,
+            strokeWidth: 0,
+            listening: false,
         });
         layer.add(DrawCursorRadius);
         DrawCursorRadius.moveToTop()
         colorButton.style.backgroundColor = color;
         var position = $(".preview-img").offset();
         var widget = document.getElementById('widget-draw');
-        var positionTop = position.top + $(".preview-img").height()+10;
+        var positionTop = position.top + $(".preview-img").height() + 10;
         var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
@@ -1914,7 +1915,7 @@ $("#draw").on("click", function () {
     }
 
 });
-$("#brush-color,#brush-size").on('mousedown touchstart',saveState)
+$("#brush-color,#brush-size").on('mousedown touchstart', saveState)
 
 $("#brush-color,#brush-size").on('input', function () {
     color = $("#brush-color").val();
@@ -1949,18 +1950,16 @@ $("#add-layer").click(function () {
     updateLayerButtons();
 });
 
-$("#duplicate-layer").click(function(){
+$("#duplicate-layer").click(function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
     saveState();
-    var layer = stage.findOne("#"+$("#currentLayer").val())
+    var layer = stage.findOne("#" + $("#currentLayer").val())
     const clonedLayer = layer.clone();
 
-    // Dá um novo ID para a camada clonada
     clonedLayer.id("layernew" + getRandomInt(1000));
-  
-    // Adiciona a camada clonada ao stage
+
     stage.add(clonedLayer);
 
     $("#currentLayer").val(clonedLayer.id());
@@ -2027,7 +2026,7 @@ function updateLayerButtons() {
             const layer = stage.findOne("#" + layerId);
             const imgsrc = img.src;
 
-            if(!layer) return;
+            if (!layer) return;
 
             const isChecked = layer.visible() ? "checked" : "";
 
@@ -2122,18 +2121,17 @@ $(".btn-delete").click(function () {
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
 
-    node.destroy();
-
-    transformer.nodes([]);
-    layer.draw();
-    if ($("#input-edit-id").val() == node.id()) {
-        $("#draggable").fadeOut(100);
-    }
-    $("#widget-image").fadeOut(100);
-    $("#widget-node").fadeOut(100);
+    deleteShape(node, layer);
 })
 
-function copyShape(node,layer){
+function deleteShape(node, layer) {
+    node.destroy();
+
+    stage.fire('click');
+    layer.draw();
+}
+
+function copyShape(node, layer) {
     i++;
     if (node.name() === "image") {
         var NodeClone = node.clone({
@@ -2164,7 +2162,7 @@ $(".btn-copy").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var node = transformer.nodes()[0];
-    copyShape(node,layer);
+    copyShape(node, layer);
 
 });
 $(".moveUp").click(function () {
