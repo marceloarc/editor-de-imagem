@@ -10,6 +10,7 @@ const alignmentIcons = {
     right: "fa-align-right",
     justify: "fa-align-justify"
 };
+const detectElement = document.querySelector(".detect-zoom");
 const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
 var color;
@@ -695,8 +696,10 @@ function generateImageWidget(image) {
     var positionTop = adjustedTop + (((image.height() * zoom) * image.getAbsoluteScale().y) + 50);
     var positionLeft = adjustedLeft + (((image.width() * zoom) / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -958,9 +961,12 @@ function generateTextWidget(Text) {
     var positionTop = adjustedTop + (((Text.height() * zoom) * Text.getAbsoluteScale().y) + 50);
     var positionLeft = adjustedLeft + (((Text.width() * zoom) / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        toolbox.style.position = 'fixed';
-        toolbox.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height() + toolbox.offsetHeight / 2) - 4;
+        toolbox.style.position = 'absolute';
+        toolbox.style.top = positionTop+"px";
         toolbox.style.left = '0px';
+        toolbox.style.width = "100%";
     } else {
         toolbox.style.position = 'absolute';
         toolbox.style.top = positionTop + 'px';
@@ -1262,8 +1268,10 @@ function generateShapeWidget(shape) {
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - (((shape.innerRadius()/2) * zoom) / 2) * shape.getAbsoluteScale().x);
     }
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -1704,8 +1712,10 @@ function generateBackgroundEvents(background, layer) {
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
+                var position = $(".editor-panel").offset();
+                var positionTop = position.top - ($(".editor-panel").height()+4);
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -1731,8 +1741,10 @@ function generateBackgroundEvents(background, layer) {
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
+                var position = $(".editor-panel").offset();
+                var positionTop = position.top - ($(".editor-panel").height()+4);
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -2018,17 +2030,18 @@ $("#draw").on("click", function () {
         colorButton.style.backgroundColor = color;
         var position = $(".preview-img").offset();
         var widget = document.getElementById('widget-draw');
-        var positionTop = position.top + $(".preview-img").height() + 10;
         var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
-            widget.style.position = 'fixed';
-            widget.style.bottom = '0px';
+            var position = $(".editor-panel").offset();
+            var positionTop = position.top - ($(".editor-panel").height()+4);
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop+"px";
             widget.style.left = '0px';
             widget.style.width = "100%";
         } else {
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + 'px';
+            widget.style.bottom = 0;
             widget.style.left = positionLeft + 'px';
         }
 
@@ -2337,16 +2350,17 @@ $("#btn-widget-figures").click(function () {
     $("#widget-figures").fadeIn(100);
     var position = $(".preview-img").offset();
     var widget = document.getElementById('widget-figures');
-    var positionTop = position.top + $(".preview-img").height() + 10;
     var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + 'px';
+        widget.style.bottom = 0
         widget.style.left = positionLeft + 'px';
     }
 
@@ -2505,8 +2519,54 @@ function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
 
 }
 
+let initialDistance = null;
+let currentScale = 1;
 
-zoomElement.addEventListener("wheel", function (e) {
+detectElement.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 2) {
+        // Calcular a distância inicial entre dois dedos
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        initialDistance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+        );
+    }
+});
+
+detectElement.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 2 && initialDistance) {
+        // Calcular a distância atual entre os dedos
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const currentDistance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+        );
+
+        // Calcular o fator de zoom
+        const scaleChange = currentDistance / initialDistance;
+        currentScale *= scaleChange;
+
+        // Limitar o zoom a um intervalo adequado, se necessário
+        currentScale = Math.min(Math.max(currentScale, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
+
+        // Aplicar o zoom ao elemento
+        zoomElement.style.transform = `scale(${currentScale})`;
+
+        // Atualizar a distância inicial para o próximo movimento
+        initialDistance = currentDistance;
+    }
+});
+
+detectElement.addEventListener("touchend", function (e) {
+    if (e.touches.length < 2) {
+        initialDistance = null; // Resetar quando um dedo é retirado
+    }
+});
+
+
+detectElement.addEventListener("wheel", function (e) {
     if (!e.ctrlKey) return;
 
     e.preventDefault();
