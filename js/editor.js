@@ -346,6 +346,21 @@ $(document).ready(function () {
             $("#draw").click();
         }
         $("#add-image-widget").fadeIn(100);
+        const windowWidth = $(window).width();
+        const windowHeight = $(window).height();
+    
+        const elementWidth = $("#add-image-widget").outerWidth();
+        const elementHeight = $("#add-image-widget").outerHeight();
+    
+        const left = (windowWidth - elementWidth) / 2;
+        const top = (windowHeight - elementHeight) / 2;
+    
+        $("#add-image-widget").css({
+            position: 'absolute',
+            left: left + 'px',
+            top: top + 'px',
+        });
+    
     })
 
     $("#text-font").on('change', function () {
@@ -1293,6 +1308,22 @@ $(".item-background").on('click', function () {
 
 $("#background-widget-btn").click(function(){
     $("#add-background-widget").fadeIn(100);
+    $("#add-background-widget").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
+
+    const elementWidth =  $("#add-background-widget").outerWidth();
+    const elementHeight =  $("#add-background-widget").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#add-background-widget").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
+
 })
 
 $("#add-circle").on('click', function () {
