@@ -780,8 +780,7 @@ body::after {
     position:fixed;
     bottom:0;
     left:0;
-    background-color: rgba(74, 75, 83, 0);
-    filter: drop-shadow(1.35rem 1.35rem 1.4rem rgba(0, 0, 0, 0.5));
+    background-color: rgba(47, 51, 54, 0.5);
   }
 
   .wrapper .editor-panel button {
