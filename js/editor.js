@@ -175,6 +175,7 @@ $(document).on('mouseup touchend', function () {
     isMousePressed = false;
 });
 
+
 document.addEventListener("keydown", (e) => {
     if ((e.key === "Delete")) {
         if (transformer.nodes().length > 0) {
