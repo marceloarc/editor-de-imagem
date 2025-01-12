@@ -30,16 +30,16 @@
 <body>
     <div class="container2">
         <div class="row2">
-            <div class="logo">
+            <div class="logo btn-mini-wrapper">
                 <img  src="images/logo.png" id="project-title" class="project-title"></img>
             </div>            
-            <div class="undo-redo" id="undo-redo">
+            <div class="undo-redo btn-mini-wrapper" id="undo-redo">
                 <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
                         class="mdi mdi-arrow-u-left-top"></span></button>
                 <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span
                         class="mdi mdi-arrow-u-right-top"></span></button>
             </div>
-            <div>
+            <div class="btn-mini-wrapper btn-right">
                 <button id="open-layers-btn" title="Camadas"
                 class="btn-mini"><span class="mdi mdi-layers"></span></button>
             </div>
@@ -197,20 +197,6 @@
 
             </div>
         </div>
-    </div>
-    <div class="text-center widget-sm widget-fixed widget-black" id="add-text-widget">
-        <div class="widget-header">
-
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> TEXTO</i>
-
-            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
-        </div>
-        <div class="widget-body">
-
-            <textarea class="text-input" id="input-text" placeholder="Adicionar um texto" row="50" cols="30"></textarea>
-
-        </div>
-        <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
 
     <div class="text-center widget widget-fixed widget-black" id="add-image-widget">
@@ -523,6 +509,20 @@
             </div>
         </div>
         
+    </div>
+    <div class="text-center widget-sm widget-fixed widget-black" id="add-text-widget">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> TEXTO</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+        <div class="widget-body">
+
+            <textarea class="text-input" id="input-text" placeholder="Adicionar um texto" row="50" cols="30"></textarea>
+
+        </div>
+        <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
 </body>
 

@@ -1827,15 +1827,21 @@ $('#widget-text').on('click', function () {
     if (drawMode) {
         $("#draw").click();
     }
+    $("#add-text-widget").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
 
-    var position = $(this).offset();
-    var widget = document.getElementById('add-text-widget');
-    var positionTop = position.top - 100;
-    var positionLeft = position.left - 100;
-    widget.style.position = 'absolute';
-    widget.style.top = positionTop + 'px';
-    widget.style.left = positionLeft + 'px';
-    widget.style.display = "block";
+    const elementWidth = $("#add-text-widget").outerWidth();
+    const elementHeight = $("#add-text-widget").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#add-text-widget").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
 
 
 });

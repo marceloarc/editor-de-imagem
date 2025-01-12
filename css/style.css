@@ -740,6 +740,11 @@ body::after {
   float: right;
 }
 
+.btn-mini-wrapper{
+  width: 100px;
+  text-align: end;
+}
+
 .btn-yellow:hover {
   color: black;
   background: #ddbe3f;
@@ -764,15 +769,23 @@ body::after {
     flex-wrap: wrap-reverse;
 
   }
-
+  #widget-zoom {
+    position:fixed;
+    top: 0;
+    width: 100%;
+  }
+  
   .wrapper .editor-panel {
     justify-content: flex-start;
     flex-direction: row;
     height: 70px;
     overflow-x: scroll;
-    margin: 20px 0px 20px 0px;
-    width: auto;
-    -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent);
+    width: 100%;
+    position:fixed;
+    bottom:0;
+    left:0;
+    background-color: rgba(0, 0, 0, 0.60);
+    -webkit-mask-image: linear-gradient(90deg, #000 100%, transparent);
   }
 
   .wrapper .editor-panel button {
