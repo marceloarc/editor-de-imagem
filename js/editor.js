@@ -2520,7 +2520,6 @@ function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
 }
 
 let initialDistance = null;
-let currentScale = 1;
 
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
@@ -2546,13 +2545,13 @@ detectElement.addEventListener("touchmove", function (e) {
 
         // Calcular o fator de zoom
         const scaleChange = currentDistance / initialDistance;
-        currentScale *= scaleChange;
+        zoom *= scaleChange;
 
         // Limitar o zoom a um intervalo adequado, se necessário
-        currentScale = Math.min(Math.max(currentScale, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
+        zoom = Math.min(Math.max(zoom, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
 
         // Aplicar o zoom ao elemento
-        zoomElement.style.transform = `scale(${currentScale})`;
+        zoomElement.style.transform = `scale(${zoom})`;
 
         // Atualizar a distância inicial para o próximo movimento
         initialDistance = currentDistance;
