@@ -768,7 +768,7 @@ body::after {
   .wrapper .editor-panel {
     justify-content: flex-start;
     flex-direction: row;
-    height: 100px;
+    height: 70px;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
     width: auto;
