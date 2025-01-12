@@ -2555,6 +2555,7 @@ detectElement.addEventListener("touchmove", function (e) {
 
         // Atualizar a distância inicial para o próximo movimento
         initialDistance = currentDistance;
+        $("#zoom-slider").val(zoom);
     }
 });
 
