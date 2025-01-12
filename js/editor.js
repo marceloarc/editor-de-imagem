@@ -1368,6 +1368,8 @@ $(function () {
         stageHeight = 600;
     }
 
+    $("body").height($(window).height());
+
     $("#project-info").text(stageWidth+" x "+stageHeight)
     originalStageWidth = stageWidth;
     originalStageHeight = stageHeight;
