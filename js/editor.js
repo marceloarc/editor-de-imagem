@@ -1829,7 +1829,7 @@ $(function () {
 
 
     $("#text-font-edit").on('click', function () {
-        $("#widget-fonts").css('background-color','black');
+        $("#widget-fonts").css('background-color','background: rgba(47, 51, 54, 1)');
         $("#widget-fonts").fadeIn(100);
         var font = $(this).attr('font');
         var position = $(this).offset();
