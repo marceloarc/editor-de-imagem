@@ -154,6 +154,12 @@ select {
     filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
 }
 
+#widget-fonts{
+    top:50%;
+    left:50%;
+    position: fixed;
+}
+
 .widget-sm {
     border-radius: 5px;
     line-height: 1;

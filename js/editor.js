@@ -851,12 +851,14 @@ $("#addText").click(function () {
 
 $("#editText").click(function () {
     $("#draggable").fadeOut(100);
+    $("#widget-fonts").fadeOut(100);
 });
 
 function generateTextEvents(text, layer) {
     text.on('transformstart', function (e) {
         saveState();
         $("#draggable").fadeOut(100);
+        $("#widget-fonts").fadeOut(100);
         generateTextWidget(e.target);
     })
 
@@ -902,6 +904,7 @@ function generateTextEvents(text, layer) {
         groupTrans.moveToTop();
         layer.draw();
         $("#draggable").fadeOut(100);
+        $("#widget-fonts").fadeOut(100);
     });
     text.on('dragend', (e) => {
         const parentLayer = e.target.getLayer();
@@ -941,9 +944,10 @@ function generateTextWidget(Text) {
     currentIcon = alignmentIcons[Text.align()];
     $(".btn-align i").attr("class", `fa ${currentIcon}`);
     $("#input-text-edit").val(Text.text());
-
+    
+    var span = `<span>${Text.fontFamily()}</span><i class="mdi mdi-menu-down"></i>`
     $("#opacity").val(Text.opacity());
-    $("#text-font-edit").val(Text.fontFamily());
+    $("#text-font-edit").html(span);
     $("#text-font-edit").css("font-family", '"' + font + '"');
     $("#input-text-edit").css("font-family", '"' + font + '"');
     $("#input-color-edit").val(Text.fill());
@@ -1613,7 +1617,7 @@ $(function () {
 
             $("#draggable").fadeOut(100);
             $("#widget-shape").fadeOut(100);
-
+            $("#widget-fonts").fadeOut(100);
             $("#widget-image").fadeOut(100);
             $("#widget-figures").fadeOut(100);
             transformer.nodes([]);
@@ -1646,6 +1650,7 @@ $(function () {
             if (e.target.name() != 'text') {
                 $("#draggable").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
+                $("#widget-fonts").fadeOut(100);
             }
             if ((e.target.name() != 'background') || (drawMode)) {
                 $("#widget-bg").fadeOut(100);
@@ -1704,7 +1709,7 @@ function generateBackgroundEvents(background, layer) {
 
     });
 
-    background.on("click tap", function () {
+    background.on("click dbltap", function () {
         if (!drawMode) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
@@ -1807,17 +1812,57 @@ $(function () {
         layer.draw();
     });
 
-    $("#text-font-edit").on('change', function () {
-        saveState();
+    $(".font-item").click(function(){
+
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
-        $(this).css("font-family", '"' + $(this).val() + '"');
         var textContent = text.text();
-        text.fontFamily($(this).val());
+        text.fontFamily($(this).attr("value"));
         text.text("");
         text.text(textContent);
         layer.draw();
+        var span = `<span>${$(this).attr("value")}</span><i class="mdi mdi-menu-down"></i>`
+        $("#text-font-edit").html(span);
+        $("#text-font-edit").css("font-family", '"' + $(this).attr("value") + '"');
+        $("#widget-fonts").fadeOut(100);
+    })
+
+
+    $("#text-font-edit").on('click', function () {
+        $("#widget-fonts").css('background-color','black');
+        $("#widget-fonts").fadeIn(100);
+        var font = $(this).attr('font');
+        var position = $(this).offset();
+        var position2 = $("#draggable").offset();
+        var widget = document.getElementById('widget-fonts');
+        var positionTop = position.top + $(this).height();
+        var positionLeft = position2.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
+        $("ul").find(`[value='${font}']`).addClass('active');
+        if ($(window).outerWidth() < 450) {
+            var position = $(".editor-panel").offset();
+            var positionTop = position.top - ($(".editor-panel").height()+4);
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop+"px";
+            widget.style.left = '0px';
+            widget.style.width = "100%";
+        } else {
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop + 'px';
+            widget.style.left = positionLeft + 'px';
+        }
+        
+        // var layer = stage.findOne("#" + $("#currentLayer").val());
+        // var text = stage.find("#" + $("#input-edit-id").val())[0];
+        // $(this).css("font-family", '"' + $(this).val() + '"');
+        // var textContent = text.text();
+        // text.fontFamily($(this).val());
+        // text.text("");
+        // text.text(textContent);
+        // layer.draw();
     });
+
+
+
     $("#input-text-edit").on('input', function () {
         saveState();
         var text = stage.find("#" + $("#input-edit-id").val())[0];
@@ -1912,7 +1957,7 @@ $('#info-widget').on('click', function () {
 
 });
 $(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
@@ -1920,6 +1965,7 @@ $(document).on('mousedown touchstart', function (e) {
             }
             layer.draw();
             $("#draggable").fadeOut(100);
+            $("#widget-fonts").fadeOut(100);
             $("#widget-bg").fadeOut(100);
             $("#widget-shape").fadeOut(100);
             $("#widget-image").fadeOut(100);

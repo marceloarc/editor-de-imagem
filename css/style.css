@@ -373,7 +373,10 @@ body::after {
   background-color: rgba(252, 202, 0, 0.74);
   border-radius: 10px;
 }
-
+.font-select::-webkit-scrollbar-thumb {
+  background-color: rgba(252, 202, 0, 0.74);
+  border-radius: 10px;
+}
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
@@ -428,6 +431,38 @@ body::after {
   text-align: center;
 }
 
+.font-select
+{
+ overflow-y: scroll;
+ height: 100%;
+ display: flex;
+ align-items: flex-start;
+ flex-direction: column;
+ cursor: pointer;
+}
+
+.font-item{
+  padding-bottom: 10px;
+  display: block;
+  cursor: pointer;
+  width: 100%;
+  padding: 5px 0 4px 5px;
+  text-align: left;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  font-size: 14px !important;
+}
+
+.font-item:hover{
+  background-color: #464646;
+}
+
+.font-item .active{
+  background-color: #464646;
+}
+.font-container{
+  height: 120px;
+}
 .editor-panel button:active {
   background-color: rgb(66, 67, 68);
 }
@@ -526,12 +561,23 @@ body::after {
 }
 
 .select-font {
+  display:flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
   margin: 5px 0px 5px 0px;
   height: 40px;
   font-size: 14px;
   border-radius: 5px;
   padding: 0px 0px;
+  background-color: white;
+  color: black;
+  text-align: left;
+  font-size: 27px !important;
+}
+.select-font span{
+  font-size: 18px !important;
 }
 
 .select-font:focus {
@@ -790,7 +836,7 @@ body::after {
     justify-content: center;
     line-height: 1.2;
     min-width: 20vw;
-    font-size: 18px;
+    font-size: 20px;
     min-height: 64px;
     text-align: center;
   }
