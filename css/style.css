@@ -310,7 +310,7 @@ body::after {
 
 
 .project-info span{
-  margin:2px;
+  margin:5px;
 }
 
 .btn-mini-yellow{
@@ -398,7 +398,7 @@ body::after {
   overflow-y: scroll;
   border:1px;
   flex-direction: column;
-  height: 500px;
+  height: 100%;
   -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
 }
 
