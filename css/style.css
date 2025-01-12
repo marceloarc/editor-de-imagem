@@ -801,8 +801,8 @@ body::after {
   }
 
   .wrapper .preview-img {
-    width: auto;
-    height: auto;
+    width: 100vw;
+    height: 70vh;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;

@@ -1360,9 +1360,15 @@ $(function () {
 
     $(document).tooltip();
     $("#stage-parent").fadeIn(100);
+    if ($(window).outerWidth() < 450) {
+        stageWidth = $(".preview-img").width();
+        stageHeight = $(".preview-img").height();
+    }else{
+        stageWidth = 800;
+        stageHeight = 600;
+    }
 
-    stageWidth = 800;
-    stageHeight = 600;
+    $("#project-info").text(stageWidth+" x "+stageHeight)
     originalStageWidth = stageWidth;
     originalStageHeight = stageHeight;
     $(".header").text(title + " - " + stageWidth + "x" + stageHeight)
@@ -1373,6 +1379,7 @@ $(function () {
         id: "stage"
 
     });
+
 
     transformer = addTransformer();
 
