@@ -864,7 +864,7 @@ body::after {
   }
 }
 
-@media screen and (min-width: 1025px) and (max-width:1280px) {
+@media screen and (min-width: 1026px) and (max-width:1280px) {
 
   .container2 {
     min-width: 90vw;
@@ -922,7 +922,7 @@ body::after {
   .wrapper .editor-panel {
     justify-content: flex-start;
     flex-direction: column;
-    height: 300px;
+    height: 100%;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
     min-width: 70px;
@@ -947,8 +947,8 @@ body::after {
   }
 
   .preview-img {
-    width: 500px;
-    height:350px;
+    width: auto;
+    height:100%;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;
