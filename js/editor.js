@@ -600,8 +600,8 @@ function addImage(imageSrc) {
 $("#widget-bg-btn").click(function () {
     $("#widget-background").fadeOut(100);
     var editor = $(".preview-img");
-    $("#widget-bg2").css("top", editor.position().top + editor.height() / 2 - $("#widget-bg2").height() / 2);
-    $("#widget-bg2").css("left", editor.position().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
+    $("#widget-bg2").css("top", editor.offset().top + editor.height() / 2);
+    $("#widget-bg2").css("left", editor.offset().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
     $("#widget-bg2").show();
 
 });
@@ -981,7 +981,7 @@ function generateTextWidget(Text) {
 }
 function textAreaPosition(Text) {
     var textPosition = Text.absolutePosition();
-    var position = $(".konvajs-content").position();
+    var position = $(".konvajs-content").offset();
     const adjustedTop = (position.top + (textPosition.y * zoom));
     const adjustedLeft = (position.left + textPosition.x * zoom);
     $("#input-text-edit").css("position", "absolute");
@@ -1410,6 +1410,7 @@ $(function () {
     }else{
         stageWidth = 800;
         stageHeight = 600;
+            zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
     }
 
     $("body").height($(window).height());
@@ -1714,7 +1715,7 @@ function generateBackgroundEvents(background, layer) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
             var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() + 10;
+            var positionTop = position.top + $(".preview-img").height()-20;
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
@@ -1835,12 +1836,12 @@ $(function () {
         var position = $(this).offset();
         var position2 = $("#draggable").offset();
         var widget = document.getElementById('widget-fonts');
-        var positionTop = position.top + $(this).height();
+        var positionTop = position2.top;
         var positionLeft = position2.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
         $("ul").find(`[value='${font}']`).addClass('active');
         if ($(window).outerWidth() < 450) {
-            var position = $(".editor-panel").offset();
-            var positionTop = position.top - ($(".editor-panel").height()+4);
+            var position = $("#draggable").offset();
+            var positionTop = position.top;
             widget.style.position = 'absolute';
             widget.style.top = positionTop+"px";
             widget.style.left = '0px';
@@ -1957,7 +1958,7 @@ $('#info-widget').on('click', function () {
 
 });
 $(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
@@ -2024,11 +2025,26 @@ function addTransformer() {
 }
 
 $("#btn-settings").click(function () {
-    $("#widget-settings").toggle();
-    var position = $("#widget-image").position();
+    $("#widget-settings").fadeIn(100);
+    var position = $("#widget-image").offset();
     var widget = document.getElementById('widget-settings');
-    var positionTop = position.top - $("#widget-image").height() - 60;
+    var positionTop = position.top;
     var positionLeft = position.left + ($("#widget-image").width() / 2 - (widget.offsetWidth / 2));
+
+
+    widget.style.position = 'fixed';
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+
+    $("#widget-figures").fadeOut(100);
+});
+
+$("#btn-text-settings").click(function () {
+    $("#widget-settings-text").fadeIn(100);
+    var position = $("#draggable").offset();
+    var widget = document.getElementById('widget-settings-text');
+    var positionTop = position.top;
+    var positionLeft = position.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
 
 
     widget.style.position = 'fixed';
@@ -2414,8 +2430,8 @@ $("#btn-widget-figures").click(function () {
 })
 $('#reset-zoom').on('click', function () {
 
-    zoomElement.style.transform = `scale(${zoom = 1})`;
-    $("#zoom-slider").val(1);
+    zoomElement.style.transform = `scale(${zoom = 0.9})`;
+    $("#zoom-slider").val(0.9);
 
 });
 $("#download").click(function () {
@@ -2620,6 +2636,7 @@ detectElement.addEventListener("wheel", function (e) {
 
     if (e.deltaY > 0) {
         zoomElement.style.transform = `scale(${zoom -= ZOOM_SPEED})`;
+        console.log(zoom);
     } else {
         zoomElement.style.transform = `scale(${zoom += ZOOM_SPEED})`;
     }

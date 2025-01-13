@@ -300,7 +300,6 @@ body::after {
 .project-info{
   z-index: 2;
   display: flex;
-  font-size: 11px;
   color:white;
   justify-content: center;
   align-items: center;
@@ -311,6 +310,7 @@ body::after {
 
 
 .project-info span{
+  font-size: 11px !important;
   margin:5px;
 }
 
@@ -434,12 +434,23 @@ body::after {
 .font-select
 {
  overflow-y: scroll;
- height: 100%;
+ max-height: 120px;
  display: flex;
  align-items: flex-start;
  flex-direction: column;
  cursor: pointer;
 }
+
+.widget-text-container
+{
+ overflow-y: scroll;
+ max-height: 120px;
+ display: flex;
+ align-items: flex-start;
+ flex-direction: row;
+ cursor: pointer;
+}
+
 
 .font-item{
   padding-bottom: 10px;
@@ -461,7 +472,7 @@ body::after {
   background-color: #464646;
 }
 .font-container{
-  height: 120px;
+  max-height: 120px;
 }
 .editor-panel button:active {
   background-color: rgb(66, 67, 68);
@@ -566,7 +577,7 @@ body::after {
   flex-direction: row;
   align-items: center;
   width: 100%;
-  margin: 5px 0px 5px 0px;
+  margin: 5px 0px 5px 5px;
   height: 40px;
   font-size: 14px;
   border-radius: 5px;

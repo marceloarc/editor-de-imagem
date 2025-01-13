@@ -224,6 +224,10 @@ textarea:focus {
     background-color: rgba(0, 0, 0, 0.60);
     color: white;
 }
+.widget-gray {
+    background: rgba(47, 51, 54, 1);
+    color: white;
+}
 
 .widget-header {
     border-radius: 3px 3px 0px 0px;
