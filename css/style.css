@@ -810,7 +810,11 @@ body::after {
     width: auto;
     height: 90%;
   }
-
+  .ui-tooltip {
+    opacity: 0 !important;
+  
+  }
+  
   .logo{
     display: flex;
     width: 70px;
