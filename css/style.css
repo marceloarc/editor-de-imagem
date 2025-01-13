@@ -570,7 +570,7 @@ body::after {
   height: 40px;
   font-size: 14px;
   border-radius: 5px;
-  padding: 0px 0px;
+  padding: 5px;
   background-color: white;
   color: black;
   text-align: left;
