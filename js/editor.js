@@ -1715,7 +1715,7 @@ function generateBackgroundEvents(background, layer) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
             var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height()-20;
+            var positionTop = position.top + $(".preview-img").height()-40;
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
