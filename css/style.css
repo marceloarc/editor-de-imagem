@@ -812,7 +812,7 @@ body::after {
   }
   .ui-tooltip {
     opacity: 0 !important;
-  
+    display: none !important;
   }
   
   .logo{
