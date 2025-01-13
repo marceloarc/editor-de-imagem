@@ -608,7 +608,7 @@ $("#widget-bg-btn").click(function () {
 
 
 function generateImageEvents(image, layer) {
-    image.on('click', (e) => {
+    image.on('click tap', (e) => {
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
