@@ -65,7 +65,7 @@ function undo() {
 
     redoStack.push(currentState);
 
-    restoreState(undoStack);
+    restoreState(undoStack.pop());
     updateundoRedoBtn();
 }
 function restoreImage(image, layer) {
@@ -80,11 +80,76 @@ function restoreImage(image, layer) {
     };
     restoredImageObj.src = imageSrc;
 }
+
+function saveToCustomFormat() {
+    // Obtenha o JSON do stage
+    saveState()
+
+    const stageResolution = {
+        width: stageWidth,
+        height: stageHeight,
+        title: title
+    };
+
+    // Crie um objeto com dados adicionais
+    const exportData = {
+        resolution: stageResolution,
+        layers: undoStack.pop() // O estado das camadas salvas
+    };
+    // Crie um Blob com o JSON
+    const jsonBlob = new Blob([JSON.stringify(exportData)], { type: 'application/json' });
+    const url = URL.createObjectURL(jsonBlob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title}.gproject`;
+    a.click();
+
+    URL.revokeObjectURL(url); // Limpa o objeto URL após o uso
+}
+
+
+$("#save").click(function(){
+    saveToCustomFormat();  
+})
+$("#import").click(function(){
+    $("#input-import").click();
+})
+
+$('#input-import').on('change', function (e) {
+    const file = e.target.files[0]; // Obtém o arquivo
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const fileContent = JSON.parse(e.target.result);
+    
+                // Extraia as informações
+                const { resolution, layers } = fileContent;
+    
+                // Redimensione o stage, se necessário
+                if (resolution) {
+                    setNewCanvasSize(resolution.width, resolution.height);
+                    title = resolution.title;
+                }
+    
+                    
+                restoreState(layers);
+                redoStack.length = 0;
+                undoStack.length = 0;
+                updateundoRedoBtn();
+            } catch (err) {
+                console.error("Erro ao carregar o arquivo:", err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+});
 function restoreState(stack) {
     if (stack.length === 0) return;
 
 
-    const state = stack.pop();
+    const state = stack;
     const currentShape = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
@@ -161,9 +226,31 @@ function redo() {
     const currentState = userLayers.map(layer => layer.toJSON());
     undoStack.push(currentState);
 
-    restoreState(redoStack);
+    restoreState(redoStack.pop());
     updateundoRedoBtn();
 }
+
+$("#export-prompt").click(function(){
+    var stagePosition = $(this).offset();
+    var widget = document.getElementById('widget-export');
+    $("#widget-export").fadeIn(100);
+    const adjustedTop = (stagePosition.top);
+    const adjustedLeft = (stagePosition.left);
+    widget.style.position = 'absolute';
+    widget.style.top = adjustedTop+10+"px";
+    widget.style.right= "10px";
+})
+
+$("#new-prompt").click(function(){
+    var stagePosition = $(this).offset();
+    var widget = document.getElementById('widget-new');
+    $("#widget-new").fadeIn(100);
+    const adjustedTop = (stagePosition.top);
+    const adjustedLeft = (stagePosition.left);
+    widget.style.position = 'absolute';
+    widget.style.top = adjustedTop+"px";
+    widget.style.left = adjustedLeft+$(this).outerWidth()+'px';
+})
 
 $("#undo").click(function () {
     undo();
@@ -375,8 +462,12 @@ $(document).ready(function () {
     });
     $("#input-color-edit").on('input', function () {
         var text = stage.find("#" + $("#input-edit-id").val())[0];
-
-        text.fill($(this).val());
+        if(text.strokeWidth() > 0){
+            text.fill("rgba(0, 0, 0, 0.0)");
+        }else{
+            text.fill($(this).val());
+        }
+        text.stroke($(this).val())
         layer.draw();
         const colorButton = document.getElementById("text-color-button");
 
@@ -805,6 +896,9 @@ var m = 0;
 
 var i = 0;
 
+
+
+
 $("#addText").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -826,7 +920,8 @@ $("#addText").click(function () {
         fill: "black",
         fakeShapeId: 'stage',
         verticalAlign: 'middle',
-
+        stroke: 'black',
+        strokeWidth: 0,
         padding: 30,
         name: 'text'
     });
@@ -944,16 +1039,25 @@ function generateTextWidget(Text) {
     currentIcon = alignmentIcons[Text.align()];
     $(".btn-align i").attr("class", `fa ${currentIcon}`);
     $("#input-text-edit").val(Text.text());
+    if(Text.strokeWidth()>0){
+        $(".btn-outline").addClass("selected");
+        $("#input-color-edit").val(Text.stroke());
+        const colorButton = document.getElementById("text-color-button");
     
+        colorButton.style.backgroundColor = Text.stroke();
+    }else{
+        $("#input-color-edit").val(Text.fill());
+        const colorButton = document.getElementById("text-color-button");
+    
+        colorButton.style.backgroundColor = Text.fill();
+        $(".btn-outline").removeClass("selected");
+    }
     var span = `<span>${Text.fontFamily()}</span><i class="mdi mdi-menu-down"></i>`
     $("#opacity").val(Text.opacity());
     $("#text-font-edit").html(span);
     $("#text-font-edit").css("font-family", '"' + font + '"');
     $("#input-text-edit").css("font-family", '"' + font + '"');
-    $("#input-color-edit").val(Text.fill());
-    const colorButton = document.getElementById("text-color-button");
 
-    colorButton.style.backgroundColor = Text.fill();
     $("#input-edit-id").val(Text.id());
 
     var textPosition = Text.absolutePosition();
@@ -1802,6 +1906,25 @@ $(function () {
         }
         layer.draw();
     });
+
+    $(".btn-outline").on('click', function () {
+        saveState();
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+            text.fill(text.stroke());
+            text.strokeWidth(0);
+        } else {
+            $(this).addClass("selected");
+            text.stroke(text.fill());
+            text.fill("rgba(0, 0, 0, 0.0)")
+            text.strokeWidth(2);
+        }
+        layer.draw();
+    });
+
+
     $("#opacity").on('mousedown touchstart', function () {
         saveState();
     });
@@ -1831,6 +1954,7 @@ $(function () {
 
     $("#text-font-edit").on('click', function () {
         $("#widget-fonts").css('background-color','background: rgba(47, 51, 54, 1)');
+        $("#widget-fonts").css('opacity','1');
         $("#widget-fonts").fadeIn(100);
         var font = $(this).attr('font');
         var position = $(this).offset();
@@ -1957,23 +2081,7 @@ $('#info-widget').on('click', function () {
     widget.style.display = "block";
 
 });
-$(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length) {
-        var transformers = stage.find('Transformer');
-        if (transformers.length > 0) {
-            for (var i = 0; i < transformers.length; i++) {
-                transformers[i].nodes([]);
-            }
-            layer.draw();
-            $("#draggable").fadeOut(100);
-            $("#widget-fonts").fadeOut(100);
-            $("#widget-bg").fadeOut(100);
-            $("#widget-shape").fadeOut(100);
-            $("#widget-image").fadeOut(100);
-        }
 
-    }
-});
 function addTransformer() {
     var sizeImage = new Image();
     var rotateImage = new Image();
@@ -2661,3 +2769,22 @@ function saveImageOriginalScale() {
     link.href = dataURL;
     link.click();
 }
+$(document).on('mousedown touchstart', function (e) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length) {
+        var transformers = stage.find('Transformer');
+        if (transformers.length > 0) {
+            for (var i = 0; i < transformers.length; i++) {
+                transformers[i].nodes([]);
+            }
+            layer.draw();
+            $("#draggable").fadeOut(100);
+            $("#widget-fonts").fadeOut(100);
+            $("#widget-bg").fadeOut(100);
+            $("#widget-shape").fadeOut(100);
+            $("#widget-image").fadeOut(100);
+            $("#widget-new").fadeOut(100);
+            $("#widget-export").fadeOut(100);
+        }
+
+    }
+});

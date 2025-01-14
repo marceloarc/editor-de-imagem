@@ -45,14 +45,14 @@
             <div class="btn-mini-wrapper btn-right">
                 <button id="open-layers-btn" title="Camadas"
                 class="btn-mini"><span class="mdi mdi-layers"></span></button>
-                <button id="download" class="btn-mini" title="Exportar imagem"><i class="mdi mdi-export"></i></button> 
+                <button id="export-prompt" class="btn-mini" title="Exportar imagem"><i class="mdi mdi-export"></i></button> 
             </div>
        
         </div>
         <div class="wrapper">
             <div class="teste"></div>
             <div class="editor-panel">
-                <button id="new-image-prompt-btn" title="Inicie um novo projeto"><i
+                <button id="new-prompt" title="Inicie um novo projeto"><i
                     class="mdi mdi-file-plus"></i><span class="btn-text">Novo</span></button>
                 <button id="add-image" title="Adicione uma imagem"><i
                         class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
@@ -197,7 +197,7 @@
         </div>
     </div>
 
-    <div class="text-center widget widget-fixed widget-black" id="add-image-widget">
+    <div class="text-center widget widget-fixed widget-gray" id="add-image-widget">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> IMAGEM</i>
@@ -208,7 +208,7 @@
 
             <div class="upload-div">
                 <div>
-                    <input id="input-image" multiple type="file" name="file" posx="" posy="" idshape="stage" />
+                    <input id="input-image" multiple type="file" accept="image/*" name="file" posx="" posy="" idshape="stage" />
                     <i class="mdi mdi-upload-box"></i>
                     <span data-defaulttext="Click or drop images here">Clique ou arraste imagens aqui</span>
                     <span class="fpd-price"></span>
@@ -369,6 +369,8 @@
                                 class="fas fa-strikethrough"></i></button>
                         <button title="Sublinhar" class="btn btn-small btn-right btn-decoration" value="underline"><i
                                 class="fas fa-underline"></i></button>
+                        <button title="Estilo vazado" class="btn btn-small btn-outline" value="line-through"><i
+                                class="mdi mdi-format-text-variant-outline"></i></button>
                         <button title="Alinhar" class="btn btn-small btn-align" value="left"><i
                                 class="fas fa-align-left"></i></button>
                         <button title="Trazer para frente" class="moveUp btn btn-small btn-left"><i
@@ -401,8 +403,7 @@
         </div>
         <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
-    <div class="text-center widget-lg widget-black widget-fixed" id="widget-fonts">
-        
+    <div class="text-center widget-lg widget-black widget-fixed" id="widget-fonts" style="display: block; opacity: 0;">       
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
             <div class="font-container">
@@ -529,13 +530,10 @@
                                 </div>
                                 <input type="range" disabled id="contrast" object-id="0" min="-100" max="100" step="1" value="0">
                             </div>
-                        </div>
-                        
+                        </div>                        
                     </div>
-
                 </div>
-        </div>
-        
+        </div>      
     </div>
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-settings-text">       
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
@@ -548,12 +546,57 @@
                                 <input type="range" title="stefd" min="0" max="1" class="slider" id="opacity" step="0.01">
                             </div>
                         </div>                       
+
                     </div>
 
                 </div>
         </div>
         
     </div>
+
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-new">       
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+        <div class="widget-body">
+            <div class="font-container">
+                    <div id="text-font-edit" class="font-select">
+                        <input id="input-import" type="file" name="input-import" accept=".gproject" style="display: none;" />
+                            <div class="slidecontainer" id="import">
+                                <button class="btn-mini" title="Carregar projeto do seu dispositivo"><i class="mdi mdi-upload-box"></i></button>
+                                <span>Carregar projeto</span>
+                            </div>
+                            <div class="slidecontainer" id="new-image-prompt-btn">
+                                <button class="btn-mini" title="Projeto vazio"><i class="mdi mdi-file-outline"></i></button>
+                                <span>Vazio</span>
+                            </div>                      
+                    </div>
+
+                </div>
+        </div>
+        
+    </div>
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-export">       
+
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+        <div class="widget-body">
+            <div class="font-container">
+                    <div id="text-font-edit" class="font-select">
+                            <div class="slidecontainer" id="save">
+                                <button class="btn-mini" title="Salvar projeto"><i class="mdi mdi-content-save-check"></i></button>
+                                <span>Salvar projeto</span>
+                            </div>
+                            <div class="slidecontainer" id="download">
+                                <button class="btn-mini" title="Baixar imagem"><i class="mdi mdi-download-box"></i></button>
+                                <span>Baixar Imagem</span>
+                            </div>                      
+
+   
+                        </div>                       
+
+                    </div>
+
+                </div>
+        </div>
+  
 </body>
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
