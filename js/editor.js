@@ -10,6 +10,7 @@ const alignmentIcons = {
     right: "fa-align-right",
     justify: "fa-align-justify"
 };
+const detectElement = document.querySelector(".detect-zoom");
 const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
 var color;
@@ -64,7 +65,7 @@ function undo() {
 
     redoStack.push(currentState);
 
-    restoreState(undoStack);
+    restoreState(undoStack.pop());
     updateundoRedoBtn();
 }
 function restoreImage(image, layer) {
@@ -79,11 +80,76 @@ function restoreImage(image, layer) {
     };
     restoredImageObj.src = imageSrc;
 }
+
+function saveToCustomFormat() {
+    // Obtenha o JSON do stage
+    saveState()
+
+    const stageResolution = {
+        width: stageWidth,
+        height: stageHeight,
+        title: title
+    };
+
+    // Crie um objeto com dados adicionais
+    const exportData = {
+        resolution: stageResolution,
+        layers: undoStack.pop() // O estado das camadas salvas
+    };
+    // Crie um Blob com o JSON
+    const jsonBlob = new Blob([JSON.stringify(exportData)], { type: 'application/json' });
+    const url = URL.createObjectURL(jsonBlob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title}.gproject`;
+    a.click();
+
+    URL.revokeObjectURL(url); // Limpa o objeto URL após o uso
+}
+
+
+$("#save").click(function(){
+    saveToCustomFormat();  
+})
+$("#import").click(function(){
+    $("#input-import").click();
+})
+
+$('#input-import').on('change', function (e) {
+    const file = e.target.files[0]; // Obtém o arquivo
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const fileContent = JSON.parse(e.target.result);
+    
+                // Extraia as informações
+                const { resolution, layers } = fileContent;
+    
+                // Redimensione o stage, se necessário
+                if (resolution) {
+                    setNewCanvasSize(resolution.width, resolution.height);
+                    title = resolution.title;
+                }
+    
+                    
+                restoreState(layers);
+                redoStack.length = 0;
+                undoStack.length = 0;
+                updateundoRedoBtn();
+            } catch (err) {
+                console.error("Erro ao carregar o arquivo:", err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+});
 function restoreState(stack) {
     if (stack.length === 0) return;
 
 
-    const state = stack.pop();
+    const state = stack;
     const currentShape = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
@@ -160,9 +226,31 @@ function redo() {
     const currentState = userLayers.map(layer => layer.toJSON());
     undoStack.push(currentState);
 
-    restoreState(redoStack);
+    restoreState(redoStack.pop());
     updateundoRedoBtn();
 }
+
+$("#export-prompt").click(function(){
+    var stagePosition = $(this).offset();
+    var widget = document.getElementById('widget-export');
+    $("#widget-export").fadeIn(100);
+    const adjustedTop = (stagePosition.top);
+    const adjustedLeft = (stagePosition.left);
+    widget.style.position = 'absolute';
+    widget.style.top = adjustedTop+10+"px";
+    widget.style.right= "10px";
+})
+
+$("#new-prompt").click(function(){
+    var stagePosition = $(this).offset();
+    var widget = document.getElementById('widget-new');
+    $("#widget-new").fadeIn(100);
+    const adjustedTop = (stagePosition.top);
+    const adjustedLeft = (stagePosition.left);
+    widget.style.position = 'absolute';
+    widget.style.top = adjustedTop+"px";
+    widget.style.left = adjustedLeft+$(this).outerWidth()+'px';
+})
 
 $("#undo").click(function () {
     undo();
@@ -173,6 +261,7 @@ $("#redo").click(function () {
 $(document).on('mouseup touchend', function () {
     isMousePressed = false;
 });
+
 
 document.addEventListener("keydown", (e) => {
     if ((e.key === "Delete")) {
@@ -346,6 +435,21 @@ $(document).ready(function () {
             $("#draw").click();
         }
         $("#add-image-widget").fadeIn(100);
+        const windowWidth = $(window).width();
+        const windowHeight = $(window).height();
+    
+        const elementWidth = $("#add-image-widget").outerWidth();
+        const elementHeight = $("#add-image-widget").outerHeight();
+    
+        const left = (windowWidth - elementWidth) / 2;
+        const top = (windowHeight - elementHeight) / 2;
+    
+        $("#add-image-widget").css({
+            position: 'absolute',
+            left: left + 'px',
+            top: top + 'px',
+        });
+    
     })
 
     $("#text-font").on('change', function () {
@@ -358,8 +462,12 @@ $(document).ready(function () {
     });
     $("#input-color-edit").on('input', function () {
         var text = stage.find("#" + $("#input-edit-id").val())[0];
-
-        text.fill($(this).val());
+        if(text.strokeWidth() > 0){
+            text.fill("rgba(0, 0, 0, 0.0)");
+        }else{
+            text.fill($(this).val());
+        }
+        text.stroke($(this).val())
         layer.draw();
         const colorButton = document.getElementById("text-color-button");
 
@@ -583,15 +691,15 @@ function addImage(imageSrc) {
 $("#widget-bg-btn").click(function () {
     $("#widget-background").fadeOut(100);
     var editor = $(".preview-img");
-    $("#widget-bg2").css("top", editor.position().top + editor.height() / 2 - $("#widget-bg2").height() / 2);
-    $("#widget-bg2").css("left", editor.position().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
+    $("#widget-bg2").css("top", editor.offset().top + editor.height() / 2);
+    $("#widget-bg2").css("left", editor.offset().left + editor.width() / 2 - $("#widget-bg2").width() / 2);
     $("#widget-bg2").show();
 
 });
 
 
 function generateImageEvents(image, layer) {
-    image.on('click', (e) => {
+    image.on('click tap', (e) => {
         const parentLayer = e.target.getLayer();
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
@@ -680,8 +788,10 @@ function generateImageWidget(image) {
     var positionTop = adjustedTop + (((image.height() * zoom) * image.getAbsoluteScale().y) + 50);
     var positionLeft = adjustedLeft + (((image.width() * zoom) / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -786,6 +896,9 @@ var m = 0;
 
 var i = 0;
 
+
+
+
 $("#addText").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -807,7 +920,8 @@ $("#addText").click(function () {
         fill: "black",
         fakeShapeId: 'stage',
         verticalAlign: 'middle',
-
+        stroke: 'black',
+        strokeWidth: 0,
         padding: 30,
         name: 'text'
     });
@@ -832,12 +946,14 @@ $("#addText").click(function () {
 
 $("#editText").click(function () {
     $("#draggable").fadeOut(100);
+    $("#widget-fonts").fadeOut(100);
 });
 
 function generateTextEvents(text, layer) {
     text.on('transformstart', function (e) {
         saveState();
         $("#draggable").fadeOut(100);
+        $("#widget-fonts").fadeOut(100);
         generateTextWidget(e.target);
     })
 
@@ -883,6 +999,7 @@ function generateTextEvents(text, layer) {
         groupTrans.moveToTop();
         layer.draw();
         $("#draggable").fadeOut(100);
+        $("#widget-fonts").fadeOut(100);
     });
     text.on('dragend', (e) => {
         const parentLayer = e.target.getLayer();
@@ -922,15 +1039,25 @@ function generateTextWidget(Text) {
     currentIcon = alignmentIcons[Text.align()];
     $(".btn-align i").attr("class", `fa ${currentIcon}`);
     $("#input-text-edit").val(Text.text());
-
+    if(Text.strokeWidth()>0){
+        $(".btn-outline").addClass("selected");
+        $("#input-color-edit").val(Text.stroke());
+        const colorButton = document.getElementById("text-color-button");
+    
+        colorButton.style.backgroundColor = Text.stroke();
+    }else{
+        $("#input-color-edit").val(Text.fill());
+        const colorButton = document.getElementById("text-color-button");
+    
+        colorButton.style.backgroundColor = Text.fill();
+        $(".btn-outline").removeClass("selected");
+    }
+    var span = `<span>${Text.fontFamily()}</span><i class="mdi mdi-menu-down"></i>`
     $("#opacity").val(Text.opacity());
-    $("#text-font-edit").val(Text.fontFamily());
+    $("#text-font-edit").html(span);
     $("#text-font-edit").css("font-family", '"' + font + '"');
     $("#input-text-edit").css("font-family", '"' + font + '"');
-    $("#input-color-edit").val(Text.fill());
-    const colorButton = document.getElementById("text-color-button");
 
-    colorButton.style.backgroundColor = Text.fill();
     $("#input-edit-id").val(Text.id());
 
     var textPosition = Text.absolutePosition();
@@ -943,9 +1070,12 @@ function generateTextWidget(Text) {
     var positionTop = adjustedTop + (((Text.height() * zoom) * Text.getAbsoluteScale().y) + 50);
     var positionLeft = adjustedLeft + (((Text.width() * zoom) / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        toolbox.style.position = 'fixed';
-        toolbox.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height() + toolbox.offsetHeight / 2) - 4;
+        toolbox.style.position = 'absolute';
+        toolbox.style.top = positionTop+"px";
         toolbox.style.left = '0px';
+        toolbox.style.width = "100%";
     } else {
         toolbox.style.position = 'absolute';
         toolbox.style.top = positionTop + 'px';
@@ -955,7 +1085,7 @@ function generateTextWidget(Text) {
 }
 function textAreaPosition(Text) {
     var textPosition = Text.absolutePosition();
-    var position = $(".konvajs-content").position();
+    var position = $(".konvajs-content").offset();
     const adjustedTop = (position.top + (textPosition.y * zoom));
     const adjustedLeft = (position.left + textPosition.x * zoom);
     $("#input-text-edit").css("position", "absolute");
@@ -1247,8 +1377,10 @@ function generateShapeWidget(shape) {
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - (((shape.innerRadius()/2) * zoom) / 2) * shape.getAbsoluteScale().x);
     }
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -1293,6 +1425,22 @@ $(".item-background").on('click', function () {
 
 $("#background-widget-btn").click(function(){
     $("#add-background-widget").fadeIn(100);
+    $("#add-background-widget").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
+
+    const elementWidth =  $("#add-background-widget").outerWidth();
+    const elementHeight =  $("#add-background-widget").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#add-background-widget").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
+
 })
 
 $("#add-circle").on('click', function () {
@@ -1360,9 +1508,18 @@ $(function () {
 
     $(document).tooltip();
     $("#stage-parent").fadeIn(100);
+    if ($(window).outerWidth() < 450) {
+        stageWidth = $(".preview-img").width();
+        stageHeight = $(".preview-img").height();
+    }else{
+        stageWidth = 800;
+        stageHeight = 600;
+            zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
+    }
 
-    stageWidth = 800;
-    stageHeight = 600;
+    $("body").height($(window).height());
+
+    $("#project-info").text(stageWidth+" x "+stageHeight)
     originalStageWidth = stageWidth;
     originalStageHeight = stageHeight;
     $(".header").text(title + " - " + stageWidth + "x" + stageHeight)
@@ -1373,6 +1530,7 @@ $(function () {
         id: "stage"
 
     });
+
 
     transformer = addTransformer();
 
@@ -1564,7 +1722,7 @@ $(function () {
 
             $("#draggable").fadeOut(100);
             $("#widget-shape").fadeOut(100);
-
+            $("#widget-fonts").fadeOut(100);
             $("#widget-image").fadeOut(100);
             $("#widget-figures").fadeOut(100);
             transformer.nodes([]);
@@ -1597,6 +1755,7 @@ $(function () {
             if (e.target.name() != 'text') {
                 $("#draggable").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
+                $("#widget-fonts").fadeOut(100);
             }
             if ((e.target.name() != 'background') || (drawMode)) {
                 $("#widget-bg").fadeOut(100);
@@ -1655,17 +1814,19 @@ function generateBackgroundEvents(background, layer) {
 
     });
 
-    background.on("click tap", function () {
+    background.on("click dbltap", function () {
         if (!drawMode) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
             var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() + 10;
+            var positionTop = position.top + $(".preview-img").height()-40;
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
+                var position = $(".editor-panel").offset();
+                var positionTop = position.top - ($(".editor-panel").height()+4);
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -1691,8 +1852,10 @@ function generateBackgroundEvents(background, layer) {
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
-                widget.style.position = 'fixed';
-                widget.style.bottom = '0px';
+                var position = $(".editor-panel").offset();
+                var positionTop = position.top - ($(".editor-panel").height()+4);
+                widget.style.position = 'absolute';
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -1743,6 +1906,25 @@ $(function () {
         }
         layer.draw();
     });
+
+    $(".btn-outline").on('click', function () {
+        saveState();
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+            text.fill(text.stroke());
+            text.strokeWidth(0);
+        } else {
+            $(this).addClass("selected");
+            text.stroke(text.fill());
+            text.fill("rgba(0, 0, 0, 0.0)")
+            text.strokeWidth(2);
+        }
+        layer.draw();
+    });
+
+
     $("#opacity").on('mousedown touchstart', function () {
         saveState();
     });
@@ -1754,17 +1936,58 @@ $(function () {
         layer.draw();
     });
 
-    $("#text-font-edit").on('change', function () {
-        saveState();
+    $(".font-item").click(function(){
+
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
-        $(this).css("font-family", '"' + $(this).val() + '"');
         var textContent = text.text();
-        text.fontFamily($(this).val());
+        text.fontFamily($(this).attr("value"));
         text.text("");
         text.text(textContent);
         layer.draw();
+        var span = `<span>${$(this).attr("value")}</span><i class="mdi mdi-menu-down"></i>`
+        $("#text-font-edit").html(span);
+        $("#text-font-edit").css("font-family", '"' + $(this).attr("value") + '"');
+        $("#widget-fonts").fadeOut(100);
+    })
+
+
+    $("#text-font-edit").on('click', function () {
+        $("#widget-fonts").css('background-color','background: rgba(47, 51, 54, 1)');
+        $("#widget-fonts").css('opacity','1');
+        $("#widget-fonts").fadeIn(100);
+        var font = $(this).attr('font');
+        var position = $(this).offset();
+        var position2 = $("#draggable").offset();
+        var widget = document.getElementById('widget-fonts');
+        var positionTop = position2.top;
+        var positionLeft = position2.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
+        $("ul").find(`[value='${font}']`).addClass('active');
+        if ($(window).outerWidth() < 450) {
+            var position = $("#draggable").offset();
+            var positionTop = position.top;
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop+"px";
+            widget.style.left = '0px';
+            widget.style.width = "100%";
+        } else {
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop + 'px';
+            widget.style.left = positionLeft + 'px';
+        }
+        
+        // var layer = stage.findOne("#" + $("#currentLayer").val());
+        // var text = stage.find("#" + $("#input-edit-id").val())[0];
+        // $(this).css("font-family", '"' + $(this).val() + '"');
+        // var textContent = text.text();
+        // text.fontFamily($(this).val());
+        // text.text("");
+        // text.text(textContent);
+        // layer.draw();
     });
+
+
+
     $("#input-text-edit").on('input', function () {
         saveState();
         var text = stage.find("#" + $("#input-edit-id").val())[0];
@@ -1827,15 +2050,21 @@ $('#widget-text').on('click', function () {
     if (drawMode) {
         $("#draw").click();
     }
+    $("#add-text-widget").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
 
-    var position = $(this).offset();
-    var widget = document.getElementById('add-text-widget');
-    var positionTop = position.top - 100;
-    var positionLeft = position.left - 100;
-    widget.style.position = 'absolute';
-    widget.style.top = positionTop + 'px';
-    widget.style.left = positionLeft + 'px';
-    widget.style.display = "block";
+    const elementWidth = $("#add-text-widget").outerWidth();
+    const elementHeight = $("#add-text-widget").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#add-text-widget").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
 
 
 });
@@ -1852,22 +2081,7 @@ $('#info-widget').on('click', function () {
     widget.style.display = "block";
 
 });
-$(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length) {
-        var transformers = stage.find('Transformer');
-        if (transformers.length > 0) {
-            for (var i = 0; i < transformers.length; i++) {
-                transformers[i].nodes([]);
-            }
-            layer.draw();
-            $("#draggable").fadeOut(100);
-            $("#widget-bg").fadeOut(100);
-            $("#widget-shape").fadeOut(100);
-            $("#widget-image").fadeOut(100);
-        }
 
-    }
-});
 function addTransformer() {
     var sizeImage = new Image();
     var rotateImage = new Image();
@@ -1919,11 +2133,26 @@ function addTransformer() {
 }
 
 $("#btn-settings").click(function () {
-    $("#widget-settings").toggle();
-    var position = $("#widget-image").position();
+    $("#widget-settings").fadeIn(100);
+    var position = $("#widget-image").offset();
     var widget = document.getElementById('widget-settings');
-    var positionTop = position.top - $("#widget-image").height() - 60;
+    var positionTop = position.top;
     var positionLeft = position.left + ($("#widget-image").width() / 2 - (widget.offsetWidth / 2));
+
+
+    widget.style.position = 'fixed';
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+
+    $("#widget-figures").fadeOut(100);
+});
+
+$("#btn-text-settings").click(function () {
+    $("#widget-settings-text").fadeIn(100);
+    var position = $("#draggable").offset();
+    var widget = document.getElementById('widget-settings-text');
+    var positionTop = position.top;
+    var positionLeft = position.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
 
 
     widget.style.position = 'fixed';
@@ -1972,17 +2201,18 @@ $("#draw").on("click", function () {
         colorButton.style.backgroundColor = color;
         var position = $(".preview-img").offset();
         var widget = document.getElementById('widget-draw');
-        var positionTop = position.top + $(".preview-img").height() + 10;
         var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
-            widget.style.position = 'fixed';
-            widget.style.bottom = '0px';
+            var position = $(".editor-panel").offset();
+            var positionTop = position.top - ($(".editor-panel").height()+4);
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop+"px";
             widget.style.left = '0px';
             widget.style.width = "100%";
         } else {
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + 'px';
+            widget.style.bottom = 0;
             widget.style.left = positionLeft + 'px';
         }
 
@@ -2291,24 +2521,25 @@ $("#btn-widget-figures").click(function () {
     $("#widget-figures").fadeIn(100);
     var position = $(".preview-img").offset();
     var widget = document.getElementById('widget-figures');
-    var positionTop = position.top + $(".preview-img").height() + 10;
     var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
-        widget.style.position = 'fixed';
-        widget.style.bottom = '0px';
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + 'px';
+        widget.style.bottom = 0
         widget.style.left = positionLeft + 'px';
     }
 
 })
 $('#reset-zoom').on('click', function () {
 
-    zoomElement.style.transform = `scale(${zoom = 1})`;
-    $("#zoom-slider").val(1);
+    zoomElement.style.transform = `scale(${zoom = 0.9})`;
+    $("#zoom-slider").val(0.9);
 
 });
 $("#download").click(function () {
@@ -2459,14 +2690,61 @@ function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
 
 }
 
+let initialDistance = null;
 
-zoomElement.addEventListener("wheel", function (e) {
+detectElement.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 2) {
+        // Calcular a distância inicial entre dois dedos
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        initialDistance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+        );
+    }
+});
+
+detectElement.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 2 && initialDistance) {
+        // Calcular a distância atual entre os dedos
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const currentDistance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+        );
+
+        // Calcular o fator de zoom
+        const scaleChange = currentDistance / initialDistance;
+        zoom *= scaleChange;
+
+        // Limitar o zoom a um intervalo adequado, se necessário
+        zoom = Math.min(Math.max(zoom, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
+
+        // Aplicar o zoom ao elemento
+        zoomElement.style.transform = `scale(${zoom})`;
+
+        // Atualizar a distância inicial para o próximo movimento
+        initialDistance = currentDistance;
+        $("#zoom-slider").val(zoom);
+    }
+});
+
+detectElement.addEventListener("touchend", function (e) {
+    if (e.touches.length < 2) {
+        initialDistance = null; // Resetar quando um dedo é retirado
+    }
+});
+
+
+detectElement.addEventListener("wheel", function (e) {
     if (!e.ctrlKey) return;
 
     e.preventDefault();
 
     if (e.deltaY > 0) {
         zoomElement.style.transform = `scale(${zoom -= ZOOM_SPEED})`;
+        console.log(zoom);
     } else {
         zoomElement.style.transform = `scale(${zoom += ZOOM_SPEED})`;
     }
@@ -2491,3 +2769,22 @@ function saveImageOriginalScale() {
     link.href = dataURL;
     link.click();
 }
+$(document).on('mousedown touchstart', function (e) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length) {
+        var transformers = stage.find('Transformer');
+        if (transformers.length > 0) {
+            for (var i = 0; i < transformers.length; i++) {
+                transformers[i].nodes([]);
+            }
+            layer.draw();
+            $("#draggable").fadeOut(100);
+            $("#widget-fonts").fadeOut(100);
+            $("#widget-bg").fadeOut(100);
+            $("#widget-shape").fadeOut(100);
+            $("#widget-image").fadeOut(100);
+            $("#widget-new").fadeOut(100);
+            $("#widget-export").fadeOut(100);
+        }
+
+    }
+});

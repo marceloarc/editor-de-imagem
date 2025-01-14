@@ -8,9 +8,6 @@
 }
 
 body {
-  display: flex;
-  padding: 10px;
-  min-height: 100vh;
   align-items: center;
   justify-content: center;
   background: #2F3336;
@@ -303,17 +300,18 @@ body::after {
 .project-info{
   z-index: 2;
   display: flex;
-  font-size: 11px;
   color:white;
   justify-content: center;
   align-items: center;
   color:white;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 
 .project-info span{
-  margin:2px;
+  font-size: 11px !important;
+  margin:5px;
 }
 
 .btn-mini-yellow{
@@ -322,16 +320,14 @@ body::after {
 
 
 .container2 {
-  width: 80vw;
-  height: auto;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   justify-content: center;
   align-items: center;
   background: rgba(47, 51, 54, 0.5);
   border-radius: 5px;
   color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.095);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -363,7 +359,6 @@ body::after {
   width: 3px;
   height: 3px;
   background-color: transparent;
-  display: none;
 }
 
 .editor-panel::-webkit-scrollbar-track {
@@ -375,10 +370,13 @@ body::after {
 }
 
 .editor-panel::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 216, 67, 0.2);
+  background-color: rgba(252, 202, 0, 0.74);
   border-radius: 10px;
 }
-
+.font-select::-webkit-scrollbar-thumb {
+  background-color: rgba(252, 202, 0, 0.74);
+  border-radius: 10px;
+}
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
@@ -386,7 +384,7 @@ body::after {
 .container2 .wrapper {
   display: flex;
   overflow: hidden;
-  height: auto;
+  height: 90%;
   border: 1px solid rgba(255, 255, 255, 0.095);
   border-left: 0;
   border-right: 0;
@@ -401,17 +399,15 @@ body::after {
   overflow-y: scroll;
   border:1px;
   flex-direction: column;
-  height: 500px;
-  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
+  height: 100%;
+
 }
 
-#widget-zoom {
-  top: 0;
-}
+
 
 .logo{
-  width: 150px;
-  height: 50px;
+  width: 100px;
+  height: 26px;
 }
 
 .logo img{
@@ -426,7 +422,7 @@ body::after {
   border: 0;
   width: 100%;
   display: flex;
-  font-size:18px;
+  font-size:22px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -435,6 +431,49 @@ body::after {
   text-align: center;
 }
 
+.font-select
+{
+ overflow-y: scroll;
+ max-height: 120px;
+ display: flex;
+ align-items: flex-start;
+ flex-direction: column;
+ cursor: pointer;
+}
+
+.widget-text-container
+{
+ overflow-y: scroll;
+ max-height: 120px;
+ display: flex;
+ align-items: flex-start;
+ flex-direction: row;
+ cursor: pointer;
+}
+
+
+.font-item{
+  padding-bottom: 10px;
+  display: block;
+  cursor: pointer;
+  width: 100%;
+  padding: 5px 0 4px 5px;
+  text-align: left;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  font-size: 14px !important;
+}
+
+.font-item:hover{
+  background-color: #464646;
+}
+
+.font-item .active{
+  background-color: #464646;
+}
+.font-container{
+  max-height: 120px;
+}
 .editor-panel button:active {
   background-color: rgb(66, 67, 68);
 }
@@ -533,12 +572,23 @@ body::after {
 }
 
 .select-font {
+  display:flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
-  margin: 5px 0px 5px 0px;
+  margin: 5px 0px 5px 5px;
   height: 40px;
   font-size: 14px;
   border-radius: 5px;
-  padding: 0px 0px;
+  padding: 5px;
+  background-color: white;
+  color: black;
+  text-align: left;
+  font-size: 27px !important;
+}
+.select-font span{
+  font-size: 18px !important;
 }
 
 .select-font:focus {
@@ -570,7 +620,7 @@ body::after {
   line-height: 1;
   margin: 5px;
   background-color: rgba(255, 255, 255, 0.3);
-
+  
 }
 
 .btn-small:active {
@@ -740,16 +790,37 @@ body::after {
   float: right;
 }
 
+.btn-mini-wrapper{
+  text-align: end;
+}
+
 .btn-yellow:hover {
   color: black;
   background: #ddbe3f;
 }
-
+@media screen and (min-width: 1024px){
+  
+  .wrapper .editor-panel {
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
+  }
+}
 @media screen and (max-width: 719px) {
   .container2 {
-    padding: 25px;
+    padding: 10px;
     width: auto;
-    height: auto;
+    height: 90%;
+  }
+  .ui-tooltip {
+    opacity: 0 !important;
+    display: none !important;
+  }
+  
+  .logo{
+    display: flex;
+    width: 70px;
+    height: 18px;
+    justify-content: center;
+    align-items: center;
   }
 
   .row2{
@@ -760,14 +831,17 @@ body::after {
 
   }
 
+
   .wrapper .editor-panel {
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-direction: row;
-    height: 100px;
+    height: 70px;
     overflow-x: scroll;
-    margin: 20px 0px 20px 0px;
-    width: auto;
-    -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent);
+    width: 100%;
+    position:fixed;
+    bottom:0;
+    left:0;
+    background-color: rgba(47, 51, 54, 0.5);
   }
 
   .wrapper .editor-panel button {
@@ -775,16 +849,16 @@ body::after {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 5px;
     line-height: 1.2;
-    min-width: 64px;
+    min-width: 20vw;
+    font-size: 20px;
     min-height: 64px;
     text-align: center;
   }
 
   .wrapper .preview-img {
-    width: auto;
-    height: auto;
+    width: 100vw;
+    height: 70vh;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;
@@ -793,7 +867,7 @@ body::after {
 @media screen and (min-width: 821px) and (max-width:912px) {
   .container2 {
     width: auto;
-    height: auto;
+    height: 100%;
 
   }
 
@@ -808,12 +882,12 @@ body::after {
     height: 100px;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
-    width: auto;
+    width: 100%;
   }
 
   .wrapper .preview-img {
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     margin-left: 0px;
     margin-right: 0px;
 
@@ -822,7 +896,7 @@ body::after {
 @media screen and (min-width: 720px) and (max-width:820px) {
   .container2 {
     width: auto;
-    height: auto;
+    height: 100%;
 
   }
 
@@ -837,7 +911,7 @@ body::after {
     height: 100px;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
-    width: auto;
+    width: 100%;
   }
 
   .wrapper .preview-img {
@@ -849,7 +923,7 @@ body::after {
   }
 }
 
-@media screen and (min-width: 1025px) and (max-width:1280px) {
+@media screen and (min-width: 1026px) and (max-width:1280px) {
 
   .container2 {
     min-width: 90vw;
@@ -859,9 +933,13 @@ body::after {
   .wrapper .editor-panel {
     min-width: 70px;
     max-width: 70px;
-    height: 450px;
     overflow-x: hidden !important;
     overflow-y: scroll !important;
+  }
+
+  .wrapper
+  {
+    height: 89% !important;
   }
 
   .options .btn {
@@ -892,18 +970,18 @@ body::after {
 @media screen and (min-width: 1000px) and (max-width:1025px) {
 
   .container2 {
-    height: auto;
+    height: 100%;
   }
 
   .wrapper{
     width: 100%;
-    height: 100%;
+    height: 85% !important;
   }
 
   .wrapper .editor-panel {
     justify-content: flex-start;
     flex-direction: column;
-    height: 300px;
+    height: 100%;
     overflow-x: scroll;
     margin: 20px 0px 20px 0px;
     min-width: 70px;
@@ -928,8 +1006,8 @@ body::after {
   }
 
   .preview-img {
-    width: 500px;
-    height:350px;
+    width: auto;
+    height:100%;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;
@@ -983,7 +1061,12 @@ body::after {
   width: 100%;
   padding:10px 10px 10px 10px;
 }
-
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
 .imageResizer .column2 label {
   font-size: 1.06rem;
 }
