@@ -102,7 +102,7 @@ function saveToCustomFormat() {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${title}.gproject`;
+    a.download = `${title}.gproj`;
     a.click();
 
     URL.revokeObjectURL(url); // Limpa o objeto URL após o uso

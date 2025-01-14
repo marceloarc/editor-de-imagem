@@ -370,11 +370,11 @@ body::after {
 }
 
 .editor-panel::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 202, 0, 0.74);
+  background-color: #FFD843;
   border-radius: 10px;
 }
 .font-select::-webkit-scrollbar-thumb {
-  background-color: rgba(252, 202, 0, 0.74);
+  background-color: #FFD843;
   border-radius: 10px;
 }
 .tooltip:hover .tooltiptext {
