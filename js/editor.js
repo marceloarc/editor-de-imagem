@@ -1512,7 +1512,6 @@ $("#add-square").on('click', function () {
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
         name: "draw",
-        strokeScaleEnabled: false,
         draggable: true,
     });
     shape.x((stageWidth / 2) - shape.width() / 2)
@@ -1966,7 +1965,6 @@ $(function () {
                 strokeWidth:lineSize,
                 width:lineSize,
                 listening: true,
-                strokeScaleEnabled: false,
                 id:"line"+Math.random(),
                 draggable:true,
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
