@@ -2329,12 +2329,13 @@ $("#layers").on('click','#duplicate-layer',function () {
     updateLayerButtons();
 })
 
-$("#layers").on('click','#delete-layer',function () {
+$("#layers").on('click','.btn-delete',function (e) {
+    e.stopPropagation();
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     let nextLayerId = userLayers[0].id();
     userLayers.forEach((layer) => {
-        if (layer.id() !== "transformerLayer" && layer.id() === $("#currentLayer").val() && userLayers.length > 1) {
+        if (layer.id() !== "transformerLayer" && layer.id() === $(this).attr('layer_id') && userLayers.length > 1) {
             saveState();
             layer.remove();
             stage.remove(layer);
@@ -2397,6 +2398,8 @@ function updateLayerButtons() {
             const buttonHtml = `
                 <li class="layer" layer-id="${layerId}">
                     <span class="layer-name">${layer.getAttr("pageNumber")}</span>
+                    <button class="btn-delete" title="Remover camada" layer_id="${layerId}"><i
+                        class="mdi mdi-close-circle" aria-hidden="true"></i></button>
                     <input class="check-visible" layer-id="${layerId}" type="checkbox" ${isChecked}>
                     <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="">
                 </li>
@@ -2426,12 +2429,10 @@ function updateLayerButtons() {
             }
         });
         $("#layers").append(`<button class="btn-add-layer" title="Adicionar nova camada"
-                                id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
-                            <button class="btn btn-middle btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
-                                    class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
-                            <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
-                                id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button> `)
+                                id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button> `)
     });
+    // <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
+    // id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
     setActiveLayer($("#currentLayer").val());
     var transformerLayer = stage.findOne("#transformerLayer");
     transformerLayer.moveToTop();

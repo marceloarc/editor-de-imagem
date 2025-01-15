@@ -80,7 +80,7 @@ body {
 }
 
 .slidecontainer2 {
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
     display: flex;
     align-items: center;
@@ -198,7 +198,7 @@ select {
 .widget-models {
     padding: 10px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 400px;
     margin: 20px;
     filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));

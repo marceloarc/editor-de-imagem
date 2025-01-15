@@ -142,7 +142,7 @@ body::after {
   bottom:0px;
   left:50%;
   padding: 10px;
-  overflow: scroll;
+  overflow: auto;
   transform: translateX(-50%);
   background: rgba(47, 51, 54, 0.5);
   background-blend-mode:darken;
@@ -229,7 +229,7 @@ body::after {
 
 .images-btn-area {
   height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 5px;
 }
 
@@ -249,7 +249,7 @@ body::after {
 
 .background-btn-area {
   height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 5px;
 }
 
@@ -433,6 +433,15 @@ body::after {
   visibility: visible;
 }
 
+.btn-delete{
+  position: absolute;
+  top:0;
+  right:0;
+  background: transparent;
+  border:0;
+  color: rgb(216, 42, 42);
+}
+
 .container2 .wrapper {
   display: flex;
   overflow: hidden;
@@ -447,7 +456,7 @@ body::after {
   width: 70px;
   position: relative;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y:auto;
   flex-direction: column;
   height: 100%;
 
@@ -483,7 +492,7 @@ body::after {
 
 .font-select
 {
- overflow-y: scroll;
+ overflow-y: auto;
  max-height: 120px;
  display: flex;
  align-items: flex-start;
@@ -493,7 +502,7 @@ body::after {
 
 .widget-text-container
 {
- overflow-y: scroll;
+ overflow-y: auto;
  max-height: 120px;
  display: flex;
  align-items: flex-start;
@@ -754,7 +763,7 @@ body::after {
   flex-grow: 1;
   z-index: 0;
   display: flex;
-  overflow: scroll;
+  overflow: auto;
   align-items: center;
   justify-content: center;
   background: #232527;
@@ -887,7 +896,7 @@ body::after {
     justify-content: space-between;
     flex-direction: row;
     height: 70px;
-    overflow-x: scroll;
+    overflow-x: auto;
     width: 100%;
     position:fixed;
     bottom:0;
@@ -931,7 +940,7 @@ body::after {
     justify-content: flex-start;
     flex-direction: row;
     height: 100px;
-    overflow-x: scroll;
+    overflow-x: auto;
     margin: 20px 0px 20px 0px;
     width: 100%;
   }
@@ -960,7 +969,7 @@ body::after {
     justify-content: flex-start;
     flex-direction: row;
     height: 100px;
-    overflow-x: scroll;
+    overflow-x: auto;
     margin: 20px 0px 20px 0px;
     width: 100%;
   }
@@ -985,7 +994,7 @@ body::after {
     min-width: 70px;
     max-width: 70px;
     overflow-x: hidden !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
   }
 
   .wrapper
@@ -1033,7 +1042,7 @@ body::after {
     justify-content: flex-start;
     flex-direction: column;
     height: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
     margin: 20px 0px 20px 0px;
     min-width: 70px;
     max-width: 70px;
