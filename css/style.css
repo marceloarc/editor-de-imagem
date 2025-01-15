@@ -433,13 +433,13 @@ body::after {
   visibility: visible;
 }
 
-.btn-delete{
+.btn-delete-layer{
   position: absolute;
   top:0;
   right:0;
   background: transparent;
   border:0;
-  color: rgb(216, 42, 42);
+  color: rgb(160, 25, 25);
 }
 
 .container2 .wrapper {

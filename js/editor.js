@@ -2398,7 +2398,7 @@ function updateLayerButtons() {
             const buttonHtml = `
                 <li class="layer" layer-id="${layerId}">
                     <span class="layer-name">${layer.getAttr("pageNumber")}</span>
-                    <button class="btn-delete" title="Remover camada" layer_id="${layerId}"><i
+                    <button class="btn-delete-layer" title="Remover camada" layer_id="${layerId}"><i
                         class="mdi mdi-close-circle" aria-hidden="true"></i></button>
                     <input class="check-visible" layer-id="${layerId}" type="checkbox" ${isChecked}>
                     <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="">
@@ -2429,7 +2429,7 @@ function updateLayerButtons() {
             }
         });
         $("#layers").append(`<button class="btn-add-layer" title="Adicionar nova camada"
-                                id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button> `)
+                                id="add-layer"><i class="mdi mdi-plus" aria-hidden="true"></i></button> `)
     });
     // <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
     // id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
