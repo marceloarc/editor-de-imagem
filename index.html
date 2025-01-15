@@ -64,6 +64,8 @@
 
                 <button id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
                         aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
+                <button id="draw-line" title="Pincel e borracha" id="btn-widget-draw-line"><i class="mdi mdi-vector-line"
+                     aria-hidden="true"></i><span class="btn-text">Linha</span></button>
 
                 <button title="Adicione uma figura geometrica" id="btn-widget-figures"><i
                         class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
@@ -145,6 +147,10 @@
                     <input type="color" id="draw-color"
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
+                <button title="Ajustar brilho e contraste" id="btn-settings-shape" class="btn btn-small"><i
+                    class="mdi mdi-cog"></i></button>
+                <button title="Vazado" class="outline-shape btn btn-small"><i
+                    class="mdi mdi-rectangle-outline"></i></button>
 
                 <button title="Trazer pra frente" class="moveUp btn btn-small btn-left"><i
                         class="fa-solid fa-arrow-up-to-line"></i></button>
@@ -163,8 +169,10 @@
             <div class="slidecontainer">
                 <button title="Adicione um triangulo" class="btn btn-small btn-left" id="add-tri"><i
                         class="mdi mdi-triangle"></i></button>
-                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-rect"><i
+                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-square"><i
                         class="mdi mdi-square"></i></button>
+                <button title="Adicione um retangulo" class="btn btn-small btn-middle" id="add-rect"><i
+                            class="mdi mdi-rectangle"></i></button>
                 <button title="Adicione um circulo" class="btn btn-small btn-middle" id="add-circle"><i
                         class="mdi mdi-circle"></i></button>
                         <button title="Adicione uma estrela" class="btn btn-small btn-right" id="add-star"><i
@@ -337,6 +345,10 @@
                     <input type="color" id="input-color-edit"
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
+
+                <button title="Editar texto" id="btn-text-edit" class="btn btn-small"><i
+                    class="mdi mdi-text-box-edit-outline"></i></button>
+
                 <button title="Ajustar Transparencia" id="btn-text-settings" class="btn btn-small"><i
                     class="mdi mdi-cog"></i></button>
 
@@ -368,7 +380,6 @@
                                 class="fa-solid fa-copy"></i></button>
                         <button title="Apagar texto" class="btn-delete btn btn-small btn-right"><i
                                 class="fa-solid fa-trash-can"></i></button>
-                        <input type="text" id="input-edit-id" style="display:none;">
                     </div>
                 </div>
             </div>
@@ -522,6 +533,7 @@
                 </div>
         </div>      
     </div>
+
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-settings-text">       
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
@@ -534,6 +546,59 @@
                             </div>
                         </div>                       
 
+                    </div>
+
+                </div>
+        </div>
+        
+    </div>
+
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-text-edit">       
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+        <div class="widget-body">
+            <div class="font-container">
+                    <div id="text-font-edit" class="font-select">
+                        <textarea class="text-input" id="edit-text-input" placeholder="Editar texto" row="50" cols="30"></textarea>                    
+
+                    </div>
+
+                </div>
+        </div>
+        
+    </div>
+
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-settings-shape">       
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+        <div class="widget-body">
+            <div class="font-container">
+                    <div id="text-font-edit" class="font-select">
+                        <div class="settings">
+                            <div>
+                                <button title="Borda" class="border-shape btn btn-small"><i
+                                    class="mdi mdi-border-outside"></i></button>
+             
+
+                                <div title="Troque a cor do objeto"
+                                style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                                <button id="border-color-button" class="btn btn-small">
+                                    <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
+                                </button>
+                                <input type="color" id="border-color"
+                                    style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+                            </div>
+                            
+                        </div>
+                                
+                            <span>Tamanho da borda</span>
+                            <div class="slidecontainer">
+                                <input type="range" title="stefd" min="0" max="100" value="0" class="slider" id="stroke-width" step="1">
+                            </div>
+                            <span>Raio da borda</span>
+                            <div class="slidecontainer">
+                                <input type="range" title="stefd" min="0" max="100" value="0" class="slider" id="border-radius" step="1">
+                            </div>                    
+
+                        </div>
                     </div>
 
                 </div>
@@ -584,6 +649,33 @@
                 </div>
         </div>
   
+    <div class="text-center widget-sm widget-black widget-fixed" id="widget-draw-line">
+        <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
+        <div class="widget-body">
+
+            <div class="row">
+                <div class="col-widget">
+                    <div style="position: relative; display: inline-block; width: 45px; height: 45px;">
+                        <button id="line-color-button" class="btn btn-small btn-color" style="border: 1px white;">
+                            <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
+                        </button>
+                        <input type="color" title="Cor do Pincel" id="line-color" name="line-color"
+                            style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
+                            value="#000000">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <span class="name">Tamanho </span>
+                        <span id="line-size-text"> 0 </span>
+                        <input type="range" min="1" max="100" class="slider" id="line-size" step="1" value="1">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </body>
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>

@@ -15,6 +15,8 @@ const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
 var color;
 var size;
+var lineColor;
+var lineSize;
 var copiedShape;
 const ZOOM_SPEED = 0.1;
 let title = "Sem Título";
@@ -183,7 +185,7 @@ function restoreState(stack) {
                     obj.y(adjustedPosition.y)
                     return;
                 }
-
+                generateLineEvents
                 generateShapeEvents(obj, layer);
             } else if (obj instanceof Konva.Image) {
                 restoreImage(obj, layer)
@@ -196,6 +198,8 @@ function restoreState(stack) {
                 }
             } else if (obj instanceof Konva.RegularPolygon) {
                 generateShapeEvents(obj, layer);
+            } else if (obj instanceof Konva.Line) {
+                generateLineEvents(obj,layer);
             }
             else {
             }
@@ -357,6 +361,10 @@ $(document).ready(function () {
         if (parent.attr('id') == "widget-draw") {
             $("#draw").click();
         }
+        if (parent.attr('id') == "widget-draw-line") {
+            drawingLineMode = false;
+            $("#draw-line").css("background",'transparent');
+        }
         if (parent.hasClass('layers-header')) {
             if($("#open-layers-btn").hasClass('active')){
                 $("#open-layers-btn").removeClass('active')
@@ -438,6 +446,9 @@ $(document).ready(function () {
         if (drawMode) {
             $("#draw").click();
         }
+        if (drawingLineMode) {
+            $("#draw-line").click();
+        }
         $("#add-image-widget").fadeIn(100);
         const windowWidth = $(window).width();
         const windowHeight = $(window).height();
@@ -465,7 +476,7 @@ $(document).ready(function () {
         saveState();
     });
     $("#input-color-edit").on('input', function () {
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         if(text.strokeWidth() > 0){
             text.fill("rgba(0, 0, 0, 0.0)");
         }else{
@@ -479,7 +490,7 @@ $(document).ready(function () {
     });
     $("#input-text-edit").on('input', function () {
         saveState();
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
 
         text.text($(this).val());
         layer.draw();
@@ -488,9 +499,22 @@ $(document).ready(function () {
         $("#input-text-edit").css("height", ((Text.height() * Text.getAbsoluteScale().y) * zoom + 'px'));
 
     });
+
+    $("#edit-text-input").on('input', function () {
+        saveState();
+        var text = transformer.nodes()[0];
+
+        text.text($(this).val());
+        layer.draw();
+        var textPosition = text.absolutePosition();
+
+    });
+
+
 });
 var sliders = ['brightness', 'contrast'];
 var drawMode = false;
+var drawingLineMode = false;
 $('#input-image').on('change', function (e) {
     var imagens = $("#input-image")[0].files;
     $(imagens).each(function (index, value) {
@@ -709,6 +733,16 @@ function generateImageEvents(image, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         transformer.nodes([e.target]);
         $("#widget-image").fadeIn(100);
 
@@ -721,6 +755,18 @@ function generateImageEvents(image, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        if(drawMode || drawingLineMode){
+            image.stopDrag();
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                image.stopDrag(); // Para o arrasto enquanto há dois dedos
+                return;
+            }
+        }
         saveState();
         transformer.nodes([e.target]);
         $("#widget-image").fadeOut(100);
@@ -729,7 +775,16 @@ function generateImageEvents(image, layer) {
 
 
     image.on('transformend dragend', (e) => {
+        if(drawMode || drawingLineMode){
+            return;
+        }
 
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         $("#widget-image").fadeIn(100);
 
         generateImageWidget(e.target)
@@ -741,6 +796,16 @@ function generateImageEvents(image, layer) {
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
+        }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
         }
         if (e.target.getAttr('fakeShapeId') != "stage") {
 
@@ -800,7 +865,7 @@ function generateImageWidget(image) {
         widget.style.width = "100%";
     } else {
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + 'px';
+        widget.style.top = '50px';
         widget.style.left = positionLeft + 'px';
     }
     $("#widget-figures").fadeOut(100);
@@ -979,7 +1044,18 @@ function generateTextEvents(text, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         $("#draggable").fadeIn(100);
+        transformer.nodes([text]);
         generateTextWidget(e.target);
     });
 
@@ -989,6 +1065,16 @@ function generateTextEvents(text, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         saveState();
         textAreaPosition(e.target)
     });
@@ -997,6 +1083,18 @@ function generateTextEvents(text, layer) {
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
+        }
+        if(drawMode || drawingLineMode){
+            text.stopDrag();
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                text.stopDrag();
+                return;
+            }
         }
         saveState();
         transformer.nodes([e.target]);
@@ -1010,6 +1108,16 @@ function generateTextEvents(text, layer) {
 
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
+        }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
         }
         $("#draggable").fadeIn(100);
         generateTextWidget(e.target)
@@ -1061,8 +1169,7 @@ function generateTextWidget(Text) {
     $("#text-font-edit").html(span);
     $("#text-font-edit").css("font-family", '"' + font + '"');
     $("#input-text-edit").css("font-family", '"' + font + '"');
-
-    $("#input-edit-id").val(Text.id());
+    $("#edit-text-input").val(Text.text());
 
     var textPosition = Text.absolutePosition();
 
@@ -1082,7 +1189,7 @@ function generateTextWidget(Text) {
         toolbox.style.width = "100%";
     } else {
         toolbox.style.position = 'absolute';
-        toolbox.style.top = positionTop + 'px';
+        toolbox.style.top = '50px';
         toolbox.style.left = positionLeft + 'px';
     }
     $("#widget-figures").fadeOut(100);
@@ -1172,7 +1279,7 @@ $('#bg-remove').on('click',
         layer.draw();
     });
 $('#draw-color').on('click', saveState)
-
+$('#border-color').on('click', saveState)
 $("#open-layers-btn").click(function(){
     if($(this).hasClass('active')){
         $("#widget-layers").fadeOut(100);
@@ -1193,14 +1300,52 @@ $("#open-layers-btn").click(function(){
     }
 })
 
+$('#border-color').on('input',
+    function () {
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        cor = $('#draw-color').val();
+        var shape = transformer.nodes()[0];
+
+        if(shape.stroke() != null){
+            shape.stroke($(this).val())
+        }else{
+            shape.stroke(null)
+        }
+
+        layer.draw();
+        const colorButton = document.getElementById("border-color-button");
+
+        colorButton.style.backgroundColor = this.value;
+    });
+
+
+$("#btn-text-edit").click(function(){
+    $("#widget-text-edit").fadeIn(100);
+    var position = $("#draggable").offset();
+    var widget = document.getElementById('widget-text-edit');
+    var positionTop = position.top;
+    var positionLeft = position.left + ($("#draggable").width() / 2 - (widget.offsetWidth / 2));
+
+
+    widget.style.position = 'fixed';
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+
+})
+
 $('#draw-color').on('input',
     function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         cor = $('#draw-color').val();
         var shape = transformer.nodes()[0];
-        shape.setAttrs({
-            fill: $('#draw-color').val()
-        });
+
+        if(shape.fill() == "rgba(0, 0, 0, 0.0)"){
+            shape.fill("rgba(0, 0, 0, 0.0)");
+            shape.stroke($(this).val())
+        }else{
+            shape.fill($(this).val());
+        }
+
         layer.draw();
         const colorButton = document.getElementById("shape-color-button");
 
@@ -1235,10 +1380,13 @@ $("#add-tri").on('click', function () {
         fill: Konva.Util.getRandomColor(),
         fakeShapeId: 'stage',
         sides: 3,
+        stroke:null,
+        strokeWidth:0,
         radius: 200,
         x: stageWidth / 2,
         y: stageHeight / 2,
         name: "draw",
+        strokeScaleEnabled: false,
         draggable: true,
     });
 
@@ -1268,8 +1416,9 @@ $("#add-star").on("click", function(){
         name: "draw",
         fakeShapeId: 'stage',
         fill: 'yellow',
-        stroke: 'black',
-        strokeWidth: 4,
+        stroke:null,
+        strokeWidth:"0",
+        strokeScaleEnabled: false,
         draggable:true
       });
       layer.add(shape);
@@ -1295,11 +1444,14 @@ $("#add-rect").on('click', function () {
         fill: Konva.Util.getRandomColor(),
         fakeShapeId: 'stage',
         width: 200,
-        height: 200,
+        height: 100,
+        stroke:null,
+        strokeWidth:0,
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
         name: "draw",
         draggable: true,
+        strokeScaleEnabled: false
     });
     shape.x((stageWidth / 2) - shape.width() / 2)
     shape.y((stageHeight / 2) - shape.height() / 2)
@@ -1313,8 +1465,69 @@ $("#add-rect").on('click', function () {
 
 })
 
+$("#stroke-width").on('input', function(){
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var shape = transformer.nodes()[0];
+    
+    shape.setAttrs({
+        strokeWidth: $(this).val()
+    });
+    layer.draw();
+})
+$("#border-radius").on('input', function() {
+    const layer = stage.findOne("#" + $("#currentLayer").val());
+    const shape = transformer.nodes()[0];
+
+    if (!shape) {
+        console.error("Nenhum objeto selecionado.");
+        return;
+    }
+
+    // Verifique se o shape suporta 'cornerRadius'
+    if (shape instanceof Konva.Rect) {
+        const cornerRadiusValue = Number($(this).val());
+        shape.setAttrs({
+            cornerRadius: cornerRadiusValue
+        });
+        layer.draw(); // Redesenha a camada
+    } 
+});
+
+
+$("#add-square").on('click', function () {
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    sliders.forEach(function (attr) {
+        $("#" + attr).prop("disabled", true);
+    });
+    i++;
+    var shape = new Konva.Rect({
+        id: i.toString() + 'rect',
+        fill: Konva.Util.getRandomColor(),
+        fakeShapeId: 'stage',
+        width: 200,
+        height: 200,
+        stroke:null,
+        strokeWidth:0,
+        x: stage.getWidth() / 2,
+        y: stage.getHeight() / 2,
+        name: "draw",
+        strokeScaleEnabled: false,
+        draggable: true,
+    });
+    shape.x((stageWidth / 2) - shape.width() / 2)
+    shape.y((stageHeight / 2) - shape.height() / 2)
+    var groupRect = new Konva.Group({ textId: i.toString() + 'rect' });
+    groupRect.add(shape);
+    layer.add(shape);
+    transformer.nodes([shape]);
+    layer.draw();
+    generateShapeEvents(shape, layer);
+    generateShapeWidget(shape);
+
+})
 function generateShapeEvents(shape, layer) {
-    shape.on('transformstart', function () {
+    shape.on('transformstart', function (e) {
         saveState();
         $("#widget-shape").fadeOut(100);
     })
@@ -1333,15 +1546,48 @@ function generateShapeEvents(shape, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         generateShapeWidget(e.target)
+        transformer.nodes([e.target]);
     });
 
 
     shape.on('dragend', (e) => {
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
         generateShapeWidget(e.target);
     });
 
     shape.on('dragstart', (e) => {
+        if(drawMode || drawingLineMode){
+            shape.stopDrag();
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                shape.stopDrag();
+                return;
+            }
+        }
         saveState();
         const parentLayer = e.target.getLayer();
 
@@ -1370,6 +1616,7 @@ function generateShapeWidget(shape) {
     if (className === 'Rect') {
         var positionTop = adjustedTop + (((shape.height() * zoom) * shape.getAbsoluteScale().y) + widget.offsetHeight);
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - ((shape.width() * zoom) / 2) * shape.getAbsoluteScale().x);
+        $("#border-radius").val(shape.cornerRadius());
     } else if (className === 'Circle') {
         var positionTop = adjustedTop + (((shape.radius() * zoom) * shape.getAbsoluteScale().y)+ widget.offsetHeight);
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
@@ -1389,16 +1636,32 @@ function generateShapeWidget(shape) {
         widget.style.width = "100%";
     } else {
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + 'px';
+        widget.style.top = '50px';
         widget.style.left = positionLeft + 'px';
     }
 
-
-    $("#draw-color").attr("disabled", false);
-    $("#draw-color").val(shape.fill());
     const colorButton = document.getElementById("shape-color-button");
+    const borderButton = document.getElementById("border-color-button");
+    $("#draw-color").attr("disabled", false);
+    if(shape.stroke() != null && shape.fill() =="rgba(0, 0, 0, 0.0)"){
+        $("#draw-color").val(shape.stroke());
+        colorButton.style.backgroundColor = shape.stroke();
+        $(".outline-shape").addClass("selected");
+    }else{
+        $("#draw-color").val(shape.fill());
+        $(".outline-shape").removeClass("selected");
+        colorButton.style.backgroundColor = shape.fill();
+        borderButton.style.backgroundColor = shape.stroke();
+    }
+
+    if(shape.stroke() != null){
+        $(".border-shape").addClass('selected');
+    }else{
+        $(".border-shape").removeClass('selected');
+    }
+
+    $("#stroke-width").val(shape.strokeWidth());
     $("#widget-figures").fadeOut(100);
-    colorButton.style.backgroundColor = shape.fill();
     $("#draw-color").attr("object-id", shape.id());
 }
 
@@ -1472,10 +1735,13 @@ $("#add-circle").on('click', function () {
         fill: Konva.Util.getRandomColor(),
         radius: 100 + Math.random() * 20,
         shadowBlur: 10,
+        stroke:null,
+        strokeWidth:0,
         fakeShapeId: 'stage',
         x: stageWidth / 2,
         y: stageHeight / 2,
         name: "draw",
+        strokeScaleEnabled: false,
         draggable: true,
     });
 
@@ -1636,12 +1902,13 @@ $(function () {
             $(".editor").css("cursor", "")
         }
     })
+    var lineId;
+    var drawingLine = false;
     stage.on('mousedown touchstart', function (e) {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         if (drawMode) {
             saveState();
             isPaint = true;
-            
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
 
@@ -1681,15 +1948,47 @@ $(function () {
                 }
             });
         }
+
+        if(drawingLineMode){
+            saveState();
+            var scale = stage.scale();
+            var stagePosition = stage.position();
+            const pointerPosition1 = stage.getPointerPosition();
+            var adjustedPosition = {
+                x: (pointerPosition1.x - stagePosition.x) / scale.x,
+                y: (pointerPosition1.y - stagePosition.y) / scale.y
+            };
+            drawingLine = true;
+            const pos = stage.getPointerPosition();
+             var line = new Konva.Line({
+                stroke: lineColor,
+                name:"line",
+                strokeWidth:lineSize,
+                width:lineSize,
+                listening: true,
+                strokeScaleEnabled: false,
+                id:"line"+Math.random(),
+                draggable:true,
+                points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
+            });
+            generateLineEvents(line,layer)
+            lineId = line.id();
+            layer.add(line);
+            layer.draw();
+        }
+
     });
     let isHandlingEvent = false;
 
     stage.on('mouseup touchend', function (e) {
         isPaint = false;
-
+        drawingLine = false;
+        lineId = 0;
     });
     stage.on('mousemove touchmove', function (e) {
         if (drawMode) {
+            
+
             var pointerPosition = stage.getPointerPosition();
 
             if (!pointerPosition) return;
@@ -1722,6 +2021,28 @@ $(function () {
 
             layer.draw();
         }
+
+        
+        if(drawingLine){
+            var line = stage.findOne("#"+lineId);
+            if (!line) {
+                return;
+              }
+              var scale = stage.scale();
+              var stagePosition = stage.position();
+              const pointerPosition1 = stage.getPointerPosition();
+              var adjustedPosition = {
+                  x: (pointerPosition1.x - stagePosition.x) / scale.x,
+                  y: (pointerPosition1.y - stagePosition.y) / scale.y
+              };
+    
+              const points = line.points().slice();
+              points[2] = adjustedPosition.x;
+              points[3] = adjustedPosition.y;
+              line.points(points);
+              layer.batchDraw();
+    
+        }
     });
     $(".draw-mode").on('click', function () {
         mode = $(this).attr("draw-mode")
@@ -1737,13 +2058,19 @@ $(function () {
 
 
     stage.on('click tap dragstart', function (e) {
-        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')) {
+        
+        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')&& (e.target.name() != 'line')) {
+
+            if(drawMode || drawingLineMode){
+                return;
+            }
 
             $("#draggable").fadeOut(100);
             $("#widget-shape").fadeOut(100);
             $("#widget-fonts").fadeOut(100);
             $("#widget-image").fadeOut(100);
             $("#widget-figures").fadeOut(100);
+            $("#widget-draw-line").fadeOut(100);
             transformer.nodes([]);
             sliders.forEach(function (attr) {
                 $("#" + attr).attr("object-id", "0")
@@ -1754,11 +2081,9 @@ $(function () {
             $("#draw-color").attr("disabled", true);
             return;
         }
-
-
         if ((e.target.name() === 'image') || (e.target.name() === 'text') || (e.target.name() === 'background') || (e.target.name() === 'draw')) {
-            if ((drawMode) && (e.target.name() != "background")) {
-                $("#draw").click();
+            if(drawMode || drawingLineMode){
+                return;
             }
             sliders.forEach(function (attr) {
                 $("#" + attr).attr("object-id", e.target.id())
@@ -1775,21 +2100,30 @@ $(function () {
                 $("#draggable").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
                 $("#widget-fonts").fadeOut(100);
+                $("#widget-draw-line").fadeOut(100);
             }
             if ((e.target.name() != 'background') || (drawMode)) {
                 $("#widget-bg").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
+                $("#widget-draw-line").fadeOut(100);
             }
             if (e.target.name() != 'draw') {
+                $("#widget-bg").fadeOut(100);
                 $("#widget-shape").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
+                $("#widget-draw-line").fadeOut(100);
             }
             if (e.target.name() != 'image') {
                 $("#widget-image").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
+                $("#widget-draw-line").fadeOut(100);
             }
             if (e.target.name() != "background") {
                 transformer.nodes([e.target]);
+            }
+            if (e.target.name() != "line") {
+                $("#widget-bg").fadeOut(100);
+                $("#widget-draw-line").fadeOut(100);
             }
 
             groupTrans.moveToTop();
@@ -1797,6 +2131,7 @@ $(function () {
             layer.draw();
             return;
         }
+
 
         layer.draw();
     });
@@ -1828,13 +2163,81 @@ $(function () {
 
 });
 
+function generateLineEvents(line,layer){
+    
+    line.on("mousedown touchstart", function(e){
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                return;
+            }
+        }
+        generateLineWidget(line,layer);
+        transformer.nodes([line])
+    })
+
+    
+    line.on("transformstart dragstart", function(e){
+        if(drawMode || drawingLineMode){
+            line.stopDrag();
+            return;
+        }
+
+        if (e.evt.type.startsWith('touch')) { 
+            // Confirma que é um evento de toque
+            if (e.evt.touches && e.evt.touches.length === 2) {
+                line.stopDrag();
+                return;
+            }
+        }
+        saveState();
+        generateLineWidget(line,layer);
+        transformer.nodes([line])
+    })
+}
+
+
+function generateLineWidget(line){
+    $("#widget-draw-line").fadeIn(100);
+
+    var position = $(".konvajs-content").offset();
+    var widget = document.getElementById('widget-draw-line');
+    var positionLeft = position.left + ($(".konvajs-content").width() / 2 - (widget.offsetWidth));
+
+    if ($(window).outerWidth() < 450) {
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($(".editor-panel").height()+4);
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
+        widget.style.left = '0px';
+        widget.style.bottom = '';
+        widget.style.width = "100%";
+    } else {
+        widget.style.position = 'absolute';
+        widget.style.top = '50px';
+        widget.style.bottom = '';
+        widget.style.right = '';
+        widget.style.left = positionLeft + 'px';
+    }
+    $("#line-color").val(line.stroke());
+    $("#line-size").val(line.strokeWidth());
+    $("#line-size-text").text(line.strokeWidth());
+    const colorButton = document.getElementById("line-color-button");
+    colorButton.style.backgroundColor = line.stroke();
+}
+
+
 function generateBackgroundEvents(background, layer) {
     background.on('mouseover', function () {
 
     });
 
     background.on("click dbltap", function () {
-        if (!drawMode) {
+        if (!drawMode && !drawingLineMode) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
             var widget = document.getElementById('widget-bg');
@@ -1850,7 +2253,7 @@ function generateBackgroundEvents(background, layer) {
                 widget.style.width = "100%";
             } else {
                 widget.style.position = 'absolute';
-                widget.style.top = positionTop + 'px';
+                widget.style.top = '50px';
                 widget.style.left = positionLeft + 'px';
             }
 
@@ -1879,7 +2282,7 @@ function generateBackgroundEvents(background, layer) {
                 widget.style.width = "100%";
             } else {
                 widget.style.position = 'absolute';
-                widget.style.top = positionTop + 'px';
+                widget.style.top = '50px';
                 widget.style.left = positionLeft + 'px';
             }
         }
@@ -1906,7 +2309,7 @@ $(function () {
     $(".btn-style").on('click', function () {
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
             text.fontStyle(text.fontStyle().replace("normal", ''));
@@ -1929,7 +2332,7 @@ $(function () {
     $(".btn-outline").on('click', function () {
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
             text.fill(text.stroke());
@@ -1943,13 +2346,48 @@ $(function () {
         layer.draw();
     });
 
+$(".outline-shape").on('click', function(){
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var shape = transformer.nodes()[0];
+    if (shape.fill() == 'rgba(0, 0, 0, 0.0)') {
+        $(this).removeClass("selected");
+        shape.fill($("#draw-color").val());
+        shape.strokeWidth(0);
+        shape.stroke(null);
+    } else {
+        $(this).addClass("selected");
+        shape.stroke(shape.fill());
+        shape.fill("rgba(0, 0, 0, 0.0)")
+        shape.strokeWidth($("#stroke-width").val());
+    }
+    layer.draw();
+});
+
+$(".border-shape").on('click', function(){
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var shape = transformer.nodes()[0];
+    if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+        shape.stroke(null);
+        shape.strokeWidth(0);
+    } else {
+        $(this).addClass("selected");
+        shape.stroke("black");
+        shape.strokeWidth($("#stroke-width").val());
+    }
+    layer.draw();
+});
+
+
 
     $("#opacity").on('mousedown touchstart', function () {
         saveState();
     });
     $("#opacity").on('input', function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
 
         text.opacity($(this).val());
         layer.draw();
@@ -1958,7 +2396,7 @@ $(function () {
     $(".font-item").click(function(){
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         var textContent = text.text();
         text.fontFamily($(this).attr("value"));
         text.text("");
@@ -1991,12 +2429,12 @@ $(function () {
             widget.style.width = "100%";
         } else {
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + 'px';
+            widget.style.top = '50px';
             widget.style.left = positionLeft + 'px';
         }
         
         // var layer = stage.findOne("#" + $("#currentLayer").val());
-        // var text = stage.find("#" + $("#input-edit-id").val())[0];
+        // var text = transformer.nodes()[0];
         // $(this).css("font-family", '"' + $(this).val() + '"');
         // var textContent = text.text();
         // text.fontFamily($(this).val());
@@ -2009,7 +2447,7 @@ $(function () {
 
     $("#input-text-edit").on('input', function () {
         saveState();
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
 
         text.text($(this).val());
         layer.draw();
@@ -2025,7 +2463,7 @@ $(function () {
         const currentIcon = icons[currentIndex];
         $(this).find("i").attr("class", `fa ${currentIcon}`);
 
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         if (!text) return;
         const newAlignment = alignments[currentIndex];
         text.align(newAlignment);
@@ -2037,7 +2475,7 @@ $(function () {
     $(".btn-decoration").on('click', function () {
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
-        var text = stage.find("#" + $("#input-edit-id").val())[0];
+        var text = transformer.nodes()[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
             text.textDecoration("");
@@ -2068,6 +2506,9 @@ $(function () {
 $('#widget-text').on('click', function () {
     if (drawMode) {
         $("#draw").click();
+    }
+    if (drawingLineMode) {
+        $("#draw-line").click();
     }
     $("#add-text-widget").fadeIn(100);
     const windowWidth = $(window).width();
@@ -2130,6 +2571,7 @@ function addTransformer() {
         anchorFill: 'black',
         borderStroke: 'gray',
         centeredScaling: true,
+        ignoreStroke: true,
         enabledAnchors: [
             'bottom-right', 'middle-right', 'middle-left',
             'bottom-center', 'top-center'
@@ -2150,6 +2592,20 @@ function addTransformer() {
 
     return transformer;
 }
+$("#btn-settings-shape").click(function () {
+    $("#widget-settings-shape").fadeIn(100);
+    var position = $("#widget-shape").offset();
+    var widget = document.getElementById('widget-settings-shape');
+    var positionTop = position.top;
+    var positionLeft = position.left + ($("#widget-shape").width() / 2 - (widget.offsetWidth / 2));
+
+
+    widget.style.position = 'fixed';
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+
+    $("#widget-figures").fadeOut(100);
+});
 
 $("#btn-settings").click(function () {
     $("#widget-settings").fadeIn(100);
@@ -2181,6 +2637,52 @@ $("#btn-text-settings").click(function () {
     $("#widget-figures").fadeOut(100);
 });
 
+$("#draw-line").on("click", function () {
+    sliders.forEach(function (attr) {
+        $("#" + attr).prop("disabled", true);
+    });
+    $(this).css('background-color', "#424344");
+    lineColor = $("#line-color").val();
+    lineSize = $("#line-size").val();
+    $("#line-size-text").text(" " + lineSize);
+    if (!drawingLineMode) {
+        if(drawMode){
+            $("#draw").click();
+        }
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        drawingLineMode = true;
+        $("#widget-draw-line").fadeIn(100);
+
+        const colorButton = document.getElementById("line-color-button");
+
+        colorButton.style.backgroundColor = lineColor;
+        var position = $(".preview-img").offset();
+        var widget = document.getElementById('widget-draw-line');
+        var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+
+        if ($(window).outerWidth() < 450) {
+            var position = $(".editor-panel").offset();
+            var positionTop = position.top - ($(".editor-panel").height()+4);
+            widget.style.position = 'absolute';
+            widget.style.top = positionTop+"px";
+            widget.style.left = '0px';
+            widget.style.bottom = '';
+            widget.style.width = "100%";
+        } else {
+            widget.style.position = 'absolute';
+            widget.style.bottom = 0;
+            widget.style.top = '';
+            widget.style.left = positionLeft + 'px';
+        }
+
+    } else {
+        $(this).css('background', "transparent");
+        $("#widget-draw-line").fadeOut(100);
+        drawingLineMode  = false;
+    }
+
+});
+
 $("#draw").on("click", function () {
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
@@ -2191,6 +2693,9 @@ $("#draw").on("click", function () {
     size = $("#brush-size").val();
     $("#brush-size-text").text(" " + size);
     if (!drawMode) {
+        if(drawingLineMode){
+            $("#draw-line").click();
+        }
         var layer = stage.findOne("#" + $("#currentLayer").val());
         drawMode = true;
         $("#widget-draw").fadeIn(100);
@@ -2258,6 +2763,25 @@ $("#brush-color,#brush-size").on('input', function () {
     colorButton.style.backgroundColor = this.value;
 })
 
+$("#line-color,#line-size").on('mousedown touchstart', saveState)
+
+$("#line-color,#line-size").on('input', function () {
+    lineColor = $("#line-color").val();
+    lineSize = $("#line-size").val();
+
+    const colorButton = document.getElementById("line-color-button");
+
+    var line = transformer.nodes()[0];
+
+    if (line instanceof Konva.Line) {
+        line.stroke($("#line-color").val());
+        line.strokeWidth($("#line-size").val());
+    }
+
+    $("#line-size-text").text(" " + lineSize + " ");
+
+    colorButton.style.backgroundColor = this.value;
+})
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -2850,7 +3374,7 @@ function saveImageOriginalScale() {
 
 }
 $(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length) {
+    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length && !$(e.target).closest("#widget-settings-shape").length && !$(e.target).closest("#widget-text-edit").length && (!$(e.target).closest("#widget-draw-line").length && !drawingLineMode)) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
@@ -2864,6 +3388,7 @@ $(document).on('mousedown touchstart', function (e) {
             $("#widget-image").fadeOut(100);
             $("#widget-new").fadeOut(100);
             $("#widget-export").fadeOut(100);
+            $("#widget-draw-line").fadeOut(100);
         }
 
     }
