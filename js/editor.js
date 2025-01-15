@@ -10,7 +10,7 @@ const alignmentIcons = {
     right: "fa-align-right",
     justify: "fa-align-justify"
 };
-const detectElement = document.querySelector(".detect-zoom");
+const detectElement = document.querySelector(".wrapper");
 const zoomElement = document.querySelector(".zoom");
 let zoom = 1;
 var color;
