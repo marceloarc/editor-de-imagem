@@ -2782,7 +2782,7 @@ detectElement.addEventListener("touchmove", function (e) {
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
         );
-
+        e.preventDefault;
         // Calcular o fator de zoom
         const scaleChange = currentDistance / initialDistance;
         zoom *= scaleChange;
