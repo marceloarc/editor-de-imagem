@@ -43,8 +43,6 @@
                         class="mdi mdi-arrow-u-right-top"></span></button>
             </div>
             <div class="btn-mini-wrapper btn-right">
-                <button id="open-layers-btn" title="Camadas"
-                class="btn-mini"><span class="mdi mdi-layers"></span></button>
                 <button id="export-prompt" class="btn-mini" title="Exportar imagem"><i class="mdi mdi-export"></i></button> 
             </div>
        
@@ -54,6 +52,8 @@
             <div class="editor-panel">
                 <button id="new-prompt" title="Inicie um novo projeto"><i
                     class="mdi mdi-file-plus"></i><span class="btn-text">Novo</span></button>
+                <button title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
+                    aria-hidden="true"></i><span class="btn-text">Modelos</span></button>
                 <button id="add-image" title="Adicione uma imagem"><i
                         class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
                 <button id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i>
@@ -64,9 +64,6 @@
 
                 <button title="Adicione uma figura geometrica" id="btn-widget-figures"><i
                         class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
-
-                <button title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
-                        aria-hidden="true"></i><span class="btn-text">Plano de fundo</span></button>
                 <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
                         class="btn-text">Soon</span></button>
                 <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
@@ -89,6 +86,13 @@
             <textarea wrap="off" style="display:none;" id="input-text-edit"></textarea>
             
         </div>
+        <div class="text-center pages-wrapper" id="widget-layers">
+                <div class="pages-container">
+                            <ul class="layers" id="layers">
+            
+                            </ul>
+                </div>
+        </div>
         <div class="footer">
             <div class="project-info" id="resize-stage-prompt-btn">
                 <span id="project-info">800 x 600</span>
@@ -98,7 +102,7 @@
                 <span>Zoom</span>
                 <div class="slidecontainer">
                     <input class="slider2" original-scale="" type="range" id="zoom-slider" object-id="0" min="0.01"
-                        max="2" step="0.01" value="0.9">
+                        max="2" step="0.01" value="0.8">
                     <span id="reset-zoom" title="Resetar valor padrão" class="fa fa-refresh" aria-hidden="true"></span>
                 </div>
             </div>
@@ -230,8 +234,14 @@
         <div class="widget-body">
 
             <div class="background-btn-area" id="background-btn-area">
-                <div class="item">
-                    <img class="item-background" src="images/bg-white.jpg" alt="" />
+                <div class="item item-proj" proj="assets/models/cartao de visita.gproj">
+                    <img class="item-background" src="images/models/cartao.png" alt="" />
+                </div>
+                <div class="item item-proj" proj="assets/models/cartao de visita 2.gproj">
+                    <img class="item-background" src="images/models/cartao 2.png" alt="" />
+                </div>
+                <div class="item item-proj" proj="assets/models/cartao de visita 3.gproj">
+                    <img class="item-background" src="images/models/cartao 3.png" alt="" />
                 </div>
             </div>
         </div>
@@ -295,32 +305,6 @@
         <button id="resize-stage" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
 
-    <div class="text-center widget-sm widget-fixed widget-black" id="widget-layers">
-        <div class="widget-header layers-header">
-
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> CAMADAS</i>
-
-            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
-
-        </div>
-        <div id="layers-body" class="widget-body">
-            <div class="row">
-                <ul class="layers" id="layers">
-
-                </ul>
-            </div>
-            <div class="row">
-                <button class="btn btn-left btn-manage-layer btn-success" title="Adicionar nova camada"
-                    id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
-                <button class="btn btn-middle btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
-                        class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
-                <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
-                    id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
-            </div>
-
-
-        </div>
-    </div>
 
     <div class="text-center widget-sm widget-black" id="widget-image">
         <div class="widget-body">
@@ -560,14 +544,14 @@
             <div class="font-container">
                     <div id="text-font-edit" class="font-select">
                         <input id="input-import" type="file" name="input-import" accept=".gproj" style="display: none;" />
+                        <div class="slidecontainer" id="new-image-prompt-btn">
+                            <button class="btn-mini" title="Projeto vazio"><i class="mdi mdi-file-outline"></i></button>
+                            <span>Projeto Vazio</span>
+                        </div>   
                             <div class="slidecontainer" id="import">
                                 <button class="btn-mini" title="Carregar projeto do seu dispositivo"><i class="mdi mdi-upload-box"></i></button>
                                 <span>Carregar projeto</span>
-                            </div>
-                            <div class="slidecontainer" id="new-image-prompt-btn">
-                                <button class="btn-mini" title="Projeto vazio"><i class="mdi mdi-file-outline"></i></button>
-                                <span>Vazio</span>
-                            </div>                      
+                            </div>                   
                     </div>
 
                 </div>

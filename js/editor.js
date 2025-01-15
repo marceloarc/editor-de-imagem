@@ -395,7 +395,7 @@ $(document).ready(function () {
         items: '.layer',
         placeholder: 'ui-sortable-placeholder',
         forcePlaceholderSize: true,
-        axis: 'y',
+        axis: 'x',
         start: function (event, ui) {
 
             // originalIndexBefore = ui.item.index();
@@ -413,14 +413,18 @@ $(document).ready(function () {
         update: function (event, ui) {
             const layersOrder = $('#layers .layer');
             layersOrder.each(function (index) {
-                const layerId = $(this).attr('layer-id');
-                const layer = stage.findOne(`#${layerId}`);
+                const layerId = $(this).attr('layer-id'); // Pegue o ID da layer no DOM
+                const layer = stage.findOne(`#${layerId}`); // Encontre a layer correspondente no stage
 
                 if (layer) {
-                    layer.zIndex(index);
+                    // Atualize o atributo de número de página
+                    layer.setAttr('pageNumber', index + 1);
+
+                    // Atualize o índice Z para refletir a ordem visual
+
                 }
             });
-
+            updatePageNumbers();
             updateLayerButtons();
 
             stage.batchDraw();
@@ -1397,31 +1401,44 @@ function generateShapeWidget(shape) {
     colorButton.style.backgroundColor = shape.fill();
     $("#draw-color").attr("object-id", shape.id());
 }
-$(".item-background").on('click', function () {
-    saveState();
-    var layer = stage.findOne("#" + $("#currentLayer").val());
-    var background = layer.findOne('.background');
 
-    if (background) {
-        background.destroy();
-        layer.draw();
+$(".item-proj").on('click', function () {
+    const filePath = $(this).attr("proj"); // Obtém o caminho do arquivo
+    if (filePath) {
+        $.ajax({
+            url: filePath,
+            method: 'GET',
+            dataType: 'json',
+            success: function (fileContent) {
+                try {
+                    // Extraia as informações do arquivo JSON
+                    const { resolution, layers } = fileContent;
+
+                    // Redimensione o stage, se necessário
+                    if (resolution) {
+                        setNewCanvasSize(resolution.width, resolution.height);
+                        title = resolution.title;
+                    }
+
+                    // Restaure as camadas
+                    restoreState(layers);
+
+                    // Limpe as pilhas de undo/redo
+                    redoStack.length = 0;
+                    undoStack.length = 0;
+
+                    // Atualize os botões de undo/redo
+                    updateundoRedoBtn();
+                } catch (err) {
+                    console.error("Erro ao processar o arquivo:", err.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Erro ao carregar o arquivo:", error);
+            }
+        });
     }
-    var bg = new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: stageWidth,
-        height: stageHeight,
-        id: "background" + layerIndex,
-        name: "background",
-        fill: 'white',
-    });
-
-    generateBackgroundEvents(bg, layer)
-
-    layer.add(bg);
-    bg.moveToBottom();
-    layer.draw();
-})
+});
 
 $("#background-widget-btn").click(function(){
     $("#add-background-widget").fadeIn(100);
@@ -1483,7 +1500,8 @@ function cleanStage() {
     });
     layer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
-        name: "Plano de fundo",
+        name: "Pagina 1",
+        pageNumber:1,
         zIndex: 1
     });
     stage.add(layer);
@@ -1509,12 +1527,12 @@ $(function () {
     $(document).tooltip();
     $("#stage-parent").fadeIn(100);
     if ($(window).outerWidth() < 450) {
-        stageWidth = $(".preview-img").width();
-        stageHeight = $(".preview-img").height();
+        stageWidth = 800;
+        stageHeight = 600;
     }else{
         stageWidth = 800;
         stageHeight = 600;
-            zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
+        zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
     }
 
     $("body").height($(window).height());
@@ -1539,7 +1557,8 @@ $(function () {
     });
     layer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
-        name: "Plano de fundo",
+        name: "Pagina 1",
+        pageNumber:1,
         zIndex: 1
     });
     var transformerLayer = new Konva.Layer({
@@ -1794,11 +1813,11 @@ $(function () {
     layer.draw();
     $(".layers-header").width(243);
     updateLayerButtons();
-    setInterval(function () {
-        if (!isMousePressed) {
-            updateLayerButtons();
-        }
-    }, 1000);
+    // setInterval(function () {
+    //     if (!isMousePressed) {
+    //         updateLayerButtons();
+    //     }
+    // }, 1000);
 
     adjustContainerToFitStage('#stage-parent', stageWidth, stageHeight);
     fitStageIntoParentContainer();
@@ -2244,24 +2263,57 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-$("#add-layer").click(function () {
+function updatePageNumbers() {
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+
+    const sortedLayers = userLayers.sort((layer1, layer2) => {
+        return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
+    });
+
+    sortedLayers.forEach((layer, index) => {
+        var number = index + 1;
+        layer.setAttrs({
+            pageNumber: index + 1,
+            name:"Pagina "+number
+        });
+    });
+
+    stage.batchDraw(); // Redesenha o stage
+}
+
+function addPage() {
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+    const newPageNumber = userLayers.length + 1;
+    var layer = stage.findOne("#" + $("#currentLayer").val())
+    const newLayer = new Konva.Layer({
+        id: "layer" + getRandomInt(1000),
+        name: "Pagina "+newPageNumber,
+        pageNumber: newPageNumber, // Atribua o número da página
+        zIndex: userLayers.length // Garante que seja a última na ordem
+    });
+    $("#currentLayer").val(newLayer.id())
+
+    var background = layer.findOne(".background");
+    if (background) {
+        var bgCopy = background.clone();
+        newLayer.add(bgCopy);
+    }
+    stage.add(newLayer);
+    updatePageNumbers(); 
+    stage.draw();
+    updateLayerButtons();
+}
+
+$("#layers").on('click','#add-layer',function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
-    saveState();
-    var layer2 = new Konva.Layer({
-        id: "layernew" + getRandomInt(1000),
-        name: "Camada " + layerIndex++
-    });
-    layer2.attrs.index = layerIndex++;
-    $("#currentLayer").val(layer2.id())
-
-    stage.add(layer2);
-    stage.draw();
-    updateLayerButtons();
+    addPage();
 });
 
-$("#duplicate-layer").click(function () {
+$("#layers").on('click','#duplicate-layer',function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
@@ -2277,7 +2329,7 @@ $("#duplicate-layer").click(function () {
     updateLayerButtons();
 })
 
-$("#delete-layer").click(function () {
+$("#layers").on('click','#delete-layer',function () {
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     let nextLayerId = userLayers[0].id();
@@ -2305,6 +2357,7 @@ $("#delete-layer").click(function () {
         }
     });
     $("#currentLayer").val(nextLayerId);
+    updatePageNumbers();
     updateLayerButtons();
 });
 
@@ -2313,7 +2366,7 @@ function updateLayerButtons() {
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
 
     const sortedLayers = userLayers.sort((layer1, layer2) => {
-        return layer1.zIndex() - layer2.zIndex();
+        return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
     });
 
     let imgPromises = [];
@@ -2343,9 +2396,9 @@ function updateLayerButtons() {
 
             const buttonHtml = `
                 <li class="layer" layer-id="${layerId}">
-                    <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="max-width: 70px; max-height: 70px; width:auto; height:auto;">
-                    <span class="layer-name">${layer.name()}</span>
+                    <span class="layer-name">${layer.getAttr("pageNumber")}</span>
                     <input class="check-visible" layer-id="${layerId}" type="checkbox" ${isChecked}>
+                    <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="">
                 </li>
             `;
             $('#layers').append(buttonHtml);
@@ -2372,6 +2425,12 @@ function updateLayerButtons() {
                 }
             }
         });
+        $("#layers").append(`<button class="btn-add-layer" title="Adicionar nova camada"
+                                id="add-layer"><i class="mdi mdi-layers-plus" aria-hidden="true"></i></button>
+                            <button class="btn btn-middle btn-manage-layer btn-danger" title="Remover camada" id="delete-layer"><i
+                                    class="mdi mdi-layers-remove" aria-hidden="true"></i></button>
+                            <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
+                                id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button> `)
     });
     setActiveLayer($("#currentLayer").val());
     var transformerLayer = stage.findOne("#transformerLayer");
@@ -2383,9 +2442,10 @@ function setActiveLayer(selectedLayerId) {
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     userLayers.forEach((layer) => {
         if (layer.id() === selectedLayerId) {
+            layer.moveToTop();
             layer.listening(true);
         } else {
-
+            layer.moveToBottom();
             layer.listening(false);
         }
     });
@@ -2400,7 +2460,13 @@ $('#layers').on('click', '.layer', function (e) {
     var layer_id = $(this).attr("layer-id");
     $("#currentLayer").val(layer_id);
     layer = stage.findOne('#' + layer_id);
-
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+  // Salvar cada camada como imagem
+    userLayers.forEach((layer, index) => {
+        layer.moveToBottom();
+    });
+    layer.moveToTop();
     updateLayerButtons();
 });
 
@@ -2447,14 +2513,14 @@ function copyShape(shape, layer) {
     if (shape.name() === "image") {
         var ShapeClone = shape.clone({
             id: 'imagecopy' + i.toString(),
-            y: shape.position().y - 100,
+            y: shape.position().y - (shape.height() * shape.getAbsoluteScale().y),
             name: shape.name(),
         });
         ShapeClone.cache();
     } else {
         var ShapeClone = shape.clone({
             id: i.toString() + "copy",
-            y: shape.position().y - 100,
+            y: shape.position().y - (shape.height() * shape.getAbsoluteScale().y),
             name: shape.name(),
         });
     }
@@ -2538,8 +2604,8 @@ $("#btn-widget-figures").click(function () {
 })
 $('#reset-zoom').on('click', function () {
 
-    zoomElement.style.transform = `scale(${zoom = 0.9})`;
-    $("#zoom-slider").val(0.9);
+    zoomElement.style.transform = `scale(${zoom = 0.8})`;
+    $("#zoom-slider").val(0.8);
 
 });
 $("#download").click(function () {
@@ -2690,6 +2756,9 @@ function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
 
 }
 
+
+
+
 let initialDistance = null;
 
 detectElement.addEventListener("touchstart", function (e) {
@@ -2760,14 +2829,24 @@ function saveImageOriginalScale() {
     stage.height(originalStageHeight);
     stage.batchDraw();
 
-    const dataURL = stage.toDataURL();
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+  // Salvar cada camada como imagem
+    userLayers.forEach((layer, index) => {
+        layer.toImage({
+            callback: function (image) {
+                // Cria um link para baixar a camada
+                const link = document.createElement('a');
+                link.download = `${layer.name()}.png`;
+                link.href = image.src;
+                link.click();
+            }
+        });
+    });
+ 
 
     fitStageIntoParentContainer();
 
-    const link = document.createElement('a');
-    link.download = title;
-    link.href = dataURL;
-    link.click();
 }
 $(document).on('mousedown touchstart', function (e) {
     if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length) {
