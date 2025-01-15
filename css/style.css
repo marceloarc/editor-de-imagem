@@ -297,6 +297,14 @@ body::after {
   width: 100%;
   margin: 2px;
 }
+
+.header-editor{
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  background: rgba(47, 51, 54, 0.5);
+}
+
 .layer-name {
   position: absolute;
   bottom: 5px;
@@ -848,7 +856,6 @@ body::after {
 }
 @media screen and (max-width: 719px) {
   .container2 {
-    padding: 10px;
     width: auto;
     height: 90%;
   }
@@ -1103,8 +1110,6 @@ body::after {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding:10px 10px 10px 10px;
-  background: rgba(47, 51, 54, 0.5);
 }
 .footer {
   display: flex;

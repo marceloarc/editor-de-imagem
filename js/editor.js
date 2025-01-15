@@ -2764,7 +2764,6 @@ let initialDistance = null;
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
         e.preventDefault;
-        // Calcular a distância inicial entre dois dedos
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
         initialDistance = Math.hypot(

@@ -32,27 +32,30 @@
 
 <body>
     <div class="container2">
-        <div class="row2">
-            <div class="logo btn-mini-wrapper">
-                <img  src="images/logo.png" id="project-title" class="project-title"></img>
-            </div>            
-            <div class="undo-redo btn-mini-wrapper" id="undo-redo">
-                <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
-                        class="mdi mdi-arrow-u-left-top"></span></button>
-                <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span
-                        class="mdi mdi-arrow-u-right-top"></span></button>
-            </div>
-            <div class="btn-mini-wrapper btn-right">
-                <button id="export-prompt" class="btn-mini" title="Exportar imagem"><i class="mdi mdi-export"></i></button> 
-            </div>
-       
+        <div class="header-editor">
+            <div class="row2">
+                <div class="logo btn-mini-wrapper">
+                    <img  src="images/logo.png" id="project-title" class="project-title"></img>
+                </div>            
+                <div class="undo-redo btn-mini-wrapper" id="undo-redo">
+                    <button id="undo" title="Desfazer" disabled class="btn btn-xsmall btn-left-round disabled"><span
+                            class="mdi mdi-arrow-u-left-top"></span></button>
+                    <button id="redo" title="Refazer" disabled class="btn btn-xsmall btn-right-round disabled"><span
+                            class="mdi mdi-arrow-u-right-top"></span></button>
+                </div>
+                <div class="btn-mini-wrapper btn-right">
+                    <button id="export-prompt" class="btn-mini" title="Exportar imagem"><i class="mdi mdi-export"></i></button> 
+                </div>
+           
+            </div> 
         </div>
+
         <div class="wrapper">
             <div class="teste"></div>
             <div class="editor-panel">
                 <button id="new-prompt" title="Inicie um novo projeto"><i
                     class="mdi mdi-file-plus"></i><span class="btn-text">Novo</span></button>
-                <button title="Modelos" id="background-widget-btn"><i class="mdi mdi-image-album"
+                <button title="Plano de fundo com cor sólida" id="background-widget-btn"><i class="mdi mdi-image-album"
                     aria-hidden="true"></i><span class="btn-text">Modelos</span></button>
                 <button id="add-image" title="Adicione uma imagem"><i
                         class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
