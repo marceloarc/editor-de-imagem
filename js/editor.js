@@ -1956,7 +1956,7 @@ $(function () {
     });
 
     $(".font-item").click(function(){
-
+        saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = stage.find("#" + $("#input-edit-id").val())[0];
         var textContent = text.text();
