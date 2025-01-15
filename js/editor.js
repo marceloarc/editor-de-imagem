@@ -484,8 +484,8 @@ $(document).ready(function () {
         text.text($(this).val());
         layer.draw();
         var textPosition = text.absolutePosition();
-        $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
-        $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
+        $("#input-text-edit").css("width", ((Text.width() * Text.getAbsoluteScale().x) * zoom + 'px'));
+        $("#input-text-edit").css("height", ((Text.height() * Text.getAbsoluteScale().y) * zoom + 'px'));
 
     });
 });
