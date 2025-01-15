@@ -2329,7 +2329,7 @@ $("#layers").on('click','#duplicate-layer',function () {
     updateLayerButtons();
 })
 
-$("#layers").on('click','.btn-delete',function (e) {
+$("#layers").on('click','.btn-delete-layer',function (e) {
     e.stopPropagation();
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
