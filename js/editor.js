@@ -2763,7 +2763,7 @@ let initialDistance = null;
 
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
-        e.preventDefault;
+        e.preventDefault();
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
         initialDistance = Math.hypot(
@@ -2782,7 +2782,7 @@ detectElement.addEventListener("touchmove", function (e) {
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
         );
-        e.preventDefault;
+        e.preventDefault();
         // Calcular o fator de zoom
         const scaleChange = currentDistance / initialDistance;
         zoom *= scaleChange;
