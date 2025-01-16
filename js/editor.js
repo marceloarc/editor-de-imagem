@@ -1758,19 +1758,39 @@ $("#add-circle").on('click', function () {
 })
 
 function cleanStage() {
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+
+    console.log(userLayers);
     userLayers.forEach((layer) => {
         layer.destroy();
     });
-    layer = new Konva.Layer({
+    var newLayer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
         name: "Pagina 1",
         pageNumber:1,
         zIndex: 1
     });
-    stage.add(layer);
-    $("#currentLayer").val(layer.id())
+
+    
+    var background = new Konva.Rect({
+        x: 0,
+        y: 0,
+        width: stageWidth,
+        height: stageHeight,
+        id: "background1",
+        name: "background",
+        fill: $('#bgcolor').val(),
+    });
+
+    generateBackgroundEvents(background, newLayer);
+    newLayer.add(background);
+    stage.add(newLayer);
+    $("#currentLayer").val(newLayer.id())
+    updatePageNumbers(); 
+    stage.draw();
+    updateLayerButtons();
 }
 var transformer;
 var stageWidth;
@@ -2146,11 +2166,11 @@ $(function () {
     layer.draw();
     $(".layers-header").width(243);
     updateLayerButtons();
-    // setInterval(function () {
-    //     if (!isMousePressed) {
-    //         updateLayerButtons();
-    //     }
-    // }, 1000);
+    setInterval(function () {
+        if (!isMousePressed) {
+            updateLayerButtons();
+        }
+    }, 1000);
 
     adjustContainerToFitStage('#stage-parent', stageWidth, stageHeight);
     fitStageIntoParentContainer();
@@ -3257,13 +3277,13 @@ function setNewCanvas(userWidth, userHeight) {
     stage.width(userWidth);
     stage.height(userHeight);
     cleanStage();
-    $(".item-background").click();
     stage.batchDraw();
     $("#project-title").text(title)
     $("#project-info").text(userWidth+" x "+userHeight)
     adjustContainerToFitStage('#stage-parent', userWidth, userHeight);
     fitStageIntoParentContainer();
-
+    readjustBackground();
+    transformer.moveToTop();
 }
 function adjustContainerToFitStage(containerId, stageWidth, stageHeight) {
     const container = document.querySelector(containerId);
