@@ -39,7 +39,11 @@ Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenv
 ### 4. Gerenciar Paginas
 - Utilize o painel de paginas para reordenar, ocultar ou excluir elementos específicos.
 
-### 5. Exportar Imagem
+### 5. Modelos e projetos
+- Carregue seu projeto modificavel ou use um dos modelos disponiveis.
+
+
+### 6. Exportar Imagem
 - VocÊ pode baixar as paginas em formato de imagem ou salvar em formato de projeto para continuar depois.
 
 ---
