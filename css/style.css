@@ -119,6 +119,16 @@ body::after {
   resize: none;
 }
 
+.shape-border{
+  position: absolute;
+  top:50%;
+  left:50%;
+  border: 1px solid #FFD843;
+  z-index: 99999999999999999999999999999;
+  pointer-events: none;
+}
+
+
 .ui-sortable-placeholder {
   background-color: rgba(200, 200, 200, 0.0);
   border: 1px solid #FFD843;

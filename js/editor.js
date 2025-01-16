@@ -737,12 +737,15 @@ function generateImageEvents(image, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
+
         transformer.nodes([e.target]);
         $("#widget-image").fadeIn(100);
 
@@ -759,14 +762,16 @@ function generateImageEvents(image, layer) {
             image.stopDrag();
             return;
         }
-
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                image.stopDrag(); // Para o arrasto enquanto há dois dedos
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    image.stopDrag();
+                    return;
+                }
             }
         }
+
         saveState();
         transformer.nodes([e.target]);
         $("#widget-image").fadeOut(100);
@@ -779,10 +784,12 @@ function generateImageEvents(image, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
         $("#widget-image").fadeIn(100);
@@ -801,12 +808,15 @@ function generateImageEvents(image, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
+
         if (e.target.getAttr('fakeShapeId') != "stage") {
 
             var shape = stage.find("#" + e.target.getAttr('fakeShapeId'))[0];
@@ -1023,7 +1033,7 @@ function generateTextEvents(text, layer) {
         saveState();
         $("#draggable").fadeOut(100);
         $("#widget-fonts").fadeOut(100);
-        generateTextWidget(e.target);
+
     })
 
     text.on('transformend', function (e) {
@@ -1032,9 +1042,35 @@ function generateTextEvents(text, layer) {
     })
 
 
-    text.on('mouseover', function (e) {
+    text.on('transform', function (e){
 
-    });
+            // Largura e altura do texto sem escala (base natural)
+            const naturalWidth = text.width();
+            const naturalHeight = text.height();
+    
+            // Multiplica pela escala absoluta
+            const scaledWidth = naturalWidth * text.getAbsoluteScale().x * zoom;
+            const scaledHeight = naturalHeight * text.getAbsoluteScale().y * zoom;
+    
+    
+            // Aplica os tamanhos ao elemento HTML
+            $("#shape-border").width(scaledWidth);
+            $("#shape-border").height(scaledHeight);
+            var textPosition = text.absolutePosition();
+
+            var position = $(".konvajs-content").offset();
+        
+            var toolbox = document.getElementById('shape-border');
+            const adjustedTop = (position.top + (textPosition.y * zoom));
+            const adjustedLeft = (position.left + textPosition.x * zoom);
+            var positionTop = adjustedTop;
+            var positionLeft = adjustedLeft + (((text.width() * zoom) / 2) * text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
+            // Define a posição do `.shape-border`
+            $(".shape-border").css({
+                top: `${positionTop}px`,
+                left: `${positionLeft }px`
+            });
+    })
 
 
     text.on('click tap', (e) => {
@@ -1047,15 +1083,16 @@ function generateTextEvents(text, layer) {
         if(drawMode || drawingLineMode){
             return;
         }
-
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
         $("#draggable").fadeIn(100);
-        transformer.nodes([text]);
+        transformer.nodes([e.target]);
         generateTextWidget(e.target);
     });
 
@@ -1069,14 +1106,71 @@ function generateTextEvents(text, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
+
         saveState();
         textAreaPosition(e.target)
+    });
+
+    text.on('mouseover touchstart', (e) =>{
+        $(".shape-border").fadeIn(100);
+            // Largura e altura do texto sem escala (base natural)
+            const naturalWidth = text.width();
+            const naturalHeight = text.height();
+    
+            // Multiplica pela escala absoluta
+            const scaledWidth = naturalWidth * text.getAbsoluteScale().x * zoom;
+            const scaledHeight = naturalHeight * text.getAbsoluteScale().y * zoom;
+    
+    
+            // Aplica os tamanhos ao elemento HTML
+            $("#shape-border").width(scaledWidth);
+            $("#shape-border").height(scaledHeight);
+            var textPosition = text.absolutePosition();
+
+            var position = $(".konvajs-content").offset();
+        
+            var toolbox = document.getElementById('shape-border');
+            const adjustedTop = (position.top + (textPosition.y * zoom));
+            const adjustedLeft = (position.left + textPosition.x * zoom);
+            var positionTop = adjustedTop;
+            var positionLeft = adjustedLeft + (((text.width() * zoom) / 2) * text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
+            // Define a posição do `.shape-border`
+            $(".shape-border").css({
+                top: `${positionTop}px`,
+                left: `${positionLeft }px`
+            });
+    })
+
+    text.on('mouseout touchend', (e) =>{
+        $(".shape-border").fadeOut(100);
+
+    })
+
+
+    text.on('dragmove', (e) => {
+        var textPosition = e.target.absolutePosition();
+
+        var position = $(".konvajs-content").offset();
+    
+        var toolbox = document.getElementById('shape-border');
+        const adjustedTop = (position.top + (textPosition.y * zoom));
+        const adjustedLeft = (position.left + textPosition.x * zoom);
+        var positionTop = adjustedTop;
+        var positionLeft = adjustedLeft + (((e.target.width() * zoom) / 2) * e.target.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
+        
+        // Define a posição do `.shape-border`
+        $(".shape-border").css({
+            top: `${positionTop}px`,
+            left: `${positionLeft }px`
+        });
     });
     text.on('dragstart', (e) => {
         const parentLayer = e.target.getLayer();
@@ -1089,15 +1183,22 @@ function generateTextEvents(text, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                text.stopDrag();
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    text.stopDrag();
+                    return;
+                }
             }
         }
+
+
+
+        $("#draggable").fadeIn(100);
+
         saveState();
-        transformer.nodes([e.target]);
+        transformer.nodes([]);
         groupTrans.moveToTop();
         layer.draw();
         $("#draggable").fadeOut(100);
@@ -1113,12 +1214,15 @@ function generateTextEvents(text, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
+        transformer.nodes([e.target]);
         $("#draggable").fadeIn(100);
         generateTextWidget(e.target)
     })
@@ -1549,12 +1653,16 @@ function generateShapeEvents(shape, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                
+                    return;
+                }
             }
         }
+
         generateShapeWidget(e.target)
         transformer.nodes([e.target]);
     });
@@ -1565,12 +1673,16 @@ function generateShapeEvents(shape, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+    
+                    return;
+                }
             }
         }
+
         generateShapeWidget(e.target);
     });
 
@@ -1580,13 +1692,16 @@ function generateShapeEvents(shape, layer) {
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                shape.stopDrag();
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    shape.stopDrag();
+                    return;
+                }
             }
         }
+
         saveState();
         const parentLayer = e.target.getLayer();
 
@@ -2090,6 +2205,7 @@ $(function () {
             $("#widget-figures").fadeOut(100);
             $("#widget-draw-line").fadeOut(100);
             transformer.nodes([]);
+            $("#shape-border").hide();
             sliders.forEach(function (attr) {
                 $("#" + attr).attr("object-id", "0")
                 $("#" + attr).prop("disabled", true);
@@ -2188,10 +2304,12 @@ function generateLineEvents(line,layer){
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    return;
+                }
             }
         }
         generateLineWidget(line,layer);
@@ -2205,11 +2323,13 @@ function generateLineEvents(line,layer){
             return;
         }
 
-        if (e.evt.type.startsWith('touch')) { 
-            // Confirma que é um evento de toque
-            if (e.evt.touches && e.evt.touches.length === 2) {
-                line.stopDrag();
-                return;
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    line.stopDrag();
+                    return;
+                }
             }
         }
         saveState();
@@ -2576,8 +2696,9 @@ function addTransformer() {
             }
         },
         anchorStroke: 'black',
-        anchorFill: 'black',
-        borderStroke: 'gray',
+        anchorFill: 'white',
+        borderStroke: '#FFD843',
+        borderStrokeWidth:"2",
         centeredScaling: true,
         ignoreStroke: true,
         enabledAnchors: [
@@ -2590,7 +2711,6 @@ function addTransformer() {
     });
 
     transformer.flipEnabled(false);
-    transformer.borderDash([2, 2]);
     transformer.anchorCornerRadius(5);
 
 
@@ -3436,6 +3556,7 @@ $(document).on('mousedown touchstart', function (e) {
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
                 transformers[i].nodes([]);
+                $("#shape-border").hide();
             }
             layer.draw();
 
