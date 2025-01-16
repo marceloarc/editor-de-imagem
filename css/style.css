@@ -126,6 +126,7 @@ body::after {
   border: 2px solid #FFD843;
   z-index: 99999999999999999999999999999;
   pointer-events: none;
+  display: none;
 }
 
 
@@ -489,7 +490,7 @@ height: 100%;
 }
 .container2 .wrapper {
   display: flex;
-  overflow: hidden;
+  overflow: scroll;
   height: 90%;
   border-left: 0;
   border-right: 0;
@@ -810,7 +811,7 @@ height: 100%;
   display: flex;
   overflow: auto;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: #232527;
 }
 
@@ -918,7 +919,7 @@ height: 100%;
     display: none !important;
   }
   .footer {
-    display: none !important;
+ 
   }
   .logo{
     display: flex;

@@ -1921,6 +1921,8 @@ $(function () {
     if ($(window).outerWidth() < 450) {
         stageWidth = 800;
         stageHeight = 600;
+        zoomElement.style.transform = `scale(${zoom = 1})`
+        $('#zoom-slider').val(1)
     }else{
         stageWidth = 800;
         stageHeight = 600;
@@ -3269,7 +3271,7 @@ $(".moveDown").click(function () {
     layer.draw();
 });
 $('#zoom-slider').on('input', function () {
-
+    zoomElement.style.transformOrigin = "left";
     zoomElement.style.transform = `scale(${zoom = $('#zoom-slider').val()})`
 
 });
@@ -3295,8 +3297,13 @@ $("#btn-widget-figures").click(function () {
 })
 $('#reset-zoom').on('click', function () {
 
-    zoomElement.style.transform = `scale(${zoom = 0.8})`;
-    $("#zoom-slider").val(0.8);
+    if ($(window).outerWidth() < 450) {
+        zoomElement.style.transform = `scale(${zoom = 1})`;
+        $("#zoom-slider").val(1);
+    }else{
+        zoomElement.style.transform = `scale(${zoom = 0.8})`;
+        $("#zoom-slider").val(0.8);
+    }
 
 });
 $("#download").click(function () {
@@ -3502,14 +3509,35 @@ detectElement.addEventListener("wheel", function (e) {
 
     e.preventDefault();
 
+    // Define o ponto de origem do zoom para a esquerda
+    zoomElement.style.transformOrigin = "left";
+
+    // Determina o novo valor de zoom
     if (e.deltaY > 0) {
-        zoomElement.style.transform = `scale(${zoom -= ZOOM_SPEED})`;
-        console.log(zoom);
+        zoom -= ZOOM_SPEED;
     } else {
-        zoomElement.style.transform = `scale(${zoom += ZOOM_SPEED})`;
+        zoom += ZOOM_SPEED;
     }
 
+    // Impede valores de zoom inválidos (mínimo de 0.1)
+    zoom = Math.max(zoom, 0.1);
+
+    // Aplica o novo nível de zoom
+    zoomElement.style.transform = `scale(${zoom})`;
+
+    // Atualiza um slider de zoom, se necessário
     $("#zoom-slider").val(zoom);
+
+    // Ajusta o deslocamento para manter a visualização na esquerda
+    const rect = zoomElement.getBoundingClientRect();
+    const container = detectElement.getBoundingClientRect();
+    const deltaX = rect.left - container.left;
+
+    if (deltaX > 0) {
+        detectElement.scrollLeft += deltaX * (zoom - 1);
+    }
+
+    console.log("Zoom: ", zoom);
 });
 
 function saveImageOriginalScale() {
