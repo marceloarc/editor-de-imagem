@@ -779,6 +779,7 @@ function generateImageEvents(image, layer) {
     });
     image.on('mouseover touchstart', (e) =>{
         if(drawMode || drawingLineMode){
+            $("#shape-border").hide();
             return;
         }
 
@@ -786,7 +787,7 @@ function generateImageEvents(image, layer) {
             if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                
+                    $("#shape-border").hide();
                     return;
                 }
             }
@@ -1029,6 +1030,7 @@ function generateTextEvents(text, layer) {
 
     text.on('mouseover touchstart', (e) =>{
         if(drawMode || drawingLineMode){
+            $("#shape-border").hide();
             return;
         }
 
@@ -1036,7 +1038,7 @@ function generateTextEvents(text, layer) {
             if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                
+                    $("#shape-border").hide();
                     return;
                 }
             }
@@ -1607,6 +1609,7 @@ function generateShapeEvents(shape, layer) {
 
     shape.on('mouseover touchstart', (e) => {
         if(drawMode || drawingLineMode){
+            $("#shape-border").hide();
             return;
         }
 
@@ -1614,7 +1617,7 @@ function generateShapeEvents(shape, layer) {
             if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                
+                    $("#shape-border").hide();
                     return;
                 }
             }
@@ -2307,6 +2310,7 @@ function generateLineEvents(line,layer){
 
     line.on('mouseover touchstart', function(e){
         if(drawMode || drawingLineMode){
+            $("#shape-border").hide();
             return;
         }
 
@@ -2314,7 +2318,7 @@ function generateLineEvents(line,layer){
             if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                
+                    $("#shape-border").hide();
                     return;
                 }
             }
