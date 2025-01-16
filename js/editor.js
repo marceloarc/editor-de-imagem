@@ -3420,21 +3420,11 @@ function saveImageOriginalScale() {
 $(document).on('mousedown touchstart', function (e) {
     // Lista de IDs ou classes dos elementos permitidos
     const allowedSelectors = [
-        "#draggable", 
-        "canvas", 
-        "#widget-bg", 
-        "#widget-shape", 
-        "#widget-image", 
-        "#widget-settings",
-        "#widget-fonts", 
-        "#widget-settings-text", 
-        "#widget-new", 
-        "#widget-export", 
-        "#widget-settings-shape", 
-        "#widget-text-edit", 
-        "#widget-draw-line",
-        "#widget-page",
-        "#add-text-widget"
+        "canvas",
+        "textarea", 
+        ".widget-sm",
+        ".widget-lg",
+        ".widget"
     ];
 
     const isClickAllowed = allowedSelectors.some(selector => 
@@ -3451,16 +3441,9 @@ $(document).on('mousedown touchstart', function (e) {
 
             // Esconda os widgets
             const widgets = [
-                "#draggable", 
-                "#widget-fonts", 
-                "#widget-bg", 
-                "#widget-shape", 
-                "#widget-image", 
-                "#widget-new", 
-                "#widget-export", 
-                "#widget-draw-line", 
-                "#widget-page",
-                "#add-text-widget"
+                ".widget-sm",
+                ".widget-lg",
+                ".widget"
             ];
 
             widgets.forEach(widget => {
