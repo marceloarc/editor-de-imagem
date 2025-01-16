@@ -3487,7 +3487,7 @@ detectElement.addEventListener("touchmove", function (e) {
 
         // Limitar o zoom a um intervalo adequado, se necessário
         zoom = Math.min(Math.max(zoom, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
-
+        zoomElement.style.transformOrigin = "left";
         // Aplicar o zoom ao elemento
         zoomElement.style.transform = `scale(${zoom})`;
 

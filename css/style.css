@@ -811,7 +811,7 @@ height: 100%;
   display: flex;
   overflow: auto;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: #232527;
 }
 
@@ -919,7 +919,7 @@ height: 100%;
     display: none !important;
   }
   .footer {
- 
+    display: none !important;
   }
   .logo{
     display: flex;
