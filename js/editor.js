@@ -1622,7 +1622,7 @@ function generateShapeEvents(shape, layer) {
                 }
             }
         }
-
+  
         $("#shape-border").show();
         adjustShapeBorder(e.target)
     });
@@ -1888,7 +1888,7 @@ function cleanStage() {
         height: stageHeight,
         id: "background1",
         name: "background",
-        fill: $('#bgcolor').val(),
+        fill: "white",
     });
 
     generateBackgroundEvents(background, newLayer);
@@ -2717,7 +2717,7 @@ function addTransformer() {
         anchorStroke: 'black',
         anchorFill: 'white',
         borderStroke: '#FFD843',
-        borderStrokeWidth:"0",
+        borderStrokeWidth:"2",
         centeredScaling: true,
         ignoreStroke: true,
         enabledAnchors: [
