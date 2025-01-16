@@ -2529,36 +2529,26 @@ $('#widget-text').on('click', function () {
         $("#draw-line").click();
     }
     $("#add-text-widget").fadeIn(100);
-    const windowWidth = $(window).width();
-    const windowHeight = $(window).height();
+    var position = $(this).offset();
+    var widget = document.getElementById('add-text-widget');
+    const adjustedTop = (position.top);
+    const adjustedLeft = (position.left);
 
-    const elementWidth = $("#add-text-widget").outerWidth();
-    const elementHeight = $("#add-text-widget").outerHeight();
-
-    const left = (windowWidth - elementWidth) / 2;
-    const top = (windowHeight - elementHeight) / 2;
-
-    $("#add-text-widget").css({
-        position: 'absolute',
-        left: left + 'px',
-        top: top + 'px',
-    });
-
-
-});
-
-$('#info-widget').on('click', function () {
-
-    var position = $(this).position();
-    var widget = document.getElementById('widget-info');
-    var positionTop = position.top + 50;
-    var positionLeft = position.left - 250;
-    widget.style.position = 'absolute';
-    widget.style.top = positionTop + 'px';
-    widget.style.left = positionLeft + 'px';
-    widget.style.display = "block";
+    if ($(window).outerWidth() < 450) {
+        var position = $(".editor-panel").offset();
+        var positionTop = position.top - ($("#add-text-widget").height()-$(this).height());
+        widget.style.position = 'absolute';
+        widget.style.top = positionTop+"px";
+        widget.style.left = '0px';
+        widget.style.bottom = '';
+    } else {
+        widget.style.position = 'absolute';
+        widget.style.top = adjustedTop+"px";
+        widget.style.left = adjustedLeft+'px';
+    }
 
 });
+
 
 function addTransformer() {
     var sizeImage = new Image();
@@ -3428,22 +3418,54 @@ function saveImageOriginalScale() {
 
 }
 $(document).on('mousedown touchstart', function (e) {
-    if (!$(e.target).closest("#draggable").length && !$(e.target).is("canvas") && !$(e.target).closest("#widget-bg").length && !$(e.target).closest("#widget-shape").length && !$(e.target).closest("#widget-image").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-fonts").length && !$(e.target).closest("#widget-settings").length && !$(e.target).closest("#widget-settings-text").length && !$(e.target).closest("#widget-new").length && !$(e.target).closest("#widget-export").length && !$(e.target).closest("#widget-settings-shape").length && !$(e.target).closest("#widget-text-edit").length && (!$(e.target).closest("#widget-draw-line").length && !drawingLineMode)) {
+    // Lista de IDs ou classes dos elementos permitidos
+    const allowedSelectors = [
+        "#draggable", 
+        "canvas", 
+        "#widget-bg", 
+        "#widget-shape", 
+        "#widget-image", 
+        "#widget-settings",
+        "#widget-fonts", 
+        "#widget-settings-text", 
+        "#widget-new", 
+        "#widget-export", 
+        "#widget-settings-shape", 
+        "#widget-text-edit", 
+        "#widget-draw-line",
+        "#widget-page",
+        "#add-text-widget"
+    ];
+
+    const isClickAllowed = allowedSelectors.some(selector => 
+        $(e.target).closest(selector).length
+    );
+
+    if (!isClickAllowed && !drawingLineMode) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
                 transformers[i].nodes([]);
             }
             layer.draw();
-            $("#draggable").fadeOut(100);
-            $("#widget-fonts").fadeOut(100);
-            $("#widget-bg").fadeOut(100);
-            $("#widget-shape").fadeOut(100);
-            $("#widget-image").fadeOut(100);
-            $("#widget-new").fadeOut(100);
-            $("#widget-export").fadeOut(100);
-            $("#widget-draw-line").fadeOut(100);
-        }
 
+            // Esconda os widgets
+            const widgets = [
+                "#draggable", 
+                "#widget-fonts", 
+                "#widget-bg", 
+                "#widget-shape", 
+                "#widget-image", 
+                "#widget-new", 
+                "#widget-export", 
+                "#widget-draw-line", 
+                "#widget-page",
+                "#add-text-widget"
+            ];
+
+            widgets.forEach(widget => {
+                $(widget).fadeOut(100);
+            });
+        }
     }
 });

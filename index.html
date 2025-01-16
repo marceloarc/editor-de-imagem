@@ -113,7 +113,7 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget-sm widget-black widget-fixed" id="widget-bg">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-bg">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
             <span>Plano de fundo</span>
@@ -152,7 +152,7 @@
 
 
     </div>
-    <div class="text-center widget-sm widget-black" id="widget-shape">
+    <div class="text-center widget-sm widget-gray" id="widget-shape">
         <div class="widget-body">
             <div class="slidecontainer">
 
@@ -180,7 +180,7 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget-sm widget-black widget-fixed" id="widget-figures">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-figures">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
             <div class="slidecontainer">
@@ -198,7 +198,7 @@
         </div>
     </div>
 
-    <div class="text-center widget-sm widget-black widget-fixed" id="widget-draw">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-draw">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
 
@@ -252,7 +252,7 @@
         </div>
     </div>
 
-    <div class="text-center widget widget-fixed widget-black" id="add-background-widget">
+    <div class="text-center widget widget-fixed widget-gray" id="add-background-widget">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Modelos</i>
@@ -275,7 +275,7 @@
         </div>
     </div>
 
-    <div class="text-center widget-sm widget-black widget-fixed" id="new-image-prompt">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="new-image-prompt">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> NOVO</i>
@@ -307,7 +307,7 @@
         </div>
         <button id="new-image" class="btn-add-text btn-yellow">Confirmar</button>
     </div>
-    <div class="text-center widget-sm widget-black widget-fixed" id="resize-stage-prompt">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="resize-stage-prompt">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Redimensionar</i>
@@ -334,7 +334,7 @@
     </div>
 
 
-    <div class="text-center widget-sm widget-black" id="widget-image">
+    <div class="text-center widget-sm widget-gray" id="widget-image">
         <div class="widget-body">
             <div class="slidecontainer">
 
@@ -351,7 +351,7 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget-lg widget-black" id="draggable">
+    <div class="text-center widget-lg widget-gray" id="draggable">
         <div class="widget-body">
 
             <div class="widget-text-container">
@@ -404,22 +404,17 @@
         
     </div>
 
-    <div class="text-center widget-sm widget-fixed widget-black" id="add-text-widget">
-        <div class="widget-header">
-
-            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> TEXTO</i>
-
-            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
-        </div>
+    <div class="text-center widget-sm widget-fixed widget-gray" id="add-text-widget">
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
 
-            <textarea class="text-input" id="input-text" placeholder="Adicionar um texto" row="50" cols="30"></textarea>
-
+            <textarea class="text-input" id="input-text" placeholder="Adicionar um texto" row="40" cols="20"></textarea>
+            <button id="addText" class="btn-add-text"><i class="mdi mdi-send-check"></i></button>
         </div>
-        <button id="addText" class="btn-add-text btn-yellow">Adicionar texto</button>
     </div>
-    <div class="text-center widget-lg widget-black widget-fixed" id="widget-fonts" style="display: block; opacity: 0;">       
-        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+
+    <div class="text-center widget-lg widget-gray widget-fixed" id="widget-fonts" style="display: block; opacity: 0;">       
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
             <div class="font-container">
                     <div id="text-font-edit" class="font-select">
@@ -624,7 +619,7 @@
     </div>
 
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-new">       
-        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
             <div class="font-container">
                     <div id="text-font-edit" class="font-select">
@@ -666,12 +661,12 @@
                 </div>
         </div>
   
-    <div class="text-center widget-sm widget-black widget-fixed" id="widget-draw-line">
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-draw-line">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
+                <div class="row2">
 
-            <div class="row">
-                <div class="col-widget">
+               
                     <div style="position: relative; display: inline-block; width: 45px; height: 45px;">
                         <button id="line-color-button" class="btn btn-small btn-color" style="border: 1px white;">
                             <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
@@ -680,8 +675,8 @@
                             style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
                             value="#000000">
                     </div>
-                </div>
-                <div class="col-6">
+
+
                     <div class="row">
                         <span class="name">Tamanho </span>
                         <span id="line-size-text"> 0 </span>
