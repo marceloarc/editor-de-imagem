@@ -778,6 +778,20 @@ function generateImageEvents(image, layer) {
         layer.draw();
     });
     image.on('mouseover touchstart', (e) =>{
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                
+                    return;
+                }
+            }
+        }
+
         $("#shape-border").show();
         adjustShapeBorder(e.target)
     })
@@ -889,95 +903,7 @@ function generateImageWidget(image) {
     $("#widget-figures").fadeOut(100);
 }
 var v = 0;
-function createText(texto, color, posx, posy, font, fontSize, circle, textDecoration, align, fontStyle, scalex, scaley, rotation, width) {
-    var layer = stage.findOne("#" + $("#currentLayer").val());
-    v++;
-    stage.find("Circle").destroy();
-    var Textpre = new Konva.Text({
-        fontFamily: font,
-        text: texto,
-        textDecoration: textDecoration,
-        width: parseFloat(width),
-        fontSize: parseInt(fontSize),
-        align: align,
-        fontStyle: fontStyle,
-        rotation: rotation,
-        x: parseFloat(posx),
-        y: parseFloat(posy),
-        scaleX: parseFloat(scalex),
-        scaleY: parseFloat(scaley),
-        draggable: true,
 
-        name: 'background-text',
-        fakeShapeId: 'stage',
-        id: "text" + v,
-        fill: color,
-    });
-    var groupText = new Konva.Group({
-        width: width,
-        textId: "text" + v,
-    })
-    Textpre.verticalAlign('middle');
-    groupText.add(Textpre);
-    if (circle == 1) {
-        var circle = new Konva.Circle({
-            x: 601.0000000000002,
-            y: 2515.655643203652,
-            radius: 40,
-            fill: color,
-            stroke: color,
-            name: 'background',
-            draggable: true,
-            dragBoundFunc: function (pos) {
-
-                var newX = pos.x;
-
-
-
-                return {
-                    x: newX,
-                    y: this.absolutePosition().y,
-                };
-            },
-
-            strokeWidth: 5
-        });
-        circle.on('dragmove', () => {
-            if (circle.position().x < 314) {
-                circle.position({ x: 314, y: circle.position().y })
-            } else if (circle.position().x > 2064) {
-                circle.position({ x: 2064, y: circle.position().y })
-            }
-        });
-
-        groupText.add(circle);
-
-    }
-    Textpre.on('mouseover', () => {
-
-    });
-
-    Textpre.on('dblclick dbltap', (e) => {
-        textAreaPosition(e.target)
-    });
-
-    Textpre.on('dragstart', (e) => {
-        transformer.nodes([e.target]);
-        layer.draw();
-
-    });
-
-    layer.add(groupText);
-    setTimeout(function () {
-        Textpre.verticalAlign('middle');
-        Textpre.width(width);
-        Textpre.align(align);
-
-
-    }, 1000);
-
-    layer.draw();
-}
 var m = 0;
 
 
@@ -1102,6 +1028,20 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('mouseover touchstart', (e) =>{
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                
+                    return;
+                }
+            }
+        }
+
         $("#shape-border").show();
         adjustShapeBorder(e.target)
     })
@@ -1666,6 +1606,20 @@ function generateShapeEvents(shape, layer) {
     })
 
     shape.on('mouseover touchstart', (e) => {
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                
+                    return;
+                }
+            }
+        }
+
         $("#shape-border").show();
         adjustShapeBorder(e.target)
     });
@@ -2352,6 +2306,20 @@ function generateLineEvents(line,layer){
     })
 
     line.on('mouseover touchstart', function(e){
+        if(drawMode || drawingLineMode){
+            return;
+        }
+
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                
+                    return;
+                }
+            }
+        }
+
         $("#shape-border").show();
         adjustShapeBorder(e.target);
     })
