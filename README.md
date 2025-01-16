@@ -26,7 +26,8 @@ Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenv
   - **Texto**
   - **Figuras geométricas**
   - **Imagens**
-  - **Linhas desenhadas**
+  - **Desenho livre**
+  - **Linhas**
 
 ### 3. Personalizar Elementos
 - Selecione um elemento para ajustar:
@@ -35,11 +36,11 @@ Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenv
   - **Posição**
   - **Conteúdo do texto**
 
-### 4. Gerenciar Camadas
-- Utilize o painel de camadas para reordenar, ocultar ou excluir elementos específicos.
+### 4. Gerenciar Paginas
+- Utilize o painel de paginas para reordenar, ocultar ou excluir elementos específicos.
 
 ### 5. Exportar Imagem
-- Clique no botão "Save Image" para salvar seu projeto como uma imagem em alta qualidade.
+- VocÊ pode baixar as paginas em formato de imagem ou salvar em formato de projeto para continuar depois.
 
 ---
 
@@ -48,7 +49,7 @@ Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenv
 ### Adicionando Texto e Formas
 📷![Texto e Formas](images/demo/textos-e-formas.png)
 
-### Gerenciando Camadas
+### Gerenciando Paginas
 📷 ![Gerenciamento de Camadas](images/demo/camadas.png)
 
 ### Exportando o Projeto
