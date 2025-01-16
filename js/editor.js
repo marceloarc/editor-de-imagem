@@ -2855,12 +2855,12 @@ $("#layers").on('click','#add-layer',function () {
     addPage();
 });
 
-$("#layers").on('click','#duplicate-layer',function () {
+$("#duplicate-layer").on('click',function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
     saveState();
-    var layer = stage.findOne("#" + $("#currentLayer").val())
+    var layer = stage.findOne("#" + $("#selected-page").val())
     const clonedLayer = layer.clone();
 
     clonedLayer.id("layernew" + getRandomInt(1000));
@@ -2869,15 +2869,17 @@ $("#layers").on('click','#duplicate-layer',function () {
 
     $("#currentLayer").val(clonedLayer.id());
     updateLayerButtons();
+    updatePageNumbers();
+    $("#widget-page").fadeOut(100);
 })
 
-$("#layers").on('click','.btn-delete-layer',function (e) {
+$(".btn-delete-layer").on('click',function (e) {
     e.stopPropagation();
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     let nextLayerId = userLayers[0].id();
     userLayers.forEach((layer) => {
-        if (layer.id() !== "transformerLayer" && layer.id() === $(this).attr('layer_id') && userLayers.length > 1) {
+        if (layer.id() !== "transformerLayer" && layer.id() === $("#selected-page").val() && userLayers.length > 1) {
             saveState();
             layer.remove();
             stage.remove(layer);
@@ -2902,7 +2904,24 @@ $("#layers").on('click','.btn-delete-layer',function (e) {
     $("#currentLayer").val(nextLayerId);
     updatePageNumbers();
     updateLayerButtons();
+    $("#widget-page").fadeOut(100);
 });
+
+$("#layers").on('click','.btn-page-options',function (e) {
+    e.stopPropagation();
+    var layer = $(this).parent()[0];
+    console.log(layer);
+    $("#widget-page").fadeIn(100);
+    $("#selected-page").val($(layer).attr("layer-id"));
+    var position = $(layer).offset();
+    var widget = document.getElementById('widget-page');
+    var positionLeft = position.left + ($(layer).width() / 2 - (widget.offsetWidth / 2));
+    var positionTop = position.top + ($(layer).parent().height() / 2 - (widget.offsetHeight / 2));
+    widget.style.position = 'absolute';
+    widget.style.top = positionTop + 'px';
+    widget.style.left = positionLeft + 'px';
+});
+
 
 function updateLayerButtons() {
     const layers = Array.from(stage.getLayers());
@@ -2940,8 +2959,8 @@ function updateLayerButtons() {
             const buttonHtml = `
                 <li class="layer" layer-id="${layerId}">
                     <span class="layer-name">${layer.getAttr("pageNumber")}</span>
-                    <button class="btn-delete-layer" title="Remover camada" layer_id="${layerId}"><i
-                        class="mdi mdi-close-circle" aria-hidden="true"></i></button>
+                    <button class="btn-page-options" title="Opções" layer_id="${layerId}"><i
+                        class="mdi mdi-dots-vertical" aria-hidden="true"></i></button>
                     <input class="check-visible" layer-id="${layerId}" type="checkbox" ${isChecked}>
                     <img src="${imgsrc}" class="layer-img" alt="Layer Image" style="">
                 </li>

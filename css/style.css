@@ -117,7 +117,7 @@ body::after {
 
 .ui-sortable-placeholder {
   background-color: rgba(200, 200, 200, 0.0);
-  border: 2px dashed #FFD843;
+  border: 1px solid #FFD843;
   margin: 0;
   border-radius: 5px;
 }
@@ -183,7 +183,7 @@ height: 100%;
   border: 1px solid rgba(255, 255, 255, 0.095);
   border-radius: 5px;
   padding: 5px;
-  cursor: move;
+  cursor: pointer;
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -326,11 +326,6 @@ height: 100%;
   background-color: rgb(66, 67, 68);
 }
 
-.layer:hover {
-  color: #6c757d;
-  border: 0.1px solid rgba(255, 255, 255, 0.3);
-}
-
 .icon {
   font-size: 18px;
 }
@@ -444,14 +439,28 @@ height: 100%;
 }
 
 .btn-delete-layer{
+
+}
+.btn-page-options{
+  display: none;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top:0;
   right:0;
-  background: transparent;
+  background: rgba(47, 51, 54, 1);
+  border-radius: 100px;
+  width: 20px;
+  height: 20px;
   border:0;
-  color: rgb(160, 25, 25);
+  font-size: 16px;
+  color: rgb(255, 255, 255);
 }
 
+
+.layer.active .btn-page-options{
+  display: flex;
+}
 .container2 .wrapper {
   display: flex;
   overflow: hidden;
