@@ -3375,18 +3375,35 @@ function saveImageOriginalScale() {
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
   // Salvar cada camada como imagem
-    userLayers.forEach((layer, index) => {
-        layer.toImage({
-            callback: function (image) {
-                // Cria um link para baixar a camada
-                const link = document.createElement('a');
-                link.download = `${layer.name()}.png`;
-                link.href = image.src;
-                link.click();
-            }
-        });
-    });
- 
+  var zip = new JSZip();
+  var promises = [];
+  
+  userLayers.forEach((layer, index) => {
+      const promise = new Promise((resolve) => {
+          layer.toImage({
+              callback: function (image) {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = image.width;
+                  canvas.height = image.height;
+  
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(image, 0, 0);
+  
+                  canvas.toBlob((blob) => {
+                      zip.file(`${layer.name() || "layer"}_${index + 1}.png`, blob);
+                      resolve();
+                  });
+              }
+          });
+      });
+      promises.push(promise);
+  });
+  
+  Promise.all(promises).then(() => {
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+          saveAs(content, title+".zip"); // Salva o ZIP com o nome 'modelo.zip'
+      });
+  });
 
     fitStageIntoParentContainer();
 
