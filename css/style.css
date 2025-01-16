@@ -123,7 +123,7 @@ body::after {
   position: absolute;
   top:50%;
   left:50%;
-  border: 1px solid #FFD843;
+  border: 2px solid #FFD843;
   z-index: 99999999999999999999999999999;
   pointer-events: none;
 }

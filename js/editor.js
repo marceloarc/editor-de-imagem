@@ -777,7 +777,22 @@ function generateImageEvents(image, layer) {
         $("#widget-image").fadeOut(100);
         layer.draw();
     });
+    image.on('mouseover touchstart', (e) =>{
+        $("#shape-border").show();
+        adjustShapeBorder(e.target)
+    })
 
+    image.on('mouseout touchend', (e) =>{
+        $("#shape-border").hide();
+    })
+
+    image.on('dragmove', (e) =>{
+        adjustShapeBorder(e.target);
+    })
+
+    image.on('transform', (e) =>{
+        adjustShapeBorder(e.target)
+    })
 
     image.on('transformend dragend', (e) => {
         if(drawMode || drawingLineMode){
@@ -841,13 +856,6 @@ function generateImageEvents(image, layer) {
         }
         generateImageWidget(e.target)
         layer.draw();
-    });
-
-
-
-    image.on('mouseover', function () {
-
-
     });
 
 }
@@ -1043,33 +1051,7 @@ function generateTextEvents(text, layer) {
 
 
     text.on('transform', function (e){
-
-            // Largura e altura do texto sem escala (base natural)
-            const naturalWidth = text.width();
-            const naturalHeight = text.height();
-    
-            // Multiplica pela escala absoluta
-            const scaledWidth = naturalWidth * text.getAbsoluteScale().x * zoom;
-            const scaledHeight = naturalHeight * text.getAbsoluteScale().y * zoom;
-    
-    
-            // Aplica os tamanhos ao elemento HTML
-            $("#shape-border").width(scaledWidth);
-            $("#shape-border").height(scaledHeight);
-            var textPosition = text.absolutePosition();
-
-            var position = $(".konvajs-content").offset();
-        
-            var toolbox = document.getElementById('shape-border');
-            const adjustedTop = (position.top + (textPosition.y * zoom));
-            const adjustedLeft = (position.left + textPosition.x * zoom);
-            var positionTop = adjustedTop;
-            var positionLeft = adjustedLeft + (((text.width() * zoom) / 2) * text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
-            // Define a posição do `.shape-border`
-            $(".shape-border").css({
-                top: `${positionTop}px`,
-                left: `${positionLeft }px`
-            });
+        adjustShapeBorder(e.target)
     })
 
 
@@ -1120,57 +1102,18 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('mouseover touchstart', (e) =>{
-        $(".shape-border").fadeIn(100);
-            // Largura e altura do texto sem escala (base natural)
-            const naturalWidth = text.width();
-            const naturalHeight = text.height();
-    
-            // Multiplica pela escala absoluta
-            const scaledWidth = naturalWidth * text.getAbsoluteScale().x * zoom;
-            const scaledHeight = naturalHeight * text.getAbsoluteScale().y * zoom;
-    
-    
-            // Aplica os tamanhos ao elemento HTML
-            $("#shape-border").width(scaledWidth);
-            $("#shape-border").height(scaledHeight);
-            var textPosition = text.absolutePosition();
-
-            var position = $(".konvajs-content").offset();
-        
-            var toolbox = document.getElementById('shape-border');
-            const adjustedTop = (position.top + (textPosition.y * zoom));
-            const adjustedLeft = (position.left + textPosition.x * zoom);
-            var positionTop = adjustedTop;
-            var positionLeft = adjustedLeft + (((text.width() * zoom) / 2) * text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
-            // Define a posição do `.shape-border`
-            $(".shape-border").css({
-                top: `${positionTop}px`,
-                left: `${positionLeft }px`
-            });
+        $("#shape-border").show();
+        adjustShapeBorder(e.target)
     })
 
     text.on('mouseout touchend', (e) =>{
-        $(".shape-border").fadeOut(100);
+        $("#shape-border").hide();;
 
     })
 
 
     text.on('dragmove', (e) => {
-        var textPosition = e.target.absolutePosition();
-
-        var position = $(".konvajs-content").offset();
-    
-        var toolbox = document.getElementById('shape-border');
-        const adjustedTop = (position.top + (textPosition.y * zoom));
-        const adjustedLeft = (position.left + textPosition.x * zoom);
-        var positionTop = adjustedTop;
-        var positionLeft = adjustedLeft + (((e.target.width() * zoom) / 2) * e.target.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
-        
-        // Define a posição do `.shape-border`
-        $(".shape-border").css({
-            top: `${positionTop}px`,
-            left: `${positionLeft }px`
-        });
+        adjustShapeBorder(e.target)
     });
     text.on('dragstart', (e) => {
         const parentLayer = e.target.getLayer();
@@ -1192,8 +1135,6 @@ function generateTextEvents(text, layer) {
                 }
             }
         }
-
-
 
         $("#draggable").fadeIn(100);
 
@@ -1629,6 +1570,86 @@ $("#add-square").on('click', function () {
     generateShapeWidget(shape);
 
 })
+
+
+function adjustShapeBorder(shape){
+
+    const className = shape.getClassName();
+    const textPosition = shape.absolutePosition();
+    const position = $(".konvajs-content").offset();
+    const toolbox = document.getElementById('shape-border');
+
+    let scaledWidth, scaledHeight;
+    var adjustedTop;
+    var adjustedLeft;
+    if (className === "Circle") {
+        const radius = shape.radius();
+        const scaleX = shape.getAbsoluteScale().x * zoom;
+        const scaleY = shape.getAbsoluteScale().y * zoom;
+        scaledWidth = scaledHeight = radius * 2 * Math.max(scaleX, scaleY);          
+        adjustedTop = (position.top + (textPosition.y * zoom) - (shape.radius() *shape.getAbsoluteScale().y) *zoom);
+        adjustedLeft = (position.left + (textPosition.x * zoom) - (shape.radius()*shape.getAbsoluteScale().x) *zoom);
+    } else if (className === "Star") {
+        const radius = shape.outerRadius();
+        const scaleX = shape.getAbsoluteScale().x * zoom;
+        const scaleY = shape.getAbsoluteScale().y * zoom;
+        scaledWidth = scaledHeight = radius * 2 * Math.max(scaleX, scaleY);
+        adjustedTop = (position.top + (textPosition.y * zoom) - (shape.outerRadius() *shape.getAbsoluteScale().y) *zoom);
+        adjustedLeft = (position.left + (textPosition.x * zoom) - (shape.outerRadius()*shape.getAbsoluteScale().x) *zoom);
+    } else if((className === "Rect")||(className === "Text")||(className === "Image")) {
+        // Shape "regular" como Retângulo, Texto, etc.
+        scaledWidth = shape.width() * shape.getAbsoluteScale().x * zoom;
+        scaledHeight = shape.height() * shape.getAbsoluteScale().y * zoom;
+        adjustedTop = (position.top + (textPosition.y * zoom));
+        adjustedLeft = (position.left + (textPosition.x * zoom));
+    }else if (className === "RegularPolygon") {
+        $("#shape-border").hide();
+
+    }
+    else if (className === "Line") {
+        const points = shape.points(); // Lista de pontos [x1, y1, x2, y2, ...]
+        const position = $(".konvajs-content").offset();
+    
+        // Obtém a posição absoluta do shape (ponto inicial do Line no canvas)
+        const absolutePosition = shape.absolutePosition();
+    
+        // Calcula as coordenadas mínimas e máximas ajustando pela posição absoluta
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (let i = 0; i < points.length; i += 2) {
+            const x = (points[i] * shape.getAbsoluteScale().x * zoom) + (absolutePosition.x * zoom);
+            const y = (points[i + 1] * shape.getAbsoluteScale().y * zoom) + (absolutePosition.y * zoom);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+        }
+    
+        // Define largura e altura baseado nos pontos
+        scaledWidth = maxX - minX;
+        scaledHeight = maxY - minY;
+    
+        // Calcula a posição ajustada
+        adjustedTop = position.top + minY;
+        adjustedLeft = position.left + minX;
+    }
+    // A    // Aplica os tamanhos ao elemento HTML
+    $("#shape-border").width(scaledWidth);
+    $("#shape-border").height(scaledHeight);
+
+
+
+
+    const positionTop = adjustedTop + (scaledHeight / 2) - (toolbox.offsetHeight / 2);
+    const positionLeft = adjustedLeft + (scaledWidth / 2) - (toolbox.offsetWidth / 2);
+
+    // Define a posição do `.shape-border`
+    $(".shape-border").css({
+        top: `${positionTop}px`,
+        left: `${positionLeft}px`,
+    });
+
+}
+
 function generateShapeEvents(shape, layer) {
     shape.on('transformstart', function (e) {
         saveState();
@@ -1639,9 +1660,23 @@ function generateShapeEvents(shape, layer) {
         generateShapeWidget(e.target)
     })
 
-    shape.on('mouseover', function () {
 
+    shape.on('transform', function(e){
+        adjustShapeBorder(e.target);
+    })
+
+    shape.on('mouseover touchstart', (e) => {
+        $("#shape-border").show();
+        adjustShapeBorder(e.target)
     });
+
+    shape.on('dragmove' , (e)=>{
+        adjustShapeBorder(e.target)
+    })
+
+    shape.on('mouseout touchend', (e) => {
+        $("#shape-border").hide();
+    })
 
     shape.on('click tap', (e) => {
         const parentLayer = e.target.getLayer();
@@ -2316,7 +2351,19 @@ function generateLineEvents(line,layer){
         transformer.nodes([line])
     })
 
+    line.on('mouseover touchstart', function(e){
+        $("#shape-border").show();
+        adjustShapeBorder(e.target);
+    })
+
+    line.on('mouseout touchend', function(e){
+        $("#shape-border").hide();
+    })
     
+    line.on("dragmove",function(e){
+        adjustShapeBorder(e.target);
+    })
+
     line.on("transformstart dragstart", function(e){
         if(drawMode || drawingLineMode){
             line.stopDrag();
@@ -2698,7 +2745,7 @@ function addTransformer() {
         anchorStroke: 'black',
         anchorFill: 'white',
         borderStroke: '#FFD843',
-        borderStrokeWidth:"2",
+        borderStrokeWidth:"0",
         centeredScaling: true,
         ignoreStroke: true,
         enabledAnchors: [
