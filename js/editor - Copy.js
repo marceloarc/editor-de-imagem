@@ -112,10 +112,10 @@ function saveToCustomFormat() {
 }
 
 
-$("#save").click(function () {
-    saveToCustomFormat();
+$("#save").click(function(){
+    saveToCustomFormat();  
 })
-$("#import").click(function () {
+$("#import").click(function(){
     $("#input-import").click();
 })
 
@@ -126,23 +126,22 @@ $('#input-import').on('change', function (e) {
         reader.onload = function (e) {
             try {
                 const fileContent = JSON.parse(e.target.result);
-
+    
                 // Extraia as informações
                 const { resolution, layers } = fileContent;
-
+    
                 // Redimensione o stage, se necessário
                 if (resolution) {
                     setNewCanvasSize(resolution.width, resolution.height);
                     title = resolution.title;
                 }
-
-
+    
+                    
                 restoreState(layers);
                 redoStack.length = 0;
                 undoStack.length = 0;
-                fitStageIntoParentContainer();
                 updateundoRedoBtn();
-                updateLayerButtons()
+                fitStageIntoParentContainer();
             } catch (err) {
                 console.error("Erro ao carregar o arquivo:", err.message);
             }
@@ -163,66 +162,61 @@ function restoreState(stack) {
     });
     state.forEach(layerJSON => {
         const layer = Konva.Node.create(layerJSON);
-        const groups = Array.from(layer.find('Group'));
-        const userPages = groups.filter(layer => layer.name() !== 'grupo');
-        userPages.forEach(page => {
-            const objects = page.findOne(".grupo").getChildren();
 
-            objects.forEach(obj => {
-                if (obj instanceof Konva.Text) {
-                    generateTextEvents(obj, layer);
-                } else if (obj instanceof Konva.Circle) {
-                    if (obj.id() == "DrawCursorRadius") {
-                        if (!drawMode) obj.destroy();
-                        var pointerPosition = stage.getPointerPosition();
+        const objects = layer.findOne(".grupo").getChildren();
 
-                        if (!pointerPosition) return;
+        objects.forEach(obj => {
+            if (obj instanceof Konva.Text) {
+                generateTextEvents(obj, layer);
+            } else if (obj instanceof Konva.Circle) {
+                if (obj.id() == "DrawCursorRadius") {
+                    if (!drawMode) obj.destroy();
+                    var pointerPosition = stage.getPointerPosition();
 
-                        var scale = stage.scale();
-                        var stagePosition = stage.position();
+                    if (!pointerPosition) return;
 
-                        var adjustedPosition = {
-                            x: (pointerPosition.x - stagePosition.x) / scale.x,
-                            y: (pointerPosition.y - stagePosition.y) / scale.y
-                        };
+                    var scale = stage.scale();
+                    var stagePosition = stage.position();
 
-                        obj.x(adjustedPosition.x)
-                        obj.y(adjustedPosition.y)
-                        return;
-                    }
-                    generateLineEvents
+                    var adjustedPosition = {
+                        x: (pointerPosition.x - stagePosition.x) / scale.x,
+                        y: (pointerPosition.y - stagePosition.y) / scale.y
+                    };
+
+                    obj.x(adjustedPosition.x)
+                    obj.y(adjustedPosition.y)
+                    return;
+                }
+                generateLineEvents
+                generateShapeEvents(obj, layer);
+            } else if (obj instanceof Konva.Image) {
+                restoreImage(obj, layer)
+                generateImageEvents(obj, layer);
+            } else if (obj instanceof Konva.Rect) {
+                if (obj.name() == "background") {
+                    generateBackgroundEvents(obj, layer);
+                } else {
                     generateShapeEvents(obj, layer);
-                } else if (obj instanceof Konva.Image) {
-                    restoreImage(obj, layer)
-                    generateImageEvents(obj, layer);
-                } else if (obj instanceof Konva.Rect) {
-                    if (obj.name() == "background") {
-                        generateBackgroundEvents(obj, layer);
-                    } else {
-                        generateShapeEvents(obj, layer);
-                    }
-                } else if (obj instanceof Konva.RegularPolygon) {
-                    generateShapeEvents(obj, layer);
-                } else if (obj instanceof Konva.Line) {
-                    generateLineEvents(obj, layer);
                 }
-                else {
+            } else if (obj instanceof Konva.RegularPolygon) {
+                generateShapeEvents(obj, layer);
+            } else if (obj instanceof Konva.Line) {
+                generateLineEvents(obj,layer);
+            }
+            else {
+            }
+            if (currentShape) {
+
+                if (obj.id() == currentShape.id()) {
+                    stage.fire('click', { target: obj });
+                    obj.fire("click");
+                } else {
+
+                    stage.fire('click');
                 }
-                if (currentShape) {
-
-                    if (obj.id() == currentShape.id()) {
-                        stage.fire('click', { target: obj });
-                        obj.fire("click");
-                    } else {
-
-                        stage.fire('click');
-                    }
-                }
-            });
-            $("#currentLayer").val(page.id());
-        })
-
-
+            }
+        });
+        $("#currentLayer").val(layer.id());
         stage.add(layer);
     });
 
@@ -242,26 +236,26 @@ function redo() {
     updateundoRedoBtn();
 }
 
-$("#export-prompt").click(function () {
+$("#export-prompt").click(function(){
     var stagePosition = $(this).offset();
     var widget = document.getElementById('widget-export');
     $("#widget-export").fadeIn(100);
     const adjustedTop = (stagePosition.top);
     const adjustedLeft = (stagePosition.left);
     widget.style.position = 'absolute';
-    widget.style.top = adjustedTop + 10 + "px";
-    widget.style.right = "10px";
+    widget.style.top = adjustedTop+10+"px";
+    widget.style.right= "10px";
 })
 
-$("#new-prompt").click(function () {
+$("#new-prompt").click(function(){
     var stagePosition = $(this).offset();
     var widget = document.getElementById('widget-new');
     $("#widget-new").fadeIn(100);
     const adjustedTop = (stagePosition.top);
     const adjustedLeft = (stagePosition.left);
     widget.style.position = 'absolute';
-    widget.style.top = adjustedTop + "px";
-    widget.style.left = adjustedLeft + $(this).outerWidth() + 'px';
+    widget.style.top = adjustedTop+"px";
+    widget.style.left = adjustedLeft+$(this).outerWidth()+'px';
 })
 
 $("#undo").click(function () {
@@ -373,10 +367,10 @@ $(document).ready(function () {
         }
         if (parent.attr('id') == "widget-draw-line") {
             drawingLineMode = false;
-            $("#draw-line").css("background", 'transparent');
+            $("#draw-line").css("background",'transparent');
         }
         if (parent.hasClass('layers-header')) {
-            if ($("#open-layers-btn").hasClass('active')) {
+            if($("#open-layers-btn").hasClass('active')){
                 $("#open-layers-btn").removeClass('active')
             }
         }
@@ -462,19 +456,19 @@ $(document).ready(function () {
         $("#add-image-widget").fadeIn(100);
         const windowWidth = $(window).width();
         const windowHeight = $(window).height();
-
+    
         const elementWidth = $("#add-image-widget").outerWidth();
         const elementHeight = $("#add-image-widget").outerHeight();
-
+    
         const left = (windowWidth - elementWidth) / 2;
         const top = (windowHeight - elementHeight) / 2;
-
+    
         $("#add-image-widget").css({
             position: 'absolute',
             left: left + 'px',
             top: top + 'px',
         });
-
+    
     })
 
     $("#text-font").on('change', function () {
@@ -488,9 +482,9 @@ $(document).ready(function () {
     $("#input-color-edit").on('input', function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = transformer.nodes()[0];
-        if (text.strokeWidth() > 0) {
+        if(text.strokeWidth() > 0){
             text.fill("rgba(0, 0, 0, 0.0)");
-        } else {
+        }else{
             text.fill($(this).val());
         }
         text.stroke($(this).val())
@@ -499,17 +493,26 @@ $(document).ready(function () {
 
         colorButton.style.backgroundColor = this.value;
     });
-
-
-    $("#edit-text-input").on('input', function () {
-        var layer = stage.findOne("#" + $("#currentLayer").val());
+    $("#input-text-edit").on('input', function () {
         saveState();
         var text = transformer.nodes()[0];
 
         text.text($(this).val());
         layer.draw();
- 
-  
+        var textPosition = text.absolutePosition();
+        $("#input-text-edit").css("width", ((Text.width() * Text.getAbsoluteScale().x) + 'px'));
+        $("#input-text-edit").css("height", ((Text.height() * Text.getAbsoluteScale().y) + 'px'));
+        updateLayerButtons();
+    }); 
+
+    $("#edit-text-input").on('input', function () {
+        saveState();
+        var text = transformer.nodes()[0];
+
+        text.text($(this).val());
+        layer.draw();
+        var textPosition = text.absolutePosition();
+        updateLayerButtons();
     });
 
 
@@ -560,9 +563,8 @@ function addImage(imageSrc) {
     l++
     saveState();
     var imageObj = new Image();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var group = layer.findOne(".grupo");
     imageObj.src = imageSrc;
     imageObj.onload = function () {
         const tempCanvas = document.createElement('canvas');
@@ -586,13 +588,28 @@ function addImage(imageSrc) {
         image.cache();
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
 
-        var bg = stage.findOne(".background");
-        image.x((bg.x() + bg.width() / 2) - image.width() / 2)
-        image.y((bg.y() + bg.height() / 2) - image.height() / 2)
+        var page = stage.findOne(".background");
+        image.x((page.x() + page.width()  / 2) - image.width() / 2)
+        image.y((page.y()+ page.height() / 2) - image.height() / 2)
 
         group.add(image)
 
         generateImageEvents(image, layer);
+
+
+        var background = stage.find(".background")[0];
+        if (background) {
+
+            if (background.id() == 1) {
+
+
+                groupImage.zIndex(background.zIndex() - 1);
+                stage.find("Text").moveToTop();
+                stage.find("Circle").moveToTop();
+            } else {
+
+            }
+        }
 
         stage.draw();
         transformer.nodes([image]);
@@ -623,12 +640,12 @@ function generateImageEvents(image, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -648,12 +665,12 @@ function generateImageEvents(image, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             image.stopDrag();
             return;
         }
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     image.stopDrag();
@@ -667,14 +684,14 @@ function generateImageEvents(image, layer) {
         $("#widget-image").fadeOut(100);
         layer.draw();
     });
-    image.on('mouseover touchstart', (e) => {
-        if (drawMode || drawingLineMode) {
+    image.on('mouseover touchstart', (e) =>{
+        if(drawMode || drawingLineMode){
             $("#shape-border").hide();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     $("#shape-border").hide();
@@ -687,25 +704,25 @@ function generateImageEvents(image, layer) {
         adjustShapeBorder(e.target)
     })
 
-    image.on('mouseout touchend', (e) => {
+    image.on('mouseout touchend', (e) =>{
         $("#shape-border").hide();
     })
 
-    image.on('dragmove', (e) => {
+    image.on('dragmove', (e) =>{
         adjustShapeBorder(e.target);
     })
 
-    image.on('transform', (e) => {
+    image.on('transform', (e) =>{
         adjustShapeBorder(e.target)
     })
 
     image.on('transformend dragend', (e) => {
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -724,12 +741,12 @@ function generateImageEvents(image, layer) {
         if (parentLayer.id() !== $("#currentLayer").val()) {
             return;
         }
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -781,9 +798,9 @@ function generateImageWidget(image) {
     var positionLeft = adjustedLeft + (((image.width()) / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($(".editor-panel").height() + 4);
+        var positionTop = position.top - ($(".editor-panel").height()+4);
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -805,8 +822,7 @@ var i = 0;
 
 $("#addText").click(function () {
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     i++;
     if (!$("#input-text").val()) {
         alert("digite um texto!");
@@ -830,12 +846,12 @@ $("#addText").click(function () {
         padding: 30,
         name: 'text'
     });
-    var bg = page.findOne(".background");
+    var page = stage.findOne(".background");
 
-    Text.x((bg.x() + bg.width() / 2) - Text.width() / 2)
-    Text.y((bg.y() + bg.height() / 2) - Text.height() / 2)
+    Text.x((page.x() + page.width()  / 2) - Text.width() / 2)
+    Text.y((page.y()+ page.height() / 2) - Text.height() / 2)
 
-    const group = page.findOne(".grupo");
+    const group = layer.findOne(".grupo");
     group.add(Text);
     transformer.nodes([Text]);
     groupTrans.moveToTop();
@@ -872,18 +888,23 @@ function generateTextEvents(text, layer) {
     })
 
 
-    text.on('transform', function (e) {
+    text.on('transform', function (e){
         adjustShapeBorder(e.target)
     })
 
 
     text.on('click tap', (e) => {
+        const parentLayer = e.target.getLayer();
 
-        if (drawMode || drawingLineMode) {
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+
             return;
         }
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(drawMode || drawingLineMode){
+            return;
+        }
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -896,13 +917,17 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('dblclick dbltap', (e) => {
+        const parentLayer = e.target.getLayer();
 
-        if (drawMode || drawingLineMode) {
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -914,14 +939,14 @@ function generateTextEvents(text, layer) {
         textAreaPosition(e.target)
     });
 
-    text.on('mouseover touchstart', (e) => {
-        if (drawMode || drawingLineMode) {
+    text.on('mouseover touchstart', (e) =>{
+        if(drawMode || drawingLineMode){
             $("#shape-border").hide();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     $("#shape-border").hide();
@@ -934,7 +959,7 @@ function generateTextEvents(text, layer) {
         adjustShapeBorder(e.target)
     })
 
-    text.on('mouseout touchend', (e) => {
+    text.on('mouseout touchend', (e) =>{
         $("#shape-border").hide();;
 
     })
@@ -943,14 +968,18 @@ function generateTextEvents(text, layer) {
         adjustShapeBorder(e.target)
     });
     text.on('dragstart', (e) => {
+        const parentLayer = e.target.getLayer();
 
-        if (drawMode || drawingLineMode) {
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        if(drawMode || drawingLineMode){
             text.stopDrag();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     text.stopDrag();
@@ -964,18 +993,23 @@ function generateTextEvents(text, layer) {
         saveState();
         transformer.nodes([]);
         groupTrans.moveToTop();
+        parentLayer .draw();
         $("#draggable").fadeOut(100);
         $("#widget-fonts").fadeOut(100);
-
+        updateLayerButtons();
     });
     text.on('dragend', (e) => {
+        const parentLayer = e.target.getLayer();
 
-        if (drawMode || drawingLineMode) {
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
@@ -989,21 +1023,19 @@ function generateTextEvents(text, layer) {
     })
 }
 function saveClippedArea() {
-    const layer = stage.findOne("#layer-main");
-    const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     const zip = new JSZip(); // Instância do ZIP
     const promises = []; // Lista de Promises para processamento das camadas
     var wasVisible = true;
     userLayers.forEach((layer, index) => {
 
         layer.visible(true);
-
+        
         promises.push(
             new Promise((resolve) => {
-
+  
                 const group = layer.findOne(".grupo");
-                const background = group.findOne(".background");
                 const originalScale = group.scale(); // Salva a escala original
 
                 // Temporariamente ajusta a escala para 1
@@ -1066,16 +1098,16 @@ function generateTextWidget(Text) {
     currentIcon = alignmentIcons[Text.align()];
     $(".btn-align i").attr("class", `fa ${currentIcon}`);
     $("#input-text-edit").val(Text.text());
-    if (Text.strokeWidth() > 0) {
+    if(Text.strokeWidth()>0){
         $(".btn-outline").addClass("selected");
         $("#input-color-edit").val(Text.stroke());
         const colorButton = document.getElementById("text-color-button");
-
+    
         colorButton.style.backgroundColor = Text.stroke();
-    } else {
+    }else{
         $("#input-color-edit").val(Text.fill());
         const colorButton = document.getElementById("text-color-button");
-
+    
         colorButton.style.backgroundColor = Text.fill();
         $(".btn-outline").removeClass("selected");
     }
@@ -1094,12 +1126,12 @@ function generateTextWidget(Text) {
     const adjustedTop = (position.top + (textPosition.y));
     const adjustedLeft = (position.left + textPosition.x);
     var positionTop = adjustedTop + (((Text.height()) * Text.getAbsoluteScale().y) + 50);
-    var positionLeft = adjustedLeft + (((Text.width()) / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
+    var positionLeft = adjustedLeft + (((Text.width() ) / 2) * Text.getAbsoluteScale().x) - ((toolbox.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
         var positionTop = position.top - ($(".editor-panel").height() + toolbox.offsetHeight / 2) - 4;
         toolbox.style.position = 'absolute';
-        toolbox.style.top = positionTop + "px";
+        toolbox.style.top = positionTop+"px";
         toolbox.style.left = '0px';
         toolbox.style.width = "100%";
     } else {
@@ -1113,7 +1145,7 @@ function textAreaPosition(Text) {
     var textPosition = Text.absolutePosition();
     var position = $(".konvajs-content").offset();
     const adjustedTop = (position.top + (textPosition.y));
-    const adjustedLeft = (position.left + textPosition.x);
+    const adjustedLeft = (position.left + textPosition.x );
     $("#input-text-edit").css("position", "absolute");
     $("#input-text-edit").css("display", "block");
     $("#input-text-edit").css("z-index", "999999")
@@ -1197,21 +1229,21 @@ $('#bg-remove').on('click',
     });
 $('#draw-color').on('click', saveState)
 $('#border-color').on('click', saveState)
-$("#open-layers-btn").click(function () {
-    if ($(this).hasClass('active')) {
+$("#open-layers-btn").click(function(){
+    if($(this).hasClass('active')){
         $("#widget-layers").fadeOut(100);
         $(this).removeClass('active');
-    } else {
+    }else{
         $("#widget-layers").fadeIn(100);
         var container = $(this)
         var widgetLayers = $('#widget-layers');
-
+    
         var containerOffset = container.offset();
-
+    
         widgetLayers.css({
             position: 'absolute',
-            top: containerOffset.top + 10,
-            left: containerOffset.left - $('#widget-layers').width() + 10,
+            top: containerOffset.top+10,
+            left: containerOffset.left - $('#widget-layers').width()+10,
         });
         $(this).addClass('active')
     }
@@ -1223,9 +1255,9 @@ $('#border-color').on('input',
         cor = $('#draw-color').val();
         var shape = transformer.nodes()[0];
 
-        if (shape.stroke() != null) {
+        if(shape.stroke() != null){
             shape.stroke($(this).val())
-        } else {
+        }else{
             shape.stroke(null)
         }
 
@@ -1236,7 +1268,7 @@ $('#border-color').on('input',
     });
 
 
-$("#btn-text-edit").click(function () {
+$("#btn-text-edit").click(function(){
     $("#widget-text-edit").fadeIn(100);
     var position = $("#draggable").offset();
     var widget = document.getElementById('widget-text-edit');
@@ -1256,10 +1288,10 @@ $('#draw-color').on('input',
         cor = $('#draw-color').val();
         var shape = transformer.nodes()[0];
 
-        if (shape.fill() == "rgba(0, 0, 0, 0.0)") {
+        if(shape.fill() == "rgba(0, 0, 0, 0.0)"){
             shape.fill("rgba(0, 0, 0, 0.0)");
             shape.stroke($(this).val())
-        } else {
+        }else{
             shape.fill($(this).val());
         }
 
@@ -1287,9 +1319,7 @@ sliders.forEach(function (attr) {
 
 $("#add-tri").on('click', function () {
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
     });
@@ -1299,8 +1329,8 @@ $("#add-tri").on('click', function () {
         fill: Konva.Util.getRandomColor(),
         fakeShapeId: 'stage',
         sides: 3,
-        stroke: null,
-        strokeWidth: 0,
+        stroke:null,
+        strokeWidth:0,
         radius: 200,
         x: stageWidth / 2,
         y: stageHeight / 2,
@@ -1308,9 +1338,10 @@ $("#add-tri").on('click', function () {
         strokeScaleEnabled: false,
         draggable: true,
     });
-    var bg = group.findOne(".background");
-    shape.x((bg.x() + bg.width() / 2) - shape.radius() / 2)
-    shape.y((bg.y() + bg.height() / 2) - shape.radius() / 2)
+    var page = layer.findOne(".background");
+    var group = layer.findOne(".grupo");
+    shape.x((page.x() + page.width()  / 2) - shape.radius() / 2)
+    shape.y((page.y()+ page.height() / 2) - shape.radius() / 2)
     group.add(shape)
     transformer.nodes([shape]);
     layer.draw();
@@ -1321,11 +1352,9 @@ $("#add-tri").on('click', function () {
     updateLayerButtons();
 })
 
-$("#add-star").on("click", function () {
+$("#add-star").on("click", function(){
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
     });
@@ -1340,29 +1369,28 @@ $("#add-star").on("click", function () {
         name: "draw",
         fakeShapeId: 'stage',
         fill: 'yellow',
-        stroke: null,
-        strokeWidth: "0",
+        stroke:null,
+        strokeWidth:"0",
         strokeScaleEnabled: false,
-        draggable: true
-    });
-    var bg = layer.findOne(".background");
-    group.add(shape)
-    transformer.nodes([shape]);
-    layer.draw();
-    shape.x((bg.x() + bg.width() / 2) - shape.innerRadius() / 2)
-    shape.y((bg.y() + bg.height() / 2) - shape.innerRadius() / 2)
-    generateShapeWidget(shape);
-    generateShapeEvents(shape, layer);
-    groupTrans.moveToTop();
-    updateLayerButtons();
+        draggable:true
+      });
+      var page = layer.findOne(".background");
+      var group = layer.findOne(".grupo");
+      group.add(shape)
+      transformer.nodes([shape]);
+      layer.draw();
+      shape.x((page.x() + page.width()  / 2) - shape.innerRadius() / 2)
+      shape.y((page.y()+ page.height() / 2) - shape.innerRadius() / 2)
+      generateShapeWidget(shape);
+      generateShapeEvents(shape, layer);
+      groupTrans.moveToTop();
+      updateLayerButtons();
 })
 
 
 $("#add-rect").on('click', function () {
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
     });
@@ -1373,18 +1401,20 @@ $("#add-rect").on('click', function () {
         fakeShapeId: 'stage',
         width: 200,
         height: 100,
-        stroke: null,
-        strokeWidth: 0,
+        stroke:null,
+        strokeWidth:0,
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
         name: "draw",
         draggable: true,
         strokeScaleEnabled: false
     });
-    var bg = layer.findOne(".background");
-    shape.x((bg.x() + bg.width() / 2) - shape.width() / 2)
-    shape.y((bg.y() + bg.height() / 2) - shape.height() / 2)
-
+    var page = layer.findOne(".background");
+    var group = layer.findOne(".grupo");
+    shape.x((page.x() + page.width()  / 2) - shape.width() / 2)
+    shape.y((page.y()+ page.height() / 2) - shape.height() / 2)
+    var groupRect = new Konva.Group({ textId: i.toString() + 'rect' });
+    groupRect.add(shape);
     group.add(shape)
     transformer.nodes([shape]);
     layer.draw();
@@ -1393,16 +1423,16 @@ $("#add-rect").on('click', function () {
     updateLayerButtons();
 })
 
-$("#stroke-width").on('input', function () {
+$("#stroke-width").on('input', function(){
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var shape = transformer.nodes()[0];
-
+    
     shape.setAttrs({
         strokeWidth: $(this).val()
     });
     layer.draw();
 })
-$("#border-radius").on('input', function () {
+$("#border-radius").on('input', function() {
     const layer = stage.findOne("#" + $("#currentLayer").val());
     const shape = transformer.nodes()[0];
 
@@ -1418,15 +1448,13 @@ $("#border-radius").on('input', function () {
             cornerRadius: cornerRadiusValue
         });
         layer.draw(); // Redesenha a camada
-    }
+    } 
 });
 
 
 $("#add-square").on('click', function () {
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
     });
@@ -1437,18 +1465,19 @@ $("#add-square").on('click', function () {
         fakeShapeId: 'stage',
         width: 200,
         height: 200,
-        stroke: null,
-        strokeWidth: 0,
+        stroke:null,
+        strokeWidth:0,
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
         name: "draw",
         draggable: true,
-        strokeScaleEnabled: false
     });
-    var bg = layer.findOne(".background");
-    shape.x((bg.x() + bg.width() / 2) - shape.width() / 2)
-    shape.y((bg.y() + bg.height() / 2) - shape.height() / 2)
-
+    var page = layer.findOne(".background");
+    var group = layer.findOne(".grupo");
+    shape.x((page.x() + page.width()  / 2) - shape.width() / 2)
+    shape.y((page.y()+ page.height() / 2) - shape.height() / 2)
+    var groupRect = new Konva.Group({ textId: i.toString() + 'rect' });
+    groupRect.add(shape);
     group.add(shape)
     transformer.nodes([shape]);
     layer.draw();
@@ -1458,7 +1487,7 @@ $("#add-square").on('click', function () {
 })
 
 
-function adjustShapeBorder(shape) {
+function adjustShapeBorder(shape){
 
     const className = shape.getClassName();
     const textPosition = shape.absolutePosition();
@@ -1472,48 +1501,48 @@ function adjustShapeBorder(shape) {
         const radius = shape.radius();
         const scaleX = shape.getAbsoluteScale().x;
         const scaleY = shape.getAbsoluteScale().y;
-        scaledWidth = scaledHeight = radius * 2 * Math.max(scaleX, scaleY);
-        adjustedTop = (position.top + (textPosition.y) - (shape.radius() * shape.getAbsoluteScale().y));
-        adjustedLeft = (position.left + (textPosition.x) - (shape.radius() * shape.getAbsoluteScale().x));
+        scaledWidth = scaledHeight = radius * 2 * Math.max(scaleX, scaleY);          
+        adjustedTop = (position.top + (textPosition.y) - (shape.radius() *shape.getAbsoluteScale().y));
+        adjustedLeft = (position.left + (textPosition.x) - (shape.radius()*shape.getAbsoluteScale().x));
     } else if (className === "Star") {
         const radius = shape.outerRadius();
         const scaleX = shape.getAbsoluteScale().x;
         const scaleY = shape.getAbsoluteScale().y;
         scaledWidth = scaledHeight = radius * 2 * Math.max(scaleX, scaleY);
-        adjustedTop = (position.top + (textPosition.y) - (shape.outerRadius() * shape.getAbsoluteScale().y));
-        adjustedLeft = (position.left + (textPosition.x) - (shape.outerRadius() * shape.getAbsoluteScale().x));
-    } else if ((className === "Rect") || (className === "Text") || (className === "Image")) {
+        adjustedTop = (position.top + (textPosition.y) - (shape.outerRadius() *shape.getAbsoluteScale().y));
+        adjustedLeft = (position.left + (textPosition.x) - (shape.outerRadius()*shape.getAbsoluteScale().x));
+    } else if((className === "Rect")||(className === "Text")||(className === "Image")) {
         // Shape "regular" como Retângulo, Texto, etc.
         scaledWidth = shape.width() * shape.getAbsoluteScale().x;
         scaledHeight = shape.height() * shape.getAbsoluteScale().y;
         adjustedTop = (position.top + (textPosition.y));
         adjustedLeft = (position.left + (textPosition.x));
-    } else if (className === "RegularPolygon") {
+    }else if (className === "RegularPolygon") {
         $("#shape-border").hide();
 
     }
     else if (className === "Line") {
         const points = shape.points(); // Lista de pontos [x1, y1, x2, y2, ...]
         const position = $(".konvajs-content").offset();
-
+    
         // Obtém a posição absoluta do shape (ponto inicial do Line no canvas)
         const absolutePosition = shape.absolutePosition();
-
+    
         // Calcula as coordenadas mínimas e máximas ajustando pela posição absoluta
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         for (let i = 0; i < points.length; i += 2) {
-            const x = (points[i] * shape.getAbsoluteScale().x) + (absolutePosition.x);
+            const x = (points[i] * shape.getAbsoluteScale().x ) + (absolutePosition.x);
             const y = (points[i + 1] * shape.getAbsoluteScale().y) + (absolutePosition.y);
             minX = Math.min(minX, x);
             minY = Math.min(minY, y);
             maxX = Math.max(maxX, x);
             maxY = Math.max(maxY, y);
         }
-
+    
         // Define largura e altura baseado nos pontos
         scaledWidth = maxX - minX;
         scaledHeight = maxY - minY;
-
+    
         // Calcula a posição ajustada
         adjustedTop = position.top + minY;
         adjustedLeft = position.left + minX;
@@ -1548,18 +1577,18 @@ function generateShapeEvents(shape, layer) {
     })
 
 
-    shape.on('transform', function (e) {
+    shape.on('transform', function(e){
         adjustShapeBorder(e.target);
     })
 
     shape.on('mouseover touchstart', (e) => {
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             $("#shape-border").hide();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     $("#shape-border").hide();
@@ -1567,12 +1596,12 @@ function generateShapeEvents(shape, layer) {
                 }
             }
         }
-
+  
         $("#shape-border").show();
         adjustShapeBorder(e.target)
     });
 
-    shape.on('dragmove', (e) => {
+    shape.on('dragmove' , (e)=>{
         adjustShapeBorder(e.target)
     })
 
@@ -1581,16 +1610,20 @@ function generateShapeEvents(shape, layer) {
     })
 
     shape.on('click tap', (e) => {
+        const parentLayer = e.target.getLayer();
 
-        if (drawMode || drawingLineMode) {
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-
+                
                     return;
                 }
             }
@@ -1602,15 +1635,15 @@ function generateShapeEvents(shape, layer) {
 
 
     shape.on('dragend', (e) => {
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-
+    
                     return;
                 }
             }
@@ -1621,13 +1654,13 @@ function generateShapeEvents(shape, layer) {
     });
 
     shape.on('dragstart', (e) => {
-        if (drawMode || drawingLineMode) {
+        if(drawMode || drawingLineMode){
             shape.stopDrag();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     shape.stopDrag();
@@ -1637,7 +1670,11 @@ function generateShapeEvents(shape, layer) {
         }
 
         saveState();
+        const parentLayer = e.target.getLayer();
 
+        if (parentLayer.id() !== $("#currentLayer").val()) {
+            return;
+        }
         $("#widget-shape").fadeOut(100);
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
@@ -1663,20 +1700,20 @@ function generateShapeWidget(shape) {
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - ((shape.width()) / 2) * shape.getAbsoluteScale().x);
         $("#border-radius").val(shape.cornerRadius());
     } else if (className === 'Circle') {
-        var positionTop = adjustedTop + (((shape.radius()) * shape.getAbsoluteScale().y) + widget.offsetHeight);
+        var positionTop = adjustedTop + (((shape.radius()) * shape.getAbsoluteScale().y)+ widget.offsetHeight);
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
     } else if (className === 'RegularPolygon') {
         var positionTop = adjustedTop + (((shape.radius()) * shape.getAbsoluteScale().y));
         var positionLeft = adjustedLeft - ((widget.offsetWidth / 2));
     } else {
         var positionTop = adjustedTop + (((shape.outerRadius()) * shape.getAbsoluteScale().y) + widget.offsetHeight);
-        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - (((shape.innerRadius() / 2)) / 2) * shape.getAbsoluteScale().x);
+        var positionLeft = adjustedLeft - ((widget.offsetWidth / 2) - (((shape.innerRadius()/2)) / 2) * shape.getAbsoluteScale().x);
     }
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($(".editor-panel").height() + 4);
+        var positionTop = position.top - ($(".editor-panel").height()+4);
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -1688,20 +1725,20 @@ function generateShapeWidget(shape) {
     const colorButton = document.getElementById("shape-color-button");
     const borderButton = document.getElementById("border-color-button");
     $("#draw-color").attr("disabled", false);
-    if (shape.stroke() != null && shape.fill() == "rgba(0, 0, 0, 0.0)") {
+    if(shape.stroke() != null && shape.fill() =="rgba(0, 0, 0, 0.0)"){
         $("#draw-color").val(shape.stroke());
         colorButton.style.backgroundColor = shape.stroke();
         $(".outline-shape").addClass("selected");
-    } else {
+    }else{
         $("#draw-color").val(shape.fill());
         $(".outline-shape").removeClass("selected");
         colorButton.style.backgroundColor = shape.fill();
         borderButton.style.backgroundColor = shape.stroke();
     }
 
-    if (shape.stroke() != null) {
+    if(shape.stroke() != null){
         $(".border-shape").addClass('selected');
-    } else {
+    }else{
         $(".border-shape").removeClass('selected');
     }
 
@@ -1748,14 +1785,14 @@ $(".item-proj").on('click', function () {
     }
 });
 
-$("#background-widget-btn").click(function () {
+$("#background-widget-btn").click(function(){
     $("#add-background-widget").fadeIn(100);
     $("#add-background-widget").fadeIn(100);
     const windowWidth = $(window).width();
     const windowHeight = $(window).height();
 
-    const elementWidth = $("#add-background-widget").outerWidth();
-    const elementHeight = $("#add-background-widget").outerHeight();
+    const elementWidth =  $("#add-background-widget").outerWidth();
+    const elementHeight =  $("#add-background-widget").outerHeight();
 
     const left = (windowWidth - elementWidth) / 2;
     const top = (windowHeight - elementHeight) / 2;
@@ -1770,9 +1807,7 @@ $("#background-widget-btn").click(function () {
 
 $("#add-circle").on('click', function () {
     saveState();
-    var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
-    var group = page.findOne(".grupo");
+    var layer = stage.findOne("#" + $("#currentLayer").val());
     sliders.forEach(function (attr) {
         $("#" + attr).prop("disabled", true);
     });
@@ -1782,8 +1817,8 @@ $("#add-circle").on('click', function () {
         fill: Konva.Util.getRandomColor(),
         radius: 100 + Math.random() * 20,
         shadowBlur: 10,
-        stroke: null,
-        strokeWidth: 0,
+        stroke:null,
+        strokeWidth:0,
         fakeShapeId: 'stage',
         x: stageWidth / 2,
         y: stageHeight / 2,
@@ -1791,10 +1826,11 @@ $("#add-circle").on('click', function () {
         strokeScaleEnabled: false,
         draggable: true,
     });
-    var bg = group.findOne(".background");
 
-    shape.x((bg.x() + bg.width() / 2) - shape.radius() / 2)
-    shape.y((bg.y() + bg.height() / 2) - shape.radius() / 2)
+    var page = layer.findOne(".background");
+    var group = layer.findOne(".grupo");
+    shape.x((page.x() + page.width()  / 2) - shape.radius() / 2)
+    shape.y((page.y()+ page.height() / 2) - shape.radius() / 2)
     group.add(shape)
     transformer.nodes([shape]);
 
@@ -1808,27 +1844,27 @@ $("#add-circle").on('click', function () {
 })
 
 function cleanStage() {
-    const layer = stage.findOne("#layer-main");
-    const Groups = Array.from(layer.find('Group'));
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
 
-    Groups.forEach((page) => {
-        page.destroy();
+    userLayers.forEach((layer) => {
+        layer.destroy();
     });
-
-    var newPage = new Konva.Group({
+    var newLayer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
         name: "Pagina 1",
-        pageNumber: 1,
-        zIndex: 1,
-        width: parseInt(originalStageWidth),
-        height: parseInt(originalStageHeight),
+        pageNumber:1,
+        width:parseInt(originalStageWidth),
+        height:parseInt(originalStageHeight),
+        zIndex: 1
     });
 
-    background = new Konva.Rect({
+    var background = new Konva.Rect({
 
         width: parseInt(originalStageWidth),
         height: parseInt(originalStageHeight),
-        id: "background" + getRandomInt(1000),
+        id: "background"+getRandomInt(1000),
         name: "background",
         fill: "white",
         x: 0,
@@ -1840,43 +1876,46 @@ function cleanStage() {
         stroke: 'gray',
         strokeWidth: 2,
     });
-    generateBackgroundEvents(background, layer);
+    generateBackgroundEvents(background, newLayer);
     var group = new Konva.Group({
-        width: parseInt(originalStageWidth),
-        height: parseInt(originalStageHeight),
-        name: 'grupo'
+        width:parseInt(originalStageWidth),
+        height:parseInt(originalStageHeight),
+        x: ($("#preview").width() - parseInt(originalStageWidth)) / 2,
+        y: ($("#preview").height() - parseInt(originalStageHeight)) / 2,
+        name:'grupo'
     });
-
+    
     group.add(background);
     var border = new Konva.Rect({
-        listening: false,
-        x: background.getAbsolutePosition().x - $("#preview").width() / 2,
-        y: background.getAbsolutePosition().y - $("#preview").width() / 2,
-        width: parseInt(originalStageWidth) + $("#preview").width(),
-        height: parseInt(originalStageHeight) + $("#preview").width(),
+        listening:false,
+        x: background.getAbsolutePosition().x- $("#preview").width()/2 ,
+        y:  background.getAbsolutePosition().y- $("#preview").width()/2,
+        width: originalStageWidth+$("#preview").width(),
+        height: originalStageHeight+$("#preview").width(),
         stroke: 'rgba(44, 44, 46, 0.87)',
         strokeWidth: $("#preview").width(),
         draggable: false, // Para manter a borda fixa
-        name: 'border'
-    });
-    newPage.add(group);
-    group.position({
-        x: ($("#preview").width() - parseInt(originalStageWidth)) / 2,
-        y: ($("#preview").height() - parseInt(originalStageHeight)) / 2,
-    })
-    layer.add(newPage);
-    layer.add(border);
-    $("#currentLayer").val(newPage.id())
-    updatePageNumbers();
+        name:'border'
+      });
 
+    newLayer.add(group);
+    newLayer.add(border);
+    stage.add(newLayer);
+    $("#currentLayer").val(newLayer.id())
+    updatePageNumbers(); 
+
+    newLayer.draw();
     stage.draw();
-   
+    updateLayerButtons();
 }
 var transformer;
 var stageWidth;
 var stageHeight;
 var stage;
 var tr;
+var layer;
+var background;
+var group;
 var rotateButton;
 var sizeButton;
 var groupTrans;
@@ -1893,7 +1932,7 @@ $(function () {
         stageHeight = 600;
 
         $('#zoom-slider').val(1)
-    } else {
+    }else{
         stageWidth = 800;
         stageHeight = 600;
 
@@ -1901,7 +1940,7 @@ $(function () {
 
     $("body").height($(window).height());
 
-    $("#project-info").text(stageWidth + " x " + stageHeight)
+    $("#project-info").text(stageWidth+" x "+stageHeight)
     originalStageWidth = 800;
     originalStageHeight = 600;
     $(".header").text(title + " - " + stageWidth + "x" + stageHeight)
@@ -1915,42 +1954,39 @@ $(function () {
 
     transformer = addTransformer();
 
-    var layer = new Konva.Layer({
-        id: "layer-main",
-    });
-
-    var page = new Konva.Group({
+    layer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
         name: "Pagina 1",
-        pageNumber: 1,
+        pageNumber:1,
         zIndex: 1
     });
-    $("#currentLayer").val(page.id());
+    
     var transformerLayer = new Konva.Layer({
         id: "transformerLayer",
         zIndex: 0
     });
-    layer.add(page);
     stage.add(layer);
     stage.add(transformerLayer);
     layer.zIndex(1)
     transformerLayer.moveToBottom();
+    $("#currentLayer").val(layer.id())
+    layerIndex = 2;
 
-    var group = new Konva.Group({
-        width: 800,
-        height: 600,
-        name: 'grupo'
+    group = new Konva.Group({
+        width:800,
+        height:600,
+        name:'grupo'
     });
 
 
     var clipRect = { x: ($("#preview").width() - 800) / 2, y: ($("#preview").height() - 600) / 2, width: 800, height: 600 };
 
-    var background = new Konva.Rect({
-        x: 0,
-        y: 0,
-        name: "background",
-        width: 800,
-        height: 600,
+    background = new Konva.Rect({
+        x:0,
+        y:0,
+        name:"background",
+        width:800,
+        height:600,
         fill: 'white',
         stroke: 'gray',
         strokeWidth: 0,
@@ -1961,36 +1997,33 @@ $(function () {
     });
 
     group.add(background);
-    group.position({
-        x: ($("#preview").width() - 800) / 2,
-        y: ($("#preview").height() - 600) / 2,
-    })
-    background.position({ x: 0, y: 0 })
+    group.position({        x: ($("#preview").width() - 800) / 2, 
+        y: ($("#preview").height() - 600) / 2, })
+    background.position({x:0,y:0})
 
-
+    
     layer.draw()
     $('#bgcolor').attr("object-id", background.id());
 
-    page.add(group);
-
+    layer.add(group);
     var border = new Konva.Rect({
-        listening: false,
-        x: background.getAbsolutePosition().x - $("#preview").width() / 2,
-        y: background.getAbsolutePosition().y - $("#preview").width() / 2,
-        width: clipRect.width + $("#preview").width(),
-        height: clipRect.height + $("#preview").width(),
+        listening:false,
+        x: background.getAbsolutePosition().x- $("#preview").width()/2 ,
+        y:  background.getAbsolutePosition().y- $("#preview").width()/2,
+        width: clipRect.width+$("#preview").width(),
+        height: clipRect.height+$("#preview").width(),
         stroke: 'rgba(44, 44, 46, 0.87)',
         strokeWidth: $("#preview").width(),
         draggable: false, // Para manter a borda fixa
-        name: 'border'
-    });
-    page.add(border);
-    border.moveToTop();
+        name:'border'
+      });
+      layer.add(border);
+      border.moveToTop();
     generateBackgroundEvents(background, layer);
     var isPaint = false;
 
     var lastLine;
-    stage.on('mouseout', function () {
+    stage.on('mouseout', function(){
         if (drawMode) {
             var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
 
@@ -2002,18 +2035,18 @@ $(function () {
         }
     })
     stage.on('mouseover', function () {
-        var layer = stage.findOne("#layer-main");
-
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var group = layer.findOne(".grupo");
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
             stage.listening(false);
-
-
-
-            var scale = stage.getAbsoluteScale(); // Obter a escala real do grupo
-            var position = stage.getAbsolutePosition(); // Obter posição do grupo no canvas
-
+            
+            if (!group) return;
+            
+            var scale = group.getAbsoluteScale(); // Obter a escala real do grupo
+            var position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
+            
             // Ajustar a posição do pointer para considerar transformações do grupo
             var adjustedPosition = {
                 x: (pointerPosition.x - position.x) / scale.x,
@@ -2039,33 +2072,32 @@ $(function () {
                 DrawCursorRadius.strokeWidth(1);
             }
         } else {
-
+            
             $(".editor").css("cursor", "")
         }
     })
     var lineId;
     var drawingLine = false;
     stage.on('mousedown touchstart', function (e) {
-        var layer = stage.findOne("#layer-main");
-        var page = layer.findOne("#" + $("#currentLayer").val());
-        var group = page.findOne(".grupo");
+        const layer = stage.findOne("#" + $("#currentLayer").val());
+        const group = layer.findOne(".grupo");
         if (drawMode) {
             saveState();
             isPaint = true;
-            const pointerPosition = stage.getRelativePointerPosition();
+            const pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
-
+                  
             if (!group) return;
-
+            
             const scale = group.getAbsoluteScale(); // Obter a escala real do grupo
             const position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
-
+             
             // Ajustar a posição do pointer para considerar transformações do grupo
             const adjustedPosition = {
                 x: (pointerPosition.x - position.x) / scale.x,
                 y: (pointerPosition.y - position.y) / scale.y
             };
-
+            
             lastLine = new Konva.Line({
                 points: [adjustedPosition.x, adjustedPosition.y],
                 stroke: color,
@@ -2074,16 +2106,13 @@ $(function () {
                     mode === 'brush' ? 'source-over' : 'destination-out',
                 lineJoin: 'round',
                 lineCap: 'round',
-                width:"100",
-                height:"100",
                 listening: false,
-                points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
             group.add(lastLine);
             const DrawCursorRadius = stage.findOne("#DrawCursorRadius");
             DrawCursorRadius.moveToTop();
             layer.draw();
-
+        
         } else {
 
             sliders.forEach(function (attr) {
@@ -2098,15 +2127,15 @@ $(function () {
             });
         }
 
-        if (drawingLineMode) {
+        if(drawingLineMode){
             saveState();
 
             const pointerPosition = stage.getPointerPosition();
             if (!group) return;
-
+            
             const scale = group.getAbsoluteScale(); // Obter a escala real do grupo
             const position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
-
+            
             // Ajustar a posição do pointer para considerar transformações do grupo
             const adjustedPosition = {
                 x: (pointerPosition.x - position.x) / scale.x,
@@ -2114,22 +2143,21 @@ $(function () {
             };
             drawingLine = true;
 
-            const line = new Konva.Line({
+             const line = new Konva.Line({
                 stroke: lineColor,
-                name: "line",
-                strokeWidth: lineSize,
+                name:"line",
+                strokeWidth:lineSize,
+                width:lineSize,
                 listening: true,
-                id: "line" + Math.random(),
-                width:"100",
-                height:"100",
-                draggable: true,
+                id:"line"+Math.random(),
+                draggable:true,
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
-            generateLineEvents(line)
+            generateLineEvents(line,layer)
             lineId = line.id();
             group.add(line);
-            page.draw();
-
+            layer.draw();
+            
         }
     });
     let isHandlingEvent = false;
@@ -2138,36 +2166,27 @@ $(function () {
         isPaint = false;
         drawingLine = false;
         lineId = 0;
-        if (drawMode || drawingLineMode) {
-            updateLayerButtons();
-        }
     });
     stage.on('mousemove touchmove', function (e) {
-        var layer = stage.findOne("#layer-main");
-        var page = layer.findOne("#" + $("#currentLayer").val());
-        var group = page.findOne(".grupo");
-        const pointerPosition = stage.getRelativePointerPosition();
+        const layer = stage.findOne("#" + $("#currentLayer").val());
+        const group = layer.findOne(".grupo");
+        const pointerPosition = stage.getPointerPosition();
         if (drawMode) {
+            
+
+    
 
             if (!pointerPosition) return;
 
             if (!group) return;
-
+            
             const scale = group.getAbsoluteScale(); // Obter a escala real do grupo
             const position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
-
+            
             // Ajustar a posição do pointer para considerar transformações do grupo
             const adjustedPosition = {
                 x: (pointerPosition.x - position.x) / scale.x,
                 y: (pointerPosition.y - position.y) / scale.y
-            };
-            const scale2 = stage.getAbsoluteScale(); // Obter a escala real do grupo
-            const position2 = stage.getAbsolutePosition(); // Obter posição do grupo no canvas
-
-            // Ajustar a posição do pointer para considerar transformações do grupo
-            const adjustedPosition2 = {
-                x: (pointerPosition.x - position2.x) / scale2.x,
-                y: (pointerPosition.y - position2.y) / scale2.y
             };
             const DrawCursorRadius = stage.findOne("#DrawCursorRadius");
 
@@ -2176,57 +2195,43 @@ $(function () {
                 return;
             }
 
-            DrawCursorRadius.x(adjustedPosition2.x)
-            DrawCursorRadius.y(adjustedPosition2.y)
+            DrawCursorRadius.x(adjustedPosition.x)
+            DrawCursorRadius.y(adjustedPosition.y)
             if (!isPaint) {
                 return;
             }
-       
+            e.evt.preventDefault();
 
             const newPoints = lastLine.points().concat([adjustedPosition.x, adjustedPosition.y]);
             lastLine.points(newPoints);
 
 
-            page.draw();
+            layer.draw();
         }
 
-
-        if (drawingLine) {
-            // Captura a linha com base no ID
-            const line = group.findOne("#" + lineId);
-            if (!line || !group) {
+        
+        if(drawingLine){
+            e.evt.preventDefault();
+            const line = group.findOne("#"+lineId);
+            if (!line) {
                 return;
-            }
-
-            // Escala e posição do grupo
-            const scale = group.getAbsoluteScale();
-            const position = group.getAbsolutePosition();
-
-            // Calcula a posição ajustada para o mouse
-            const adjustedPosition = {
-                x: (pointerPosition.x - position.x) / scale.x,
-                y: (pointerPosition.y - position.y) / scale.y
-            };
-
-            // Atualiza os pontos sem sobrescrever excessivamente
-            const points = line.points();
-            if (points.length < 4) {
-                points.push(adjustedPosition.x, adjustedPosition.y);
-            } else {
-                points[points.length - 2] = adjustedPosition.x;
-                points[points.length - 1] = adjustedPosition.y;
-            }
-
-            // Verificação dos pontos
-            if (!points.every(val => typeof val === 'number' && !isNaN(val))) {
-                console.error("Invalid points detected:", points);
-                return;
-            }
-
-            line.points(points); // Atualiza os pontos na linha
-
-            // Força um desenho seguro da camada
-            layer.batchDraw();
+              }
+              if (!group) return;
+              
+              const scale = group.getAbsoluteScale(); // Obter a escala real do grupo
+              const position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
+              
+              // Ajustar a posição do pointer para considerar transformações do grupo
+              const adjustedPosition = {
+                  x: (pointerPosition.x - position.x) / scale.x,
+                  y: (pointerPosition.y - position.y) / scale.y
+              };
+              const points = line.points().slice();
+              points[2] = adjustedPosition.x;
+              points[3] = adjustedPosition.y;
+              line.points(points);
+              layer.batchDraw();
+              updateLayerButtons();
         }
     });
     $(".draw-mode").on('click', function () {
@@ -2240,11 +2245,13 @@ $(function () {
         }
     });
 
+
+
     stage.on('click tap dragstart', function (e) {
+        
+        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy')&& (e.target.name() != 'line')) {
 
-        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'line')) {
-
-            if (drawMode || drawingLineMode) {
+            if(drawMode || drawingLineMode){
                 return;
             }
 
@@ -2266,7 +2273,7 @@ $(function () {
             return;
         }
         if ((e.target.name() === 'image') || (e.target.name() === 'text') || (e.target.name() === 'background') || (e.target.name() === 'draw')) {
-            if (drawMode || drawingLineMode) {
+            if(drawMode || drawingLineMode){
                 return;
             }
             sliders.forEach(function (attr) {
@@ -2325,7 +2332,9 @@ $(function () {
     groupTrans.add(transformer);
     transformerLayer.add(groupTrans);
     transformerLayer.draw();
-    layer.add(page);
+
+
+    layer.add(group);
     layer.draw();
 
     $(".layers-header").width(243);
@@ -2336,33 +2345,33 @@ $(function () {
 
 });
 
-function generateLineEvents(line, layer) {
-
-    line.on("mousedown touchstart", function (e) {
-        if (drawMode || drawingLineMode) {
+function generateLineEvents(line,layer){
+    
+    line.on("mousedown touchstart", function(e){
+        if(drawMode || drawingLineMode){
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     return;
                 }
             }
         }
-        generateLineWidget(e.target);
-        transformer.nodes([e.target])
+        generateLineWidget(line,layer);
+        transformer.nodes([line])
     })
 
-    line.on('mouseover touchstart', function (e) {
-        if (drawMode || drawingLineMode) {
+    line.on('mouseover touchstart', function(e){
+        if(drawMode || drawingLineMode){
             $("#shape-border").hide();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     $("#shape-border").hide();
@@ -2375,22 +2384,22 @@ function generateLineEvents(line, layer) {
         adjustShapeBorder(e.target);
     })
 
-    line.on('mouseout touchend', function (e) {
+    line.on('mouseout touchend', function(e){
         $("#shape-border").hide();
     })
-
-    line.on("dragmove", function (e) {
+    
+    line.on("dragmove",function(e){
         adjustShapeBorder(e.target);
     })
 
-    line.on("transformstart dragstart", function (e) {
-        if (drawMode || drawingLineMode) {
+    line.on("transformstart dragstart", function(e){
+        if(drawMode || drawingLineMode){
             line.stopDrag();
             return;
         }
 
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
+        if(e.evt){
+            if (e.evt.type.startsWith('touch')) { 
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
                     line.stopDrag();
@@ -2399,15 +2408,17 @@ function generateLineEvents(line, layer) {
             }
         }
         saveState();
-        generateLineWidget(e.target);
-        transformer.nodes([e.target])
-     
+        generateLineWidget(line,layer);
+        transformer.nodes([line])
+        updateLayerButtons();
     })
-
+    line.on('transformend dragend', function(e){
+        updateLayerButtons();
+    })
 }
 
 
-function generateLineWidget(line) {
+function generateLineWidget(line){
     $("#widget-draw-line").fadeIn(100);
 
     var position = $(".konvajs-content").offset();
@@ -2416,9 +2427,9 @@ function generateLineWidget(line) {
 
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($(".editor-panel").height() + 4);
+        var positionTop = position.top - ($(".editor-panel").height()+4);
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.bottom = '';
         widget.style.width = "100%";
@@ -2438,20 +2449,23 @@ function generateLineWidget(line) {
 
 
 function generateBackgroundEvents(background, layer) {
+    background.on('mouseover', function () {
 
-    background.on("click dbltap", function (e) {
+    });
+
+    background.on("click dbltap", function () {
         if (!drawMode && !drawingLineMode) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
             var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() - 40;
+            var positionTop = position.top + $(".preview-img").height()-40;
             var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
             if ($(window).outerWidth() < 450) {
                 var position = $(".editor-panel").offset();
-                var positionTop = position.top - ($(".editor-panel").height() + 4);
+                var positionTop = position.top - ($(".editor-panel").height()+4);
                 widget.style.position = 'absolute';
-                widget.style.top = positionTop + "px";
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -2464,32 +2478,11 @@ function generateBackgroundEvents(background, layer) {
         }
     });
 
-    background.on('mouseover touchstart', function (e) {
-        if (drawMode || drawingLineMode) {
-            $("#shape-border").hide();
-            return;
-        }
-
-        if (e.evt) {
-            if (e.evt.type.startsWith('touch')) {
-                // Confirma que é um evento de toque
-                if (e.evt.touches && e.evt.touches.length === 2) {
-                    $("#shape-border").hide();
-                    return;
-                }
-            }
-        }
-
-        $("#shape-border").show();
-        adjustShapeBorder(e.target)
+    background.on('dragstart', function(){
+        $("#widget-bg").fadeOut(100);
     })
 
-    background.on('mouseout touchend', function (e) {
-        $("#shape-border").hide();
-    })
-
-
-    background.on("dragend", function (e) {
+    background.on("dragend", function () {
         if (!drawMode) {
             $("#widget-bg").fadeIn(100);
             var position = $(".preview-img").offset();
@@ -2499,9 +2492,9 @@ function generateBackgroundEvents(background, layer) {
 
             if ($(window).outerWidth() < 450) {
                 var position = $(".editor-panel").offset();
-                var positionTop = position.top - ($(".editor-panel").height() + 4);
+                var positionTop = position.top - ($(".editor-panel").height()+4);
                 widget.style.position = 'absolute';
-                widget.style.top = positionTop + "px";
+                widget.style.top = positionTop+"px";
                 widget.style.left = '0px';
                 widget.style.width = "100%";
             } else {
@@ -2515,63 +2508,43 @@ function generateBackgroundEvents(background, layer) {
 }
 
 function fitStageIntoParentContainer() {
-    var layer = stage.findOne("#layer-main");
-    var groups = Array.from(layer.find('Group'));
-    var pages = groups.filter(group => group.name() !== 'grupo');
-
+    const layer = stage.findOne("#" + $("#currentLayer").val());
     const stageParent = document.getElementById('preview'); // Container principal do stage
 
     // Dimensões do container pai (área visível no browser)
     const stageWidth = stageParent.offsetWidth;
     const stageHeight = stageParent.offsetHeight;
-    var scaleX = stageWidth / originalStageWidth;
-    var scaleY = stageHeight / originalStageHeight;
-    var scale = Math.min(scaleX, scaleY); // Escolhe o menor fator para manter a proporção
-    if ($(window).outerWidth() < 820) {
-        scaleX = stageWidth / originalStageWidth;
-        scaleY = stageHeight / originalStageHeight;
 
-    }else{
-        scaleX = 1000 / originalStageWidth;
-        scaleY = 1000  / originalStageHeight;
-        
-    }
-    var scale = Math.min(scaleX, scaleY); // Escolhe o menor fator para manter a proporção
-
-    pages.forEach((page, index) => {
-       console.log(page)
-        const group = page.findOne(".grupo");
-
-        group.scale({ x: scale, y: scale });
-        $('#zoom-slider').val(scale);
-        zoom = scale;
-        // Centraliza o grupo
-        group.position({
-            x: (stageWidth - originalStageWidth * group.getAbsoluteScale().x) / 2, // Centraliza horizontalmente
-            y: (stageHeight - originalStageHeight * group.getAbsoluteScale().y) / 2, // Centraliza verticalmente
-        });
+    // Calcula a escala proporcional com base nas dimensões do projeto inicial
+    const scaleX = 1000/ originalStageWidth;
+    const scaleY = 1000/ originalStageHeight;
+    const scale = Math.min(scaleX, scaleY); // Escolhe o menor fator para manter a proporção
     
-        // Encontra o background e garante suas dimensões e posicionamento
+    // Ajusta a escala e posição do grupo principal
+    const group = layer.findOne(".grupo");
 
-    
-        const border = page.findOne(".border");
+    group.scale({ x: scale, y: scale });
+    $('#zoom-slider').val(scale);
+    zoom = scale;
+    // Centraliza o grupo
+    group.position({
+        x: (stageWidth - originalStageWidth * scale) / 2, // Centraliza horizontalmente
+        y: (stageHeight - originalStageHeight * scale) / 2, // Centraliza verticalmente
+    });
 
-        if(border){
-            border.setAttrs({
-                listening: false,
-                x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-                y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-                width: (originalStageWidth * scale) + $("#preview").width(),
-                height: (originalStageHeight * scale) + $("#preview").width(),
-                stroke: 'rgba(44, 44, 46, 0.87)',
-                strokeWidth: $("#preview").width(),
-                draggable: false, // Para manter a borda fixa
-                name: 'border'
-            })
-        
-        }
-    
-    })
+    // Encontra o background e garante suas dimensões e posicionamento
+    const background = stage.findOne(".background");
+
+    const border = stage.findOne(".border");
+    border.setAttrs({    listening:false,
+        x: group.getAbsolutePosition().x- ($("#preview").width()/2) ,
+        y:  group.getAbsolutePosition().y- ($("#preview").width()/2),
+        width: (originalStageWidth*scale)+$("#preview").width(),
+        height: (originalStageHeight*scale)+$("#preview").width(),
+        stroke: 'rgba(44, 44, 46, 0.87)',
+        strokeWidth: $("#preview").width(),
+        draggable: false, // Para manter a borda fixa
+        name:'border'})
 
     layer.draw();
     stage.draw();
@@ -2620,41 +2593,41 @@ $(function () {
         updateLayerButtons();
     });
 
-    $(".outline-shape").on('click', function () {
-        saveState();
-        var layer = stage.findOne("#" + $("#currentLayer").val());
-        var shape = transformer.nodes()[0];
-        if (shape.fill() == 'rgba(0, 0, 0, 0.0)') {
-            $(this).removeClass("selected");
-            shape.fill($("#draw-color").val());
-            shape.strokeWidth(0);
-            shape.stroke(null);
-        } else {
-            $(this).addClass("selected");
-            shape.stroke(shape.fill());
-            shape.fill("rgba(0, 0, 0, 0.0)")
-            shape.strokeWidth($("#stroke-width").val());
-        }
-        layer.draw();
-        updateLayerButtons();
-    });
+$(".outline-shape").on('click', function(){
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var shape = transformer.nodes()[0];
+    if (shape.fill() == 'rgba(0, 0, 0, 0.0)') {
+        $(this).removeClass("selected");
+        shape.fill($("#draw-color").val());
+        shape.strokeWidth(0);
+        shape.stroke(null);
+    } else {
+        $(this).addClass("selected");
+        shape.stroke(shape.fill());
+        shape.fill("rgba(0, 0, 0, 0.0)")
+        shape.strokeWidth($("#stroke-width").val());
+    }
+    layer.draw();
+    updateLayerButtons();
+});
 
-    $(".border-shape").on('click', function () {
-        saveState();
-        var layer = stage.findOne("#" + $("#currentLayer").val());
-        var shape = transformer.nodes()[0];
-        if ($(this).hasClass("selected")) {
-            $(this).removeClass("selected");
-            shape.stroke(null);
-            shape.strokeWidth(0);
-        } else {
-            $(this).addClass("selected");
-            shape.stroke("black");
-            shape.strokeWidth($("#stroke-width").val());
-        }
-        layer.draw();
-        updateLayerButtons();
-    });
+$(".border-shape").on('click', function(){
+    saveState();
+    var layer = stage.findOne("#" + $("#currentLayer").val());
+    var shape = transformer.nodes()[0];
+    if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+        shape.stroke(null);
+        shape.strokeWidth(0);
+    } else {
+        $(this).addClass("selected");
+        shape.stroke("black");
+        shape.strokeWidth($("#stroke-width").val());
+    }
+    layer.draw();
+    updateLayerButtons();
+});
 
 
 
@@ -2670,7 +2643,7 @@ $(function () {
         layer.draw();
     });
 
-    $(".font-item").click(function () {
+    $(".font-item").click(function(){
         saveState();
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = transformer.nodes()[0];
@@ -2688,8 +2661,8 @@ $(function () {
 
 
     $("#text-font-edit").on('click', function () {
-        $("#widget-fonts").css('background-color', 'background: rgba(47, 51, 54, 1)');
-        $("#widget-fonts").css('opacity', '1');
+        $("#widget-fonts").css('background-color','background: rgba(47, 51, 54, 1)');
+        $("#widget-fonts").css('opacity','1');
         $("#widget-fonts").fadeIn(100);
         var font = $(this).attr('font');
         var position = $(this).offset();
@@ -2702,7 +2675,7 @@ $(function () {
             var position = $("#draggable").offset();
             var positionTop = position.top;
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + "px";
+            widget.style.top = positionTop+"px";
             widget.style.left = '0px';
             widget.style.width = "100%";
         } else {
@@ -2710,7 +2683,7 @@ $(function () {
             widget.style.top = '50px';
             widget.style.left = positionLeft + 'px';
         }
-
+        
         // var layer = stage.findOne("#" + $("#currentLayer").val());
         // var text = transformer.nodes()[0];
         // $(this).css("font-family", '"' + $(this).val() + '"');
@@ -2726,15 +2699,14 @@ $(function () {
     $("#input-text-edit").on('input', function () {
         saveState();
         var text = transformer.nodes()[0];
-        if(text){
-            text.text($(this).val());
-            stage.findOne("#layer-main").batchDraw();
-            $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
-            $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
-        }
-        
+
+        text.text($(this).val());
+        layer.draw();
+        var textPosition = text.absolutePosition();
+        $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
+        $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
+        updateLayerButtons();
     });
-  
 
     $(".btn-align").on("click", function () {
         saveState();
@@ -2797,15 +2769,15 @@ $('#widget-text').on('click', function () {
 
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($("#add-text-widget").height() - $(this).height());
+        var positionTop = position.top - ($("#add-text-widget").height()-$(this).height());
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.bottom = '';
     } else {
         widget.style.position = 'absolute';
-        widget.style.top = adjustedTop + "px";
-        widget.style.left = adjustedLeft + 'px';
+        widget.style.top = adjustedTop+"px";
+        widget.style.left = adjustedLeft+'px';
     }
 
 });
@@ -2839,7 +2811,7 @@ function addTransformer() {
         anchorStroke: 'black',
         anchorFill: 'white',
         borderStroke: '#FFD843',
-        borderStrokeWidth: "2",
+        borderStrokeWidth:"2",
         centeredScaling: true,
         ignoreStroke: true,
         enabledAnchors: [
@@ -2915,7 +2887,7 @@ $("#draw-line").on("click", function () {
     lineSize = $("#line-size").val();
     $("#line-size-text").text(" " + lineSize);
     if (!drawingLineMode) {
-        if (drawMode) {
+        if(drawMode){
             $("#draw").click();
         }
         var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -2931,9 +2903,9 @@ $("#draw-line").on("click", function () {
 
         if ($(window).outerWidth() < 450) {
             var position = $(".editor-panel").offset();
-            var positionTop = position.top - ($(".editor-panel").height() + 4);
+            var positionTop = position.top - ($(".editor-panel").height()+4);
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + "px";
+            widget.style.top = positionTop+"px";
             widget.style.left = '0px';
             widget.style.bottom = '';
             widget.style.width = "100%";
@@ -2947,7 +2919,7 @@ $("#draw-line").on("click", function () {
     } else {
         $(this).css('background', "transparent");
         $("#widget-draw-line").fadeOut(100);
-        drawingLineMode = false;
+        drawingLineMode  = false;
     }
 
 });
@@ -2962,10 +2934,11 @@ $("#draw").on("click", function () {
     size = $("#brush-size").val();
     $("#brush-size-text").text(" " + size);
     if (!drawMode) {
-        if (drawingLineMode) {
+        if(drawingLineMode){
             $("#draw-line").click();
         }
-        var layer = stage.findOne("#layer-main");
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var group = layer.findOne(".grupo");
         drawMode = true;
         $("#widget-draw").fadeIn(100);
         if (mode == "brush") {
@@ -2987,9 +2960,9 @@ $("#draw").on("click", function () {
             stroke: 'black',
             strokeWidth: 0,
             listening: false,
-            visible: false
+            visible:false
         });
-        layer.add(DrawCursorRadius);
+        group.add(DrawCursorRadius);
         DrawCursorRadius.moveToTop()
         colorButton.style.backgroundColor = color;
         var position = $(".preview-img").offset();
@@ -2998,9 +2971,9 @@ $("#draw").on("click", function () {
 
         if ($(window).outerWidth() < 450) {
             var position = $(".editor-panel").offset();
-            var positionTop = position.top - ($(".editor-panel").height() + 4);
+            var positionTop = position.top - ($(".editor-panel").height()+4);
             widget.style.position = 'absolute';
-            widget.style.top = positionTop + "px";
+            widget.style.top = positionTop+"px";
             widget.style.left = '0px';
             widget.style.width = "100%";
         } else {
@@ -3015,9 +2988,7 @@ $("#draw").on("click", function () {
         $("#widget-draw").fadeOut(100);
         drawMode = false;
         var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
-        if (DrawCursorRadius) {
-            DrawCursorRadius.destroy();
-        }
+        DrawCursorRadius.destroy();
     }
 
 });
@@ -3059,9 +3030,8 @@ function getRandomInt(max) {
 }
 
 function updatePageNumbers() {
-    const layer = stage.findOne("#layer-main");
-    const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
 
     const sortedLayers = userLayers.sort((layer1, layer2) => {
         return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
@@ -3071,7 +3041,7 @@ function updatePageNumbers() {
         var number = index + 1;
         layer.setAttrs({
             pageNumber: index + 1,
-            name: "Pagina " + number
+            name:"Pagina "+number
         });
     });
 
@@ -3079,24 +3049,22 @@ function updatePageNumbers() {
 }
 
 function addPage() {
-    const layer = stage.findOne("#layer-main");
-    const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     const newPageNumber = userLayers.length + 1;
+    var layer = stage.findOne("#" + $("#currentLayer").val())
     var group = new Konva.Group({
-        width: 800,
-        height: 600,
-        name: 'grupo'
+        width:800,
+        height:600,
+        name:'grupo'
     });
 
-    group.position({
-        x: ($("#preview").width() - originalStageWidth) / 2,
-        y: ($("#preview").height() - originalStageHeight) / 2,
-    })
+    group.position({        x: ($("#preview").width() - originalStageWidth) / 2, 
+        y: ($("#preview").height() - originalStageHeight) / 2, })
 
-    const newLayer = new Konva.Group({
+    const newLayer = new Konva.Layer({
         id: "layer" + getRandomInt(1000),
-        name: "Pagina " + newPageNumber,
+        name: "Pagina "+newPageNumber,
         pageNumber: newPageNumber, // Atribua o número da página
         zIndex: userLayers.length // Garante que seja a última na ordem
     });
@@ -3106,52 +3074,52 @@ function addPage() {
     if (background) {
         var bgCopy = background.clone();
         group.add(bgCopy);
-        bgCopy.position({ x: 0, y: 0 })
+        bgCopy.position({x:0,y:0})
     }
     newLayer.add(group);
     var border = stage.findOne(".border");
     newLayer.add(border);
-    layer.add(newLayer);
-    updatePageNumbers();
+    stage.add(newLayer);
+    updatePageNumbers(); 
     stage.draw();
     updateLayerButtons();
     fitStageIntoParentContainer();
 }
 
-$("#layers").on('click', '#add-layer', function () {
+$("#layers").on('click','#add-layer',function () {
     if (stage.getLayers().length >= 5) {
         return;
     }
     addPage();
 });
 
-$("#duplicate-layer").on('click', function () {
-
+$("#duplicate-layer").on('click',function () {
+    if (stage.getLayers().length >= 5) {
+        return;
+    }
     saveState();
-    const layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#selected-page").val())
-    const clonedPage = page.clone();
+    var layer = stage.findOne("#" + $("#selected-page").val())
+    const clonedLayer = layer.clone();
 
-    clonedPage.id("layernew" + getRandomInt(1000));
+    clonedLayer.id("layernew" + getRandomInt(1000));
 
-    layer.add(clonedPage);
+    stage.add(clonedLayer);
 
-    $("#currentLayer").val(clonedPage.id());
+    $("#currentLayer").val(clonedLayer.id());
     updateLayerButtons();
     updatePageNumbers();
     $("#widget-page").fadeOut(100);
 })
 
-$(".btn-delete-layer").on('click', function (e) {
+$(".btn-delete-layer").on('click',function (e) {
 
-    const layer = stage.findOne("#layer-main");
-    const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     let nextLayerId = userLayers[0].id();
-    userLayers.forEach((page) => {
-        if (page.id() === $("#selected-page").val() && userLayers.length > 1) {
+    userLayers.forEach((layer) => {
+        if (layer.id() !== "transformerLayer" && layer.id() === $("#selected-page").val() && userLayers.length > 1) {
             saveState();
-            const buttonLayer = $('#layers').find(`[layer-id='${page.id()}']`);
+            const buttonLayer = $('#layers').find(`[layer-id='${layer.id()}']`);
             var border = stage.findOne(".border");
             const siblings = buttonLayer.next(".layer");
 
@@ -3162,10 +3130,10 @@ $(".btn-delete-layer").on('click', function (e) {
                 nextLayerId = buttonLayer.prev(".layer").attr("layer-id");
 
             }
-            var nextLayer = layer.findOne("#" + nextLayerId);
+            var nextLayer = stage.findOne("#"+nextLayerId);
             nextLayer.add(border);
             $("#currentLayer").val(nextLayerId);
-            page.destroy();
+            layer.destroy();
             stage.draw();
             return;
         }
@@ -3175,7 +3143,7 @@ $(".btn-delete-layer").on('click', function (e) {
     $("#widget-page").fadeOut(100);
 });
 
-$("#layers").on('click', '.btn-page-options', function (e) {
+$("#layers").on('click','.btn-page-options',function (e) {
     e.stopPropagation();
     var layer = $(this).parent()[0];
     $("#widget-page").fadeIn(100);
@@ -3191,69 +3159,59 @@ $("#layers").on('click', '.btn-page-options', function (e) {
 
 
 function generateLayerThumbnail(layer) {
+    return new Promise((resolve) => {
+        // Clona a layer, tornando-a visível
+        const clone = layer.clone({ visible: true });
 
-    return new Promise((resolve, reject) => {
-        const group = layer.findOne(".grupo");
-    
-        if (!group) {
-            console.error("Group not found in layer:", layer);
-            reject(new Error("Group not found"));
-            return;
-        }
-    
-        // Clona o grupo
-        var clone = group.clone();
-        
-        // Adicione ajustes ao clone para garantir que ele esteja fora do contexto da camada original
-
-        // Desanexa qualquer relacionamento de hierarquia do clone
-        const tempLayer = new Konva.Layer();
-        tempLayer.add(clone);
-
-        stage.add(tempLayer);
-      
-        tempLayer.toImage({
+        // Configura escala proporcional
+        stage.add(clone);
+        var group = clone.findOne(".grupo");
+        // Renderiza a imagem do clone
+        group.toImage({
+            
             callback: function (img) {
                 resolve(img.src);
+                
             },
-
         });
-        tempLayer.destroy(); // Limpa após uso
+        
+        clone.destroy(); // Remove o clone após renderizar
     });
 }
 
 function updateLayerButtons() {
-    var layer = stage.findOne("#layer-main");
-    var layers = Array.from(layer.find('Group'));
-    var userLayers = layers.filter(layer => layer.name() !== 'grupo');
-    var sortedLayers = userLayers.sort((layer1, layer2) => {
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
+
+    const sortedLayers = userLayers.sort((layer1, layer2) => {
         return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
     });
-    
-    var imgPromises = [];
+
+    // Atualizar todas as thumbnails
+    const imgPromises = [];
     sortedLayers.forEach((layer2) => {
-        if ((layer2.name() !== 'Grupo') && (layer2.id() !== undefined)) {
+        if ((layer2.id() !== "transformerLayer")&&(layer2.id() !== undefined)) {
             imgPromises.push(
                 generateLayerThumbnail(layer2).then((imgData) => ({
                     imgData,
                     layerId: layer2.id(),
                 }))
             );
-
+        
         }
     });
 
-    // Atualizar thumbnails no DOM
-    Promise.all(imgPromises).then((images) => {
-        $("#layers").html(""); // Limpa o container das layers
+// Atualizar thumbnails no DOM
+Promise.all(imgPromises).then((images) => {
 
-        images.forEach(({ imgData, layerId }) => {
-            const layer1 = stage.findOne("#layer-main");
-            const layer = layer1.findOne("#" + layerId);
-            if (layer === undefined) {
-                return;
-            }
-            const buttonHtml = `
+    $("#layers").html(""); // Limpa o container das layers
+
+    images.forEach(({ imgData, layerId }) => {
+        const layer = stage.findOne("#" + layerId);
+        if(layer  === undefined){
+            return;
+        }
+        const buttonHtml = `
             <li class="layer" layer-id="${layerId}">
                 <span class="layer-name">${layer.getAttr("pageNumber")}</span>
                 <button class="btn-page-options" title="Opções" layer_id="${layerId}"><i
@@ -3261,56 +3219,54 @@ function updateLayerButtons() {
                 <img src="${imgData}" class="layer-img" alt="Layer Image" style="">
             </li>
         `;
-            $("#layers").append(buttonHtml);
+        $("#layers").append(buttonHtml);
 
-            const newButton = $("#layers").find(`[layer-id='${layerId}']`);
+        const newButton = $("#layers").find(`[layer-id='${layerId}']`);
 
-            if ($("#currentLayer").val() === layerId) {
-                newButton.addClass("active");
-                const background = layer.findOne(".background");
-                if (background) {
-                    $("#bgcolor").attr("disabled", false);
-                    $("#bgcolor").attr("object-id", background.id());
-                    $("#bgcolor").val(background.fill());
-                    const colorButton = document.getElementById("bg-color-button");
-                    colorButton.style.backgroundColor = background.fill();
-                } else {
-                    $("#bgcolor").attr("disabled", true);
-                    $("#bgcolor").val("#ffffff");
-                    const colorButton = document.getElementById("bg-color-button");
-                    colorButton.style.backgroundColor = "#ffffff";
-                }
+        if ($("#currentLayer").val() === layerId) {
+            newButton.addClass("active");
+            const background = layer.findOne(".background");
+            if (background) {
+                $("#bgcolor").attr("disabled", false);
+                $("#bgcolor").attr("object-id", background.id());
+                $("#bgcolor").val(background.fill());
+                const colorButton = document.getElementById("bg-color-button");
+                colorButton.style.backgroundColor = background.fill();
+            } else {
+                $("#bgcolor").attr("disabled", true);
+                $("#bgcolor").val("#ffffff");
+                const colorButton = document.getElementById("bg-color-button");
+                colorButton.style.backgroundColor = "#ffffff";
             }
-        });
+        }
+    });
 
-        // Botão para adicionar nova camada
-        $("#layers").append(
-            `<button class="btn-add-layer" title="Adicionar nova camada" id="add-layer">
+    // Botão para adicionar nova camada
+    $("#layers").append(
+        `<button class="btn-add-layer" title="Adicionar nova camada" id="add-layer">
             <i class="mdi mdi-plus" aria-hidden="true"></i>
          </button>`
-        );
-    });
+    );
+});
     // <button class="btn btn-right btn-manage-layer btn-secondary" title="Duplicar camada"
     // id="duplicate-layer"><i class="mdi mdi-layers-triple" aria-hidden="true"></i></button>
-    
     setActiveLayer($("#currentLayer").val());
     var transformerLayer = stage.findOne("#transformerLayer");
     transformerLayer.moveToTop();
     stage.draw();
 }
 function setActiveLayer(selectedLayerId) {
-    const layer = stage.findOne("#layer-main");
-    const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const layers = Array.from(stage.getLayers());
+    const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
     userLayers.forEach((layer) => {
         if (layer.id() === selectedLayerId) {
             layer.visible(true);
             layer.listening(true);
             var border = stage.findOne(".border");
-            if (border) {
+            if(border){
                 layer.add(border);
             }
-
+            $("#currentLayer").val(selectedLayerId);
         } else {
             layer.moveToBottom();
             layer.listening(false);
@@ -3327,7 +3283,7 @@ $('#layers').on('click', '.layer', function (e) {
     }
 
     var layer_id = $(this).attr("layer-id");
-    $("#currentLayer").val(layer_id)
+    setActiveLayer(layer_id)
     updateLayerButtons();
 });
 
@@ -3434,11 +3390,6 @@ $(".moveDown").click(function () {
     layer.draw();
     updateLayerButtons();
 });
-$('#zoom-slider').on('mouseup touchend', function () {
-    updateLayerButtons();
-
-});
-
 $('#zoom-slider').on('input', function () {
     var layer = stage.findOne("#" + $("#currentLayer").val())
     var group = layer.findOne('.grupo');
@@ -3453,6 +3404,8 @@ $('#zoom-slider').on('input', function () {
     const newScale = $(this).val();
     const clampedScale = Math.max(newScale, 0.1); // Limita o zoom mínimo a 0.1
 
+    // Obtém a posição absoluta antes do ajuste
+    const absolutePositionBeforeZoom = group.getAbsolutePosition();
 
     // Calcula o ponto central absoluto
     const absoluteCenter = {
@@ -3462,28 +3415,26 @@ $('#zoom-slider').on('input', function () {
 
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
-    var border = stage.findOne(".border");
+    var border =  stage.findOne(".border");
 
     // Ajusta a posição para centralizar no stage
     const newPosition = {
         x: stageCenter.x - absoluteCenter.x * clampedScale,
         y: stageCenter.y - absoluteCenter.y * clampedScale,
     };
-
+  
     var border = layer.findOne(".border")
     group.position(newPosition);
-
-    border.setAttrs({
-        listening: false,
-        x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-        y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-        width: (originalStageWidth * clampedScale) + $("#preview").width(),
-        height: (originalStageHeight * clampedScale) + $("#preview").width(),
+  
+    border.setAttrs({    listening:false,
+        x: group.getAbsolutePosition().x- ($("#preview").width()/2) ,
+        y:  group.getAbsolutePosition().y- ($("#preview").width()/2),
+        width: (originalStageWidth*clampedScale)+$("#preview").width(),
+        height: (originalStageHeight*clampedScale)+$("#preview").width(),
         stroke: 'rgba(44, 44, 46, 0.87)',
         strokeWidth: $("#preview").width(),
         draggable: false, // Para manter a borda fixa
-        name: 'border'
-    })
+        name:'border'})
 
     group.getLayer().batchDraw();
 
@@ -3496,9 +3447,9 @@ $("#btn-widget-figures").click(function () {
     var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($(".editor-panel").height() + 4);
+        var positionTop = position.top - ($(".editor-panel").height()+4);
         widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
+        widget.style.top = positionTop+"px";
         widget.style.left = '0px';
         widget.style.width = "100%";
     } else {
@@ -3513,7 +3464,7 @@ $('#reset-zoom').on('click', function () {
     if ($(window).outerWidth() < 450) {
 
         $("#zoom-slider").val(1);
-    } else {
+    }else{
 
         $("#zoom-slider").val(0.8);
     }
@@ -3604,7 +3555,7 @@ function setNewCanvasSize(userWidth, userHeight) {
     originalStageHeight = userHeight;
 
     $("#project-title").text(title)
-    $("#project-info").text(userWidth + " x " + userHeight)
+    $("#project-info").text(userWidth+" x "+userHeight)
     fitStageIntoParentContainer();
     stage.batchDraw();
 
@@ -3637,9 +3588,9 @@ function setNewCanvas(userWidth, userHeight) {
 
     cleanStage();
     $("#project-title").text(title)
-    $("#project-info").text(userWidth + " x " + userHeight)
+    $("#project-info").text(userWidth+" x "+userHeight)
     fitStageIntoParentContainer();
-    updateLayerButtons();
+    stage.batchDraw();
     transformer.moveToTop();
 }
 
@@ -3671,57 +3622,15 @@ detectElement.addEventListener("touchmove", function (e) {
         const scaleChange = currentDistance / initialDistance;
         zoom *= scaleChange;
 
-        var layer = stage.findOne("#" + $("#currentLayer").val())
-        var group = layer.findOne('.grupo');
-        // Obtém a escala atual do grupo
-        let currentScale = group.scaleX(); // Presume escala uniforme
-        const stageCenter = {
-            x: stage.width() / 2,
-            y: stage.height() / 2,
-        };
-        const newScale = currentScale * scaleChange; // Preserva a escala proporcional
-        const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
-        // Ajusta o nível de zoom
- 
-    
-        // Calcula o ponto central absoluto
-        const absoluteCenter = {
-            x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
-            y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
-        };
-    
-    
-        // Aplica o novo zoom
-        group.scale({ x: clampedScale, y: clampedScale });
-        var border = stage.findOne(".border");
-    
-        // Ajusta a posição para centralizar no stage
-        const newPosition = {
-            x: stageCenter.x - absoluteCenter.x * clampedScale,
-            y: stageCenter.y - absoluteCenter.y * clampedScale,
-        };
-    
-    
-    
-        group.position(newPosition);
-    
-        border.setAttrs({
-            listening: false,
-            x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-            y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-            width: (originalStageWidth * clampedScale) + $("#preview").width(),
-            height: (originalStageHeight * clampedScale) + $("#preview").width(),
-            stroke: 'rgba(44, 44, 46, 0.87)',
-            strokeWidth: $("#preview").width(),
-            draggable: false, // Para manter a borda fixa
-            name: 'border'
-        })
-    
-        // Atualiza o slider de zoom (se necessário)
-        $("#zoom-slider").val(clampedScale);
-    
-        // Atualiza a camada para aplicar as mudanças
-        group.getLayer().batchDraw();
+        // Limitar o zoom a um intervalo adequado, se necessário
+        zoom = Math.min(Math.max(zoom, 0.5), 3); // Exemplo: mínimo 0.5x, máximo 3x
+        zoomElement.style.transformOrigin = "left";
+        // Aplicar o zoom ao elemento
+        zoomElement.style.transform = `scale(${zoom})`;
+
+        // Atualizar a distância inicial para o próximo movimento
+        initialDistance = currentDistance;
+        $("#zoom-slider").val(zoom);
     }
 });
 
@@ -3762,29 +3671,27 @@ detectElement.addEventListener("wheel", function (e) {
 
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
-    var border = stage.findOne(".border");
+    var border =  stage.findOne(".border");
 
     // Ajusta a posição para centralizar no stage
     const newPosition = {
         x: stageCenter.x - absoluteCenter.x * clampedScale,
         y: stageCenter.y - absoluteCenter.y * clampedScale,
     };
-
+  
 
 
     group.position(newPosition);
 
-    border.setAttrs({
-        listening: false,
-        x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-        y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-        width: (originalStageWidth * clampedScale) + $("#preview").width(),
-        height: (originalStageHeight * clampedScale) + $("#preview").width(),
+    border.setAttrs({    listening:false,
+        x: group.getAbsolutePosition().x- ($("#preview").width()/2) ,
+        y:  group.getAbsolutePosition().y- ($("#preview").width()/2),
+        width: (originalStageWidth*clampedScale)+$("#preview").width(),
+        height: (originalStageHeight*clampedScale)+$("#preview").width(),
         stroke: 'rgba(44, 44, 46, 0.87)',
         strokeWidth: $("#preview").width(),
         draggable: false, // Para manter a borda fixa
-        name: 'border'
-    })
+        name:'border'})
 
     // Atualiza o slider de zoom (se necessário)
     $("#zoom-slider").val(clampedScale);
@@ -3804,37 +3711,37 @@ function saveImageOriginalScale() {
 
     const layers = Array.from(stage.getLayers());
     const userLayers = layers.filter(layer => layer.id() !== 'transformerLayer');
-    // Salvar cada camada como imagem
-    var zip = new JSZip();
-    var promises = [];
-
-    userLayers.forEach((layer, index) => {
+  // Salvar cada camada como imagem
+  var zip = new JSZip();
+  var promises = [];
+  
+  userLayers.forEach((layer, index) => {
         var group = layer.findOne(".grupo");
-        const promise = new Promise((resolve) => {
-            group.toImage({
-                callback: function (image) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, 0, 0);
-
-                    canvas.toBlob((blob) => {
-                        zip.file(`${layer.name() || "layer"}_${index + 1}.png`, blob);
-                        resolve();
-                    });
-                }
-            });
-        });
-        promises.push(promise);
-    });
-
-    Promise.all(promises).then(() => {
-        zip.generateAsync({ type: "blob" }).then(function (content) {
-            saveAs(content, title + ".zip"); // Salva o ZIP com o nome 'modelo.zip'
-        });
-    });
+      const promise = new Promise((resolve) => {
+          group.toImage({
+              callback: function (image) {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = image.width;
+                  canvas.height = image.height;
+  
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(image, 0, 0);
+  
+                  canvas.toBlob((blob) => {
+                      zip.file(`${layer.name() || "layer"}_${index + 1}.png`, blob);
+                      resolve();
+                  });
+              }
+          });
+      });
+      promises.push(promise);
+  });
+  
+  Promise.all(promises).then(() => {
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+          saveAs(content, title+".zip"); // Salva o ZIP com o nome 'modelo.zip'
+      });
+  });
 
     fitStageIntoParentContainer();
 
@@ -3843,13 +3750,13 @@ $(document).on('mousedown touchstart', function (e) {
     // Lista de IDs ou classes dos elementos permitidos
     const allowedSelectors = [
         "canvas",
-        "textarea",
+        "textarea", 
         ".widget-sm",
         ".widget-lg",
         ".widget"
     ];
 
-    const isClickAllowed = allowedSelectors.some(selector =>
+    const isClickAllowed = allowedSelectors.some(selector => 
         $(e.target).closest(selector).length
     );
 
@@ -3860,6 +3767,7 @@ $(document).on('mousedown touchstart', function (e) {
                 transformers[i].nodes([]);
                 $("#shape-border").hide();
             }
+            layer.draw();
 
             // Esconda os widgets
             const widgets = [
