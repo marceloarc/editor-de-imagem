@@ -38,7 +38,6 @@ function saveState() {
     }
 
     redoStack.length = 0;
-    updateLayerButtons();
     updateundoRedoBtn();
 }
 
@@ -70,7 +69,7 @@ function undo() {
     restoreState(undoStack.pop());
     updateundoRedoBtn();
 }
-function restoreImage(image, layer) {
+function restoreImage(image, layer, currentShape = false) {
     const imageSrc = image.getAttr("imageSrc");
     const restoredImageObj = new Image();
 
@@ -79,6 +78,10 @@ function restoreImage(image, layer) {
         image.cache();
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
         layer.draw();
+        if(currentShape){
+            image.fire('click');
+        }
+
     };
     restoredImageObj.src = imageSrc;
 }
@@ -193,8 +196,10 @@ function restoreState(stack) {
                     generateLineEvents
                     generateShapeEvents(obj, layer);
                 } else if (obj instanceof Konva.Image) {
-                    restoreImage(obj, layer)
+                    transformer.nodes([]);
+                    restoreImage(obj, layer, currentShape && obj.id() === currentShape.id());
                     generateImageEvents(obj, layer);
+                    return;
                 } else if (obj instanceof Konva.Rect) {
                     if (obj.name() == "background") {
                         generateBackgroundEvents(obj, layer);
@@ -212,10 +217,7 @@ function restoreState(stack) {
 
                     if (obj.id() == currentShape.id()) {
                         stage.fire('click', { target: obj });
-                        obj.fire("click");
-                    } else {
-
-                        stage.fire('click');
+                        obj.fire('click');
                     }
                 }
             });
@@ -227,7 +229,7 @@ function restoreState(stack) {
     });
 
     updateLayerButtons();
-    stage.draw();
+
 }
 
 function redo() {
@@ -618,11 +620,7 @@ $("#widget-bg-btn").click(function () {
 
 function generateImageEvents(image, layer) {
     image.on('click tap', (e) => {
-        const parentLayer = e.target.getLayer();
 
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
         if (drawMode || drawingLineMode) {
             return;
         }
@@ -643,11 +641,7 @@ function generateImageEvents(image, layer) {
         layer.draw();
     });
     image.on('dragstart transformstart', (e) => {
-        const parentLayer = e.target.getLayer();
 
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
         if (drawMode || drawingLineMode) {
             image.stopDrag();
             return;
@@ -719,11 +713,7 @@ function generateImageEvents(image, layer) {
     });
 
     image.on('dragend', (e) => {
-        const parentLayer = e.target.getLayer();
 
-        if (parentLayer.id() !== $("#currentLayer").val()) {
-            return;
-        }
         if (drawMode || drawingLineMode) {
             return;
         }
@@ -1833,10 +1823,6 @@ function cleanStage() {
         fill: "white",
         x: 0,
         y: 0,
-        shadowColor: 'rgba(0,0,0,0.3)',
-        shadowBlur: 10,
-        shadowOffset: { x: 3, y: 3 },
-        shadowOpacity: 0.5,
         stroke: 'gray',
         strokeWidth: 2,
     });
@@ -2003,6 +1989,8 @@ $(function () {
     })
     stage.on('mouseover', function () {
         var layer = stage.findOne("#layer-main");
+        var page = layer.findOne("#" + $("#currentLayer").val());
+        var group = page.findOne(".grupo");
 
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
@@ -2027,7 +2015,7 @@ $(function () {
             DrawCursorRadius.visible(true);
             DrawCursorRadius.x(adjustedPosition.x)
             DrawCursorRadius.y(adjustedPosition.y)
-            DrawCursorRadius.radius(size / 2);
+            DrawCursorRadius.radius((size / 2)*group.getAbsoluteScale().x);
             DrawCursorRadius.moveToTop();
             if (mode == 'brush') {
                 DrawCursorRadius.fill(color);
@@ -2539,7 +2527,7 @@ function fitStageIntoParentContainer() {
     var scale = Math.min(scaleX, scaleY); // Escolhe o menor fator para manter a proporção
 
     pages.forEach((page, index) => {
-       console.log(page)
+
         const group = page.findOne(".grupo");
 
         group.scale({ x: scale, y: scale });
@@ -2975,11 +2963,12 @@ $("#draw").on("click", function () {
             $(".draw-mode[draw-mode='brush']").removeClass("active");
             $(".draw-mode[draw-mode='eraser']").addClass("active");
         }
+        var group = layer.findOne("#"+$("#currentLayer").val()).findOne(".grupo");
         const colorButton = document.getElementById("brush-color-button");
         var DrawCursorRadius = new Konva.Circle({
             id: "DrawCursorRadius",
             fill: color,
-            radius: size / 2,
+            radius: (size / 2)* group.getAbsoluteScale().x,
             fakeShapeId: 'stage',
             x: stageWidth / 2,
             y: stageHeight / 2,
@@ -3305,15 +3294,12 @@ function setActiveLayer(selectedLayerId) {
     userLayers.forEach((layer) => {
         if (layer.id() === selectedLayerId) {
             layer.visible(true);
-            layer.listening(true);
             var border = stage.findOne(".border");
             if (border) {
                 layer.add(border);
             }
 
         } else {
-            layer.moveToBottom();
-            layer.listening(false);
             layer.visible(false)
         }
     });
