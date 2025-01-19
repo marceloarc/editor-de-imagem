@@ -3666,10 +3666,12 @@ detectElement.addEventListener("touchmove", function (e) {
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
         );
+        const dampingFactor = 0.1;
         e.preventDefault();
         // Calcular o fator de zoom
         const scaleChange = currentDistance / initialDistance;
-        zoom *= scaleChange;
+        const targetZoom = zoom * scaleChange;
+        zoom = zoom + (targetZoom - zoom) * dampingFactor;
 
         var layer = stage.findOne("#" + $("#currentLayer").val())
         var group = layer.findOne('.grupo');
@@ -3680,6 +3682,8 @@ detectElement.addEventListener("touchmove", function (e) {
             y: stage.height() / 2,
         };
         const newScale = currentScale * scaleChange; // Preserva a escala proporcional
+
+        
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
         // Ajusta o nível de zoom
  
