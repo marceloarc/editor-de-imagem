@@ -18,6 +18,7 @@ var size;
 var lineColor;
 var lineSize;
 var copiedShape;
+var lastPageId;
 const ZOOM_SPEED = 0.1;
 let title = "Sem Título";
 var mode = 'brush';
@@ -36,7 +37,7 @@ function saveState() {
     if (undoStack.length > MAX_STATES) {
         undoStack.shift();
     }
-
+    lastPageId = $("#currentLayer").val();
     redoStack.length = 0;
     updateundoRedoBtn();
 }
@@ -77,9 +78,10 @@ function restoreImage(image, layer, currentShape = false) {
         image.image(restoredImageObj);
         image.cache();
         image.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
-        layer.draw();
         if(currentShape){
+
             image.fire('click');
+
         }
 
     };
@@ -145,7 +147,7 @@ $('#input-import').on('change', function (e) {
                 undoStack.length = 0;
                 fitStageIntoParentContainer();
                 updateundoRedoBtn();
-                updateLayerButtons()
+                updateLayerButtons();
             } catch (err) {
                 console.error("Erro ao carregar o arquivo:", err.message);
             }
@@ -155,8 +157,7 @@ $('#input-import').on('change', function (e) {
 });
 function restoreState(stack) {
     if (stack.length === 0) return;
-
-
+    var teste = false;
     const state = stack;
     const currentShape = transformer.nodes()[0];
     const layers = Array.from(stage.getLayers());
@@ -170,7 +171,6 @@ function restoreState(stack) {
         const userPages = groups.filter(layer => layer.name() !== 'grupo');
         userPages.forEach(page => {
             const objects = page.findOne(".grupo").getChildren();
-
             objects.forEach(obj => {
                 if (obj instanceof Konva.Text) {
                     generateTextEvents(obj, layer);
@@ -196,7 +196,7 @@ function restoreState(stack) {
                     generateLineEvents
                     generateShapeEvents(obj, layer);
                 } else if (obj instanceof Konva.Image) {
-                    transformer.nodes([]);
+
                     restoreImage(obj, layer, currentShape && obj.id() === currentShape.id());
                     generateImageEvents(obj, layer);
                     return;
@@ -221,14 +221,22 @@ function restoreState(stack) {
                     }
                 }
             });
-            $("#currentLayer").val(page.id());
+            if(page.id()=== lastPageId){
+                $("#currentLayer").val(page.id());
+                teste = true;
+            }
         })
 
 
         stage.add(layer);
     });
+    if(!teste){
+        var layer = stage.findOne("#layer-main");
+        $("#currentLayer").val(layer.findOne("Group").id());
+    }
 
-    updateLayerButtons();
+    setTimeout(updateLayerButtons, 300)
+
 
 }
 
@@ -284,7 +292,7 @@ document.addEventListener("keydown", (e) => {
             var layer = stage.findOne("#" + $("#currentLayer").val());
             var shape = transformer.nodes()[0];
             deleteShape(shape, layer);
-            updateLayerButtons();
+            updateLayerButton();
         }
     }
     if ((e.ctrlKey && e.key === "c")) {
@@ -297,7 +305,7 @@ document.addEventListener("keydown", (e) => {
             saveState();
             var layer = stage.findOne("#" + $("#currentLayer").val());
             copyShape(copiedShape, layer);
-            updateLayerButtons();
+            updateLayerButton();
         }
     }
     if (e.ctrlKey && e.key === "z") {
@@ -416,6 +424,8 @@ $(document).ready(function () {
         placeholder: 'ui-sortable-placeholder',
         forcePlaceholderSize: true,
         axis: 'x',
+        distance: 0,
+        tolerance: "pointer",
         start: function (event, ui) {
 
             // originalIndexBefore = ui.item.index();
@@ -603,7 +613,7 @@ function addImage(imageSrc) {
             $("#" + attr).prop("disabled", false);
         });
         groupTrans.moveToTop();
-        updateLayerButtons();
+        updateLayerButton();
     }
 }
 
@@ -707,7 +717,7 @@ function generateImageEvents(image, layer) {
             }
         }
         $("#widget-image").fadeIn(100);
-        updateLayerButtons();
+        updateLayerButton();
         generateImageWidget(e.target)
         layer.draw();
     });
@@ -839,7 +849,7 @@ $("#addText").click(function () {
     $("#add-text-widget").fadeOut(100);
     $("#draggable").fadeIn(100);
     generateTextWidget(Text);
-    updateLayerButtons();
+    updateLayerButton();
 });
 
 $("#editText").click(function () {
@@ -858,7 +868,7 @@ function generateTextEvents(text, layer) {
     text.on('transformend', function (e) {
         $("#draggable").fadeIn(100);
         generateTextWidget(e.target);
-        updateLayerButtons();
+        updateLayerButton();
     })
 
 
@@ -975,7 +985,7 @@ function generateTextEvents(text, layer) {
         transformer.nodes([e.target]);
         $("#draggable").fadeIn(100);
         generateTextWidget(e.target)
-        updateLayerButtons();
+        updateLayerButton();
     })
 }
 function saveClippedArea() {
@@ -1183,7 +1193,7 @@ $('#bg-remove').on('click',
         shape.destroy()
         $("#widget-bg").fadeOut(100);
         layer.draw();
-        updateLayerButtons();
+        updateLayerButton();
     });
 $('#draw-color').on('click', saveState)
 $('#border-color').on('click', saveState)
@@ -1308,7 +1318,7 @@ $("#add-tri").on('click', function () {
     generateShapeWidget(shape);
     generateShapeEvents(shape, layer);
     groupTrans.moveToTop();
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 $("#add-star").on("click", function () {
@@ -1344,7 +1354,7 @@ $("#add-star").on("click", function () {
     generateShapeWidget(shape);
     generateShapeEvents(shape, layer);
     groupTrans.moveToTop();
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 
@@ -1380,7 +1390,7 @@ $("#add-rect").on('click', function () {
     layer.draw();
     generateShapeEvents(shape, layer);
     generateShapeWidget(shape);
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 $("#stroke-width").on('input', function () {
@@ -1444,7 +1454,7 @@ $("#add-square").on('click', function () {
     layer.draw();
     generateShapeEvents(shape, layer);
     generateShapeWidget(shape);
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 
@@ -1534,7 +1544,7 @@ function generateShapeEvents(shape, layer) {
 
     shape.on('transformend', function (e) {
         generateShapeWidget(e.target)
-        updateLayerButtons();
+        updateLayerButton();
     })
 
 
@@ -1607,7 +1617,7 @@ function generateShapeEvents(shape, layer) {
         }
 
         generateShapeWidget(e.target);
-        updateLayerButtons();
+        updateLayerButton();
     });
 
     shape.on('dragstart', (e) => {
@@ -1632,7 +1642,6 @@ function generateShapeEvents(shape, layer) {
         transformer.nodes([e.target]);
         groupTrans.moveToTop();
         layer.draw();
-        updateLayerButtons();
     });
 }
 
@@ -1794,7 +1803,7 @@ $("#add-circle").on('click', function () {
     generateShapeEvents(shape, layer);
 
     groupTrans.moveToTop();
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 function cleanStage() {
@@ -2127,7 +2136,7 @@ $(function () {
         drawingLine = false;
         lineId = 0;
         if (drawMode || drawingLineMode) {
-            updateLayerButtons();
+            updateLayerButton();
         }
     });
     stage.on('mousemove touchmove', function (e) {
@@ -2317,9 +2326,9 @@ $(function () {
     layer.draw();
 
     $(".layers-header").width(243);
-    updateLayerButtons();
-
+    
     fitStageIntoParentContainer();
+    updateLayerButtons()
     stage.draw();
 
 });
@@ -2390,6 +2399,10 @@ function generateLineEvents(line, layer) {
         generateLineWidget(e.target);
         transformer.nodes([e.target])
      
+    })
+
+    line.on('transformend dragend', function(e){
+        updateLayerButton();
     })
 
 }
@@ -2587,7 +2600,7 @@ $(function () {
 
         }
         layer.draw();
-        updateLayerButtons();
+        updateLayerButton();
     });
 
     $(".btn-outline").on('click', function () {
@@ -2605,7 +2618,7 @@ $(function () {
             text.strokeWidth(2);
         }
         layer.draw();
-        updateLayerButtons();
+        updateLayerButton();
     });
 
     $(".outline-shape").on('click', function () {
@@ -2624,7 +2637,7 @@ $(function () {
             shape.strokeWidth($("#stroke-width").val());
         }
         layer.draw();
-        updateLayerButtons();
+        updateLayerButton();
     });
 
     $(".border-shape").on('click', function () {
@@ -2641,14 +2654,14 @@ $(function () {
             shape.strokeWidth($("#stroke-width").val());
         }
         layer.draw();
-        updateLayerButtons();
+        updateLayerButton();
     });
 
 
 
     $("#opacity").on('mousedown touchstart', function () {
         saveState();
-        updateLayerButtons();
+        updateLayerButton();
     });
     $("#opacity").on('input', function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
@@ -2671,7 +2684,7 @@ $(function () {
         $("#text-font-edit").html(span);
         $("#text-font-edit").css("font-family", '"' + $(this).attr("value") + '"');
         $("#widget-fonts").fadeOut(100);
-        updateLayerButtons();
+        updateLayerButton();
     })
 
 
@@ -2737,7 +2750,7 @@ $(function () {
         layer.draw();
 
         currentIndex = (currentIndex + 1) % alignments.length;
-        updateLayerButtons();
+        updateLayerButton();
     });
     $(".btn-decoration").on('click', function () {
         saveState();
@@ -2752,7 +2765,7 @@ $(function () {
             text.textDecoration($(this).attr("value"));
         }
 
-        updateLayerButtons();
+        updateLayerButton();
         layer.draw();
     });
 
@@ -3068,6 +3081,7 @@ function updatePageNumbers() {
 }
 
 function addPage() {
+    saveState();
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
     const userLayers = layers.filter(layer => layer.name() !== 'grupo');
@@ -3103,8 +3117,8 @@ function addPage() {
     layer.add(newLayer);
     updatePageNumbers();
     stage.draw();
-    updateLayerButtons();
     fitStageIntoParentContainer();
+    updateLayerButtons();
 }
 
 $("#layers").on('click', '#add-layer', function () {
@@ -3190,26 +3204,88 @@ function generateLayerThumbnail(layer) {
             return;
         }
     
-        // Clona o grupo
+        const background = group.findOne(".background");
         var clone = group.clone();
-        
-        // Adicione ajustes ao clone para garantir que ele esteja fora do contexto da camada original
 
-        // Desanexa qualquer relacionamento de hierarquia do clone
-        const tempLayer = new Konva.Layer();
-        tempLayer.add(clone);
-
-        stage.add(tempLayer);
-      
-        tempLayer.toImage({
-            callback: function (img) {
-                resolve(img.src);
-            },
-
+        // Temporariamente ajusta a escala para 1
+        clone.scale({ x: 1, y: 1 });
+        const canvas = clone.toCanvas({
+            x: background.getAbsolutePosition().x,
+            y: background.getAbsolutePosition().y,
+            width: background.width(),
+            height: background.height(),
         });
-        tempLayer.destroy(); // Limpa após uso
+
+
+        const imageSrc = canvas.toDataURL();
+        resolve(imageSrc);
+        clone.destroy();
+
     });
 }
+
+
+function updateLayerButton() {
+    var layer = stage.findOne("#layer-main");
+    var page = layer.findOne("#"+$("#currentLayer").val())
+
+    var imgPromises = [];
+
+        if ((page.name() !== 'Grupo') && (page.id() !== undefined)) {
+            imgPromises.push(
+                generateLayerThumbnail(page).then((imgData) => ({
+                    imgData,
+                    layerId: page.id(),
+                }))
+            );
+
+        }
+
+
+    // Atualizar thumbnails no DOM
+    Promise.all(imgPromises).then((images) => {
+
+
+        images.forEach(({ imgData, layerId }) => {
+            $(`.layer[layer-id="${layerId}"]`).html(""); // Limpa o container das layers
+            const layer1 = stage.findOne("#layer-main");
+            const layer = layer1.findOne("#" + layerId);
+            if (layer === undefined) {
+                return;
+            }
+            const buttonHtml = `
+                <span class="layer-name">${layer.getAttr("pageNumber")}</span>
+                <button class="btn-page-options" title="Opções" layer_id="${layerId}"><i
+                    class="mdi mdi-dots-vertical" aria-hidden="true"></i></button>
+                <img src="${imgData}" class="layer-img" alt="Layer Image" style="">
+        `;
+        $(`.layer[layer-id="${layerId}"]`).append(buttonHtml);
+
+            const newButton = $("#layers").find(`[layer-id='${layerId}']`);
+
+            if ($("#currentLayer").val() === layerId) {
+                newButton.addClass("active");
+                const background = layer.findOne(".background");
+                if (background) {
+                    $("#bgcolor").attr("disabled", false);
+                    $("#bgcolor").attr("object-id", background.id());
+                    $("#bgcolor").val(background.fill());
+                    const colorButton = document.getElementById("bg-color-button");
+                    colorButton.style.backgroundColor = background.fill();
+                } else {
+                    $("#bgcolor").attr("disabled", true);
+                    $("#bgcolor").val("#ffffff");
+                    const colorButton = document.getElementById("bg-color-button");
+                    colorButton.style.backgroundColor = "#ffffff";
+                }
+            }
+        });
+
+
+    });
+}
+
+
 
 function updateLayerButtons() {
     var layer = stage.findOne("#layer-main");
@@ -3329,7 +3405,7 @@ $('#layers').on('change', '.check-visible', function () {
         readjustBackground();
         stage.batchDraw();
     }
-    updateLayerButtons();
+    updateLayerButton();
 });
 function downloadURI(uri, name) {
     var link = document.createElement('a');
@@ -3347,7 +3423,7 @@ $(".btn-delete").click(function () {
     var shape = transformer.nodes()[0];
 
     deleteShape(shape, layer);
-    updateLayerButtons();
+    updateLayerButton();
 })
 
 function deleteShape(shape, layer) {
@@ -3388,7 +3464,7 @@ $(".btn-copy").click(function () {
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var shape = transformer.nodes()[0];
     copyShape(shape, layer);
-    updateLayerButtons();
+    updateLayerButton();
 });
 $(".moveUp").click(function () {
     saveState();
@@ -3403,7 +3479,7 @@ $(".moveUp").click(function () {
     shape.moveUp();
     groupTrans.moveToTop();
     layer.draw();
-    updateLayerButtons();
+    updateLayerButton();
 });
 $(".moveDown").click(function () {
     saveState();
@@ -3418,10 +3494,10 @@ $(".moveDown").click(function () {
     shape.moveDown();
     groupTrans.moveToTop();
     layer.draw();
-    updateLayerButtons();
+    updateLayerButton();
 });
 $('#zoom-slider').on('mouseup touchend', function () {
-    updateLayerButtons();
+    updateLayerButton();
 
 });
 
@@ -3652,13 +3728,13 @@ detectElement.addEventListener("touchmove", function (e) {
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
         );
-        const dampingFactor = 0.1;
         e.preventDefault();
-        // Calcular o fator de zoom
-        const scaleChange = currentDistance / initialDistance;
-        const targetZoom = zoom * scaleChange;
-        zoom = zoom + (targetZoom - zoom) * dampingFactor;
 
+        if (currentDistance > previousDistance) {
+            zoom = Math.min(maxZoom, zoom + zoomStep);
+        } else if (currentDistance < previousDistance) {
+            zoom = Math.max(minZoom, zoom - zoomStep);
+        }
         var layer = stage.findOne("#" + $("#currentLayer").val())
         var group = layer.findOne('.grupo');
         // Obtém a escala atual do grupo
@@ -3667,7 +3743,13 @@ detectElement.addEventListener("touchmove", function (e) {
             x: stage.width() / 2,
             y: stage.height() / 2,
         };
-        const newScale = currentScale * scaleChange; // Preserva a escala proporcional
+        var newScale;
+        if (currentDistance > previousDistance) {
+            newScale = currentScale + 0.1;
+        } else if (currentDistance < previousDistance) {
+            newScale = currentScale - 0.1;
+        }
+
 
         
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
