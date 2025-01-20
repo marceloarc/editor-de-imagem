@@ -3739,13 +3739,17 @@ detectElement.addEventListener("touchmove", function (e) {
             x: stage.width() / 2,
             y: stage.height() / 2,
         };
-        var newScale;
-        if (currentDistance > initialDistance ) {
-            newScale = currentScale + 0.1;
-        } else if (currentDistance < initialDistance ) {
-            newScale = currentScale - 0.1;
-        }
 
+        const distanceChange = Math.abs(currentDistance - previousDistance);
+
+        var newScale;
+        if (distanceChange > 10) {
+            if (currentDistance > initialDistance ) {
+                newScale = currentScale + 0.1;
+            } else if (currentDistance < initialDistance ) {
+                newScale = currentScale - 0.1;
+            }
+        }
         initialDistance = currentDistance;
         
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
