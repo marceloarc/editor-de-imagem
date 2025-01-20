@@ -1726,16 +1726,14 @@ $(".item-proj").on('click', function () {
                         setNewCanvasSize(resolution.width, resolution.height);
                         title = resolution.title;
                     }
-
-                    // Restaure as camadas
+    
+    
                     restoreState(layers);
-
-                    // Limpe as pilhas de undo/redo
                     redoStack.length = 0;
                     undoStack.length = 0;
-
-                    // Atualize os botões de undo/redo
+                    fitStageIntoParentContainer();
                     updateundoRedoBtn();
+                    updateLayerButtons();
                 } catch (err) {
                     console.error("Erro ao processar o arquivo:", err.message);
                 }
