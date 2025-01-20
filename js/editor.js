@@ -1747,6 +1747,62 @@ $(".item-proj").on('click', function () {
     }
 });
 
+function limitGroupPosition(group){
+    var border = stage.findOne(".border");
+
+        
+    const target = group; // O objeto sendo arrastado
+    const position = target.getAbsolutePosition(); // Posição atual do objeto
+
+
+    const previewOffset = $("#preview").offset();
+    const previewWidth = $("#preview").outerWidth();
+    const previewHeight = $("#preview").outerHeight();
+    const boundaryLeft = previewOffset.left + 10; // Limite esquerdo
+    const boundaryRight = previewOffset.left + previewWidth - 10; // Limite direito
+    const boundaryTop = previewOffset.top-50;
+    const boundaryBottom = previewOffset.top+previewHeight;
+    console.log(boundaryTop);
+    console.log(position.y)
+
+    const adjustedWidth = group.width() * group.getAbsoluteScale().x;
+    const adjustedHeight = group.height() * group.getAbsoluteScale().y;
+
+    // Define os novos valores
+    let newX = position.x;
+    let newY = position.y;
+
+    // Restrição para o limite esquerdo
+    if (newX > boundaryLeft) {
+        newX = boundaryLeft;
+    }
+    // Restrição para o limite direito
+    if (newX + adjustedWidth < boundaryRight) {
+        newX = boundaryRight - adjustedWidth;
+    }
+
+    // Restrição para o limite superior
+    if (newY < boundaryTop) {
+        newY = boundaryTop;
+    }
+    // Restrição para o limite inferior
+    if (newY + adjustedHeight > boundaryBottom) {
+        newY = boundaryBottom - adjustedHeight;
+    }
+
+    // Define a posição restrita final
+    target.setAbsolutePosition({ x: newX, y: newY });
+                border.setAttrs({
+                    listening: false,
+                    x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
+                    y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
+                    stroke: 'rgba(44, 44, 46, 0.87)',
+                    strokeWidth: $("#preview").width(),
+                    draggable: false, // Para manter a borda fixa
+                    name: 'border'
+                })
+}
+
 $("#background-widget-btn").click(function () {
     $("#add-background-widget").fadeIn(100);
     $("#add-background-widget").fadeIn(100);
@@ -2020,59 +2076,7 @@ $(function () {
                     y: initialGroupPosition.y + dy,
                 });
 
-                var border = stage.findOne(".border");
-
-        
-                const target = group; // O objeto sendo arrastado
-                const position = target.getAbsolutePosition(); // Posição atual do objeto
-            
-    
-                const previewOffset = $("#preview").offset();
-                const previewWidth = $("#preview").outerWidth();
-                const previewHeight = $("#preview").outerHeight();
-                const boundaryLeft = previewOffset.left + 10; // Limite esquerdo
-                const boundaryRight = previewOffset.left + previewWidth - 10; // Limite direito
-                const boundaryTop = previewOffset.top-50;
-                const boundaryBottom = previewOffset.top+previewHeight;
-                console.log(boundaryTop);
-                console.log(position.y)
-
-                const adjustedWidth = group.width() * group.getAbsoluteScale().x;
-                const adjustedHeight = group.height() * group.getAbsoluteScale().y;
-
-                // Define os novos valores
-                let newX = position.x;
-                let newY = position.y;
-
-                // Restrição para o limite esquerdo
-                if (newX > boundaryLeft) {
-                    newX = boundaryLeft;
-                }
-                // Restrição para o limite direito
-                if (newX + adjustedWidth < boundaryRight) {
-                    newX = boundaryRight - adjustedWidth;
-                }
-
-                // Restrição para o limite superior
-                if (newY < boundaryTop) {
-                    newY = boundaryTop;
-                }
-                // Restrição para o limite inferior
-                if (newY + adjustedHeight > boundaryBottom) {
-                    newY = boundaryBottom - adjustedHeight;
-                }
-
-                // Define a posição restrita final
-                target.setAbsolutePosition({ x: newX, y: newY });
-                            border.setAttrs({
-                                listening: false,
-                                x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-                                y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-                                stroke: 'rgba(44, 44, 46, 0.87)',
-                                strokeWidth: $("#preview").width(),
-                                draggable: false, // Para manter a borda fixa
-                                name: 'border'
-                            })
+                limitGroupPosition(group)
                         
             }else{
                 group.stopDrag();
@@ -3625,18 +3629,32 @@ $('#zoom-slider').on('input', function () {
     };
 
     // Ajusta o nível de zoom
+    const absoluteCenter = {
+        x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
+        y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
+    };
+
     const newScale = $(this).val();
     const clampedScale = Math.max(newScale, 0.1); // Limita o zoom mínimo a 0.1
-
+    var newPosition;
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
     var border = stage.findOne(".border");
-
+    if(group.width()*group.getAbsoluteScale().x < $("#preview").outerWidth()){
+        newPosition = {
+            x: stageCenter.x - group.width()/2 * clampedScale,
+            y: stageCenter.y - group.height()/2 * clampedScale,
+        };
+    
+    
+    }else{
+        newPosition = {
+            x: stageCenter.x - absoluteCenter.x * clampedScale,
+            y: stageCenter.y - absoluteCenter.y * clampedScale,
+        };
+      
+    }
     // Ajusta a posição para centralizar no stage
-    const newPosition = {
-        x: stageCenter.x - (group.width()/2) * clampedScale,
-        y: stageCenter.y - (group.height()/2) * clampedScale,
-    };
 
     var border = layer.findOne(".border")
     group.position(newPosition);
@@ -3652,6 +3670,9 @@ $('#zoom-slider').on('input', function () {
         draggable: false, // Para manter a borda fixa
         name: 'border'
     })
+    if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+        limitGroupPosition(group);
+    }
 
     group.getLayer().batchDraw();
 
@@ -3845,7 +3866,10 @@ detectElement.addEventListener("touchmove", function (e) {
             x: stage.width() / 2,
             y: stage.height() / 2,
         };
-
+        const absoluteCenter = {
+            x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
+            y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
+        };
         const distanceChange = Math.abs(currentDistance - initialDistance);
         console.log(distanceChange)
         var newScale = currentScale;
@@ -3865,14 +3889,22 @@ detectElement.addEventListener("touchmove", function (e) {
         // Aplica o novo zoom
         group.scale({ x: clampedScale, y: clampedScale });
         var border = stage.findOne(".border");
-    
-        // Ajusta a posição para centralizar no stage
-        const newPosition = {
-            x: stageCenter.x - group.width()/2 * clampedScale,
-            y: stageCenter.y - group.height()/2 * clampedScale,
-        };
-    
-    
+        var newPosition;
+        if(group.width()*group.getAbsoluteScale().x < $("#preview").outerWidth()){
+            newPosition = {
+                x: stageCenter.x - group.width()/2 * clampedScale,
+                y: stageCenter.y - group.height()/2 * clampedScale,
+            };
+        
+        
+        }
+        else{
+            newPosition = {
+                x: stageCenter.x - absoluteCenter.x * clampedScale,
+                y: stageCenter.y - absoluteCenter.y * clampedScale,
+            };
+          
+        }
     
         group.position(newPosition);
     
@@ -3891,7 +3923,9 @@ detectElement.addEventListener("touchmove", function (e) {
         // Atualiza o slider de zoom (se necessário)
         $("#zoom-slider").val(clampedScale);
     
-        // Atualiza a camada para aplicar as mudanças
+        if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+            limitGroupPosition(group);
+        }
         group.getLayer().batchDraw();
     }
 });
@@ -3916,7 +3950,10 @@ detectElement.addEventListener("wheel", function (e) {
         x: stage.width() / 2,
         y: stage.height() / 2,
     };
-
+    const absoluteCenter = {
+        x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
+        y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
+    };
     // Ajusta o nível de zoom
     const newScale = e.deltaY > 0 ? currentScale - 0.1 : currentScale + 0.1;
     const clampedScale = Math.max(newScale, 0.1); // Limita o zoom mínimo a 0.1
@@ -3927,12 +3964,22 @@ detectElement.addEventListener("wheel", function (e) {
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
     var border = stage.findOne(".border");
-
+    var newPosition;
     // Ajusta a posição para centralizar no stage
-    const newPosition = {
-        x: stageCenter.x - group.width()/2 * clampedScale,
-        y: stageCenter.y - group.height()/2 * clampedScale,
-    };
+    if(group.width()*group.getAbsoluteScale().x < $("#preview").outerWidth()){
+        newPosition = {
+            x: stageCenter.x - group.width()/2 * clampedScale,
+            y: stageCenter.y - group.height()/2 * clampedScale,
+        };
+    
+    
+    }else{
+        newPosition = {
+            x: stageCenter.x - absoluteCenter.x * clampedScale,
+            y: stageCenter.y - absoluteCenter.y * clampedScale,
+        };
+      
+    }
 
 
 
@@ -3952,7 +3999,9 @@ detectElement.addEventListener("wheel", function (e) {
 
     // Atualiza o slider de zoom (se necessário)
     $("#zoom-slider").val(clampedScale);
-
+    if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+        limitGroupPosition(group);
+    }
     // Atualiza a camada para aplicar as mudanças
     group.getLayer().batchDraw();
 });
