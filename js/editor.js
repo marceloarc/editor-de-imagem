@@ -170,7 +170,9 @@ function restoreState(stack) {
         const groups = Array.from(layer.find('Group'));
         const userPages = groups.filter(layer => layer.name() !== 'grupo');
         userPages.forEach(page => {
-            const objects = page.findOne(".grupo").getChildren();
+            const group = page.findOne(".grupo");
+            generateGroupEvents(group);
+            const objects = group.getChildren();
             objects.forEach(obj => {
                 if (obj instanceof Konva.Text) {
                     generateTextEvents(obj, layer);
@@ -1902,7 +1904,7 @@ $(function () {
         container: 'container',
         width: $("#preview").width(),
         height: $("#preview").height(),
-        id: "stage"
+        id: "stage",
 
     });
 
@@ -1910,13 +1912,15 @@ $(function () {
 
     var layer = new Konva.Layer({
         id: "layer-main",
+       
     });
 
     var page = new Konva.Group({
         id: "layer" + getRandomInt(1000),
         name: "Pagina 1",
         pageNumber: 1,
-        zIndex: 1
+        zIndex: 1,
+
     });
     $("#currentLayer").val(page.id());
     var transformerLayer = new Konva.Layer({
@@ -1932,9 +1936,8 @@ $(function () {
     var group = new Konva.Group({
         width: 800,
         height: 600,
-        name: 'grupo'
+        name: 'grupo',
     });
-
 
     var clipRect = { x: ($("#preview").width() - 800) / 2, y: ($("#preview").height() - 600) / 2, width: 800, height: 600 };
 
@@ -1983,6 +1986,110 @@ $(function () {
     var isPaint = false;
 
     var lastLine;
+
+
+
+    let isDraggingStage = false; // Indica se o arrasto está ativo
+    let dragStartPosition = null; // Posição inicial do arrasto
+    let initialGroupPosition = null; // Posição inicial do grupo antes do arrasto
+    
+    stage.on('mousedown touchstart', (e) => {
+        var page = stage.findOne("#"+$("#currentLayer").val());
+        var group = page.findOne(".grupo");
+        if (e.target === stage) {
+            isDraggingStage = true;
+            dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
+            initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
+        }
+    });
+    
+    stage.on('mousemove touchmove', (e) => {
+        if (isDraggingStage) {
+            var page = stage.findOne("#"+$("#currentLayer").val());
+            var group = page.findOne(".grupo");
+            const pointerPosition = stage.getPointerPosition(); // Captura a posição atual do cursor
+    
+            // Calcula o deslocamento do cursor
+            const dx = pointerPosition.x - dragStartPosition.x;
+            const dy = pointerPosition.y - dragStartPosition.y;
+
+    
+            if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+                group.setAbsolutePosition({
+                    x: initialGroupPosition.x + dx,
+                    y: initialGroupPosition.y + dy,
+                });
+
+                var border = stage.findOne(".border");
+
+        
+                const target = group; // O objeto sendo arrastado
+                const position = target.getAbsolutePosition(); // Posição atual do objeto
+            
+    
+                const previewOffset = $("#preview").offset();
+                const previewWidth = $("#preview").outerWidth();
+                const previewHeight = $("#preview").outerHeight();
+                const boundaryLeft = previewOffset.left + 10; // Limite esquerdo
+                const boundaryRight = previewOffset.left + previewWidth - 10; // Limite direito
+                const boundaryTop = previewOffset.top-50;
+                const boundaryBottom = previewOffset.top+previewHeight;
+                console.log(boundaryTop);
+                console.log(position.y)
+
+                const adjustedWidth = group.width() * group.getAbsoluteScale().x;
+                const adjustedHeight = group.height() * group.getAbsoluteScale().y;
+
+                // Define os novos valores
+                let newX = position.x;
+                let newY = position.y;
+
+                // Restrição para o limite esquerdo
+                if (newX > boundaryLeft) {
+                    newX = boundaryLeft;
+                }
+                // Restrição para o limite direito
+                if (newX + adjustedWidth < boundaryRight) {
+                    newX = boundaryRight - adjustedWidth;
+                }
+
+                // Restrição para o limite superior
+                if (newY < boundaryTop) {
+                    newY = boundaryTop;
+                }
+                // Restrição para o limite inferior
+                if (newY + adjustedHeight > boundaryBottom) {
+                    newY = boundaryBottom - adjustedHeight;
+                }
+
+                // Define a posição restrita final
+                target.setAbsolutePosition({ x: newX, y: newY });
+                            border.setAttrs({
+                                listening: false,
+                                x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
+                                y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
+                                stroke: 'rgba(44, 44, 46, 0.87)',
+                                strokeWidth: $("#preview").width(),
+                                draggable: false, // Para manter a borda fixa
+                                name: 'border'
+                            })
+                        
+            }else{
+                group.stopDrag();
+            }
+
+            stage.batchDraw();
+        }
+    });
+    
+    stage.on('mouseup touchend', () => {
+        isDraggingStage = false; // Finaliza o arrasto
+    });
+
+
+
+
+
     stage.on('mouseout', function () {
         if (drawMode) {
             var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
@@ -3054,6 +3161,16 @@ $("#line-color,#line-size").on('input', function () {
     colorButton.style.backgroundColor = this.value;
 })
 
+function generateGroupEvents(group){
+    
+    group.on("dragmove", function (e) {
+        if(e.target === group){
+
+        }
+    });
+}
+
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
@@ -3084,11 +3201,8 @@ function addPage() {
     const layers = Array.from(layer.find('Group'));
     const userLayers = layers.filter(layer => layer.name() !== 'grupo');
     const newPageNumber = userLayers.length + 1;
-    var group = new Konva.Group({
-        width: 800,
-        height: 600,
-        name: 'grupo'
-    });
+
+    var group = layer.findOne(".grupo").clone();
 
     group.position({
         x: ($("#preview").width() - originalStageWidth) / 2,
@@ -3098,8 +3212,8 @@ function addPage() {
     const newLayer = new Konva.Group({
         id: "layer" + getRandomInt(1000),
         name: "Pagina " + newPageNumber,
-        pageNumber: newPageNumber, // Atribua o número da página
-        zIndex: userLayers.length // Garante que seja a última na ordem
+        pageNumber: newPageNumber,
+        zIndex: userLayers.length,
     });
     $("#currentLayer").val(newLayer.id())
 
@@ -3500,25 +3614,19 @@ $('#zoom-slider').on('mouseup touchend', function () {
 });
 
 $('#zoom-slider').on('input', function () {
-    var layer = stage.findOne("#" + $("#currentLayer").val())
+    const layer1 = stage.findOne("#layer-main");
+    const layer = layer1.findOne("#" + $("#currentLayer").val());
     var group = layer.findOne('.grupo');
     // Obtém a escala atual do grupo
     let currentScale = group.getAbsoluteScale().x; // Presume escala uniforme
     const stageCenter = {
-        x: stage.width() / 2,
-        y: stage.height() / 2,
+        x: (stage.width() * stage.getAbsoluteScale().x) / 2,
+        y: (stage.height()* stage.getAbsoluteScale().y)  / 2,
     };
 
     // Ajusta o nível de zoom
     const newScale = $(this).val();
     const clampedScale = Math.max(newScale, 0.1); // Limita o zoom mínimo a 0.1
-
-
-    // Calcula o ponto central absoluto
-    const absoluteCenter = {
-        x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
-        y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
-    };
 
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
@@ -3526,13 +3634,13 @@ $('#zoom-slider').on('input', function () {
 
     // Ajusta a posição para centralizar no stage
     const newPosition = {
-        x: stageCenter.x - absoluteCenter.x * clampedScale,
-        y: stageCenter.y - absoluteCenter.y * clampedScale,
+        x: stageCenter.x - (group.width()/2) * clampedScale,
+        y: stageCenter.y - (group.height()/2) * clampedScale,
     };
 
     var border = layer.findOne(".border")
     group.position(newPosition);
-
+    console.log(group);
     border.setAttrs({
         listening: false,
         x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
@@ -3753,22 +3861,15 @@ detectElement.addEventListener("touchmove", function (e) {
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
         // Ajusta o nível de zoom
         
-    
-        // Calcula o ponto central absoluto
-        const absoluteCenter = {
-            x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
-            y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
-        };
-    
-    
+
         // Aplica o novo zoom
         group.scale({ x: clampedScale, y: clampedScale });
         var border = stage.findOne(".border");
     
         // Ajusta a posição para centralizar no stage
         const newPosition = {
-            x: stageCenter.x - absoluteCenter.x * clampedScale,
-            y: stageCenter.y - absoluteCenter.y * clampedScale,
+            x: stageCenter.x - group.width()/2 * clampedScale,
+            y: stageCenter.y - group.height()/2 * clampedScale,
         };
     
     
@@ -3806,11 +3907,11 @@ detectElement.addEventListener("wheel", function (e) {
     if (!e.ctrlKey) return; // Só permite zoom ao segurar Ctrl
 
     e.preventDefault(); // Evita o comportamento padrão de rolagem
-
-    var layer = stage.findOne("#" + $("#currentLayer").val())
+    const layer1 = stage.findOne("#layer-main");
+    const layer = layer1.findOne("#" + $("#currentLayer").val());
     var group = layer.findOne('.grupo');
     // Obtém a escala atual do grupo
-    let currentScale = group.scaleX(); // Presume escala uniforme
+    let currentScale = group.getAbsoluteScale().x; // Presume escala uniforme
     const stageCenter = {
         x: stage.width() / 2,
         y: stage.height() / 2,
@@ -3823,21 +3924,14 @@ detectElement.addEventListener("wheel", function (e) {
     // Obtém a posição absoluta antes do ajuste
     const absolutePositionBeforeZoom = group.getAbsolutePosition();
 
-    // Calcula o ponto central absoluto
-    const absoluteCenter = {
-        x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
-        y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
-    };
-
-
     // Aplica o novo zoom
     group.scale({ x: clampedScale, y: clampedScale });
     var border = stage.findOne(".border");
 
     // Ajusta a posição para centralizar no stage
     const newPosition = {
-        x: stageCenter.x - absoluteCenter.x * clampedScale,
-        y: stageCenter.y - absoluteCenter.y * clampedScale,
+        x: stageCenter.x - group.width()/2 * clampedScale,
+        y: stageCenter.y - group.height()/2 * clampedScale,
     };
 
 
