@@ -3741,7 +3741,7 @@ detectElement.addEventListener("touchmove", function (e) {
         };
 
         const distanceChange = Math.abs(currentDistance - initialDistance);
-
+        console.log(distanceChange)
         var newScale = currentScale;
         if (distanceChange > 10) {
             if (currentDistance > initialDistance ) {
@@ -3749,8 +3749,8 @@ detectElement.addEventListener("touchmove", function (e) {
             } else if (currentDistance < initialDistance ) {
                 newScale = currentScale - 0.1;
             }
+            initialDistance = currentDistance;
         }
-        initialDistance = currentDistance;
         
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
         // Ajusta o nível de zoom
