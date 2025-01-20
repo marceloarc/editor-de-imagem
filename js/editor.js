@@ -3742,7 +3742,7 @@ detectElement.addEventListener("touchmove", function (e) {
 
         const distanceChange = Math.abs(currentDistance - initialDistance);
 
-        var newScale;
+        var newScale = currentScale;
         if (distanceChange > 10) {
             if (currentDistance > initialDistance ) {
                 newScale = currentScale + 0.1;
