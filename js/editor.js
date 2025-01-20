@@ -3851,9 +3851,9 @@ detectElement.addEventListener("touchmove", function (e) {
         var newScale = currentScale;
         if (distanceChange > 10) {
             if (currentDistance > initialDistance ) {
-                newScale = currentScale + 0.1;
+                newScale = currentScale + 0.01;
             } else if (currentDistance < initialDistance ) {
-                newScale = currentScale - 0.1;
+                newScale = currentScale - 0.01;
             }
             initialDistance = currentDistance;
         }
