@@ -3740,7 +3740,7 @@ detectElement.addEventListener("touchmove", function (e) {
             y: stage.height() / 2,
         };
 
-        const distanceChange = Math.abs(currentDistance - previousDistance);
+        const distanceChange = Math.abs(currentDistance - initialDistance);
 
         var newScale;
         if (distanceChange > 10) {
