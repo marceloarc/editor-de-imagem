@@ -3730,11 +3730,7 @@ detectElement.addEventListener("touchmove", function (e) {
         );
         e.preventDefault();
 
-        if (currentDistance > previousDistance) {
-            zoom = Math.min(maxZoom, zoom + zoomStep);
-        } else if (currentDistance < previousDistance) {
-            zoom = Math.max(minZoom, zoom - zoomStep);
-        }
+
         var layer = stage.findOne("#" + $("#currentLayer").val())
         var group = layer.findOne('.grupo');
         // Obtém a escala atual do grupo
@@ -3744,17 +3740,17 @@ detectElement.addEventListener("touchmove", function (e) {
             y: stage.height() / 2,
         };
         var newScale;
-        if (currentDistance > previousDistance) {
+        if (currentDistance > initialDistance ) {
             newScale = currentScale + 0.1;
-        } else if (currentDistance < previousDistance) {
+        } else if (currentDistance < initialDistance ) {
             newScale = currentScale - 0.1;
         }
 
-
+        initialDistance = currentDistance;
         
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
         // Ajusta o nível de zoom
- 
+        
     
         // Calcula o ponto central absoluto
         const absoluteCenter = {
