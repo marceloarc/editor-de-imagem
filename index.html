@@ -44,7 +44,7 @@
                             class="mdi mdi-arrow-u-right-top"></span></button>
                 </div>
                 <div id="export-prompt" class="btn-export-wrapper btn-right btn-yellow">
-                <span class="mdi mdi-export"></span>Exportar
+                <span class="mdi mdi-tray-arrow-down"></span>Baixar
                 </div>
            
             </div> 
@@ -53,8 +53,8 @@
         <div class="wrapper">
             <div class="teste"></div>
             <div class="editor-panel">
-                <button id="new-prompt" title="Inicie um novo projeto"><i
-                    class="mdi mdi-file-plus"></i><span class="btn-text">Novo</span></button>
+                <button id="new-prompt"><i
+                    class="mdi mdi-file"></i><span class="btn-text">Arquivo</span></button>
                 <button title="Modelos" id="background-widget-btn"><i class="mdi mdi-image-album"
                     aria-hidden="true"></i><span class="btn-text">Modelos</span></button>
                 <button id="add-image" title="Adicione uma imagem"><i
@@ -116,7 +116,6 @@
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-bg">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
-            <span>Plano de fundo</span>
             <div class="slidecontainer">
                 <div title="Troque a cor do fundo"
                     style="position: relative; display: inline-block; width: 50px; height: 50px;">
@@ -126,10 +125,6 @@
                     <input type="color" id="bgcolor" value="#ffffff"
                         style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                 </div>
-                <button title="Apagar fundo" id="bg-remove" class="btn btn-small btn-danger">
-                    <i class="mdi mdi-close" style="font-size: 20px; color: white;"></i>
-                </button>
-
             </div>
         </div>
 
@@ -404,7 +399,7 @@
         
     </div>
 
-    <div class="text-center widget-sm widget-fixed widget-gray" id="add-text-widget">
+    <div class="text-center widget-sm b-r widget-fixed widget-gray" id="add-text-widget">
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
 
@@ -491,6 +486,8 @@
                         <span class="font-item" value="Pinyon Script" style="font-family: &quot;Pinyon Script&quot;; display: block;">
                             Pinyon
                             Script</span>
+                            <span class="font-item" value="Poppins" style="font-family:Poppins; display: block;">
+                                Poppins</span>
                         <span class="font-item" value="Press Start 2P" style="font-family:&quot;Press Start 2P&quot;; display: block;">
                             Press
                             Start 2P</span>
@@ -618,48 +615,50 @@
         
     </div>
 
-    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-new">       
+    <div class="text-center widget-sm b-r widget-gray widget-fixed" id="widget-new">       
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
-        <div class="widget-body">
-            <div class="font-container">
-                    <div id="text-font-edit" class="font-select">
+
+          
                         <input id="input-import" type="file" name="input-import" accept=".gproj" style="display: none;" />
-                        <div class="slidecontainer" id="new-image-prompt-btn">
-                            <button class="btn-mini" title="Projeto vazio"><i class="mdi mdi-file-outline"></i></button>
-                            <span>Projeto Vazio</span>
-                        </div>   
-                            <div class="slidecontainer" id="import">
-                                <button class="btn-mini" title="Carregar projeto do seu dispositivo"><i class="mdi mdi-upload-box"></i></button>
-                                <span>Carregar projeto</span>
-                            </div>                   
-                    </div>
+                        <div class="menu-container" id="new-image-prompt-btn">
+                            <div class="menu-btn">
+                                <button class="btn-mini" title="Projeto vazio"><i class="mdi mdi-plus"></i></button>
+                                <span>Crie um novo projeto</span>
+                            </div>
+
+                        </div> 
+                            <div class="menu-container-bottom" id="import">
+                                <div class="menu-btn">
+                                    <button class="btn-mini" title="Carregar projeto do seu dispositivo"><i class="mdi mdi-folder-open-outline"></i></button>
+                                    <span>Abrir</span>
+                                </div>
+                                <div class="menu-btn">
+                                    <button class="btn-mini" title="Salvar projeto"><i class="mdi mdi-content-save"></i></button>
+                                    <span>Salvar projeto</span>
+                                </div>
+                            </div>  
+               
+              
 
                 </div>
         </div>
         
     </div>
-    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-export">       
+    <div class="text-center widget-sm b-r b-l widget-gray widget-fixed" id="widget-export">       
 
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
-        <div class="widget-body">
-            <div class="font-container">
-                    <div id="text-font-edit" class="font-select">
-                            <div class="slidecontainer" id="save">
-                                <button class="btn-mini" title="Salvar projeto"><i class="mdi mdi-content-save-check"></i></button>
-                                <span>Salvar projeto</span>
-                            </div>
-                            <div class="slidecontainer" id="download">
-                                <button class="btn-mini" title="Baixar imagem"><i class="mdi mdi-download-box"></i></button>
-                                <span>Baixar Imagem</span>
-                            </div>                      
 
-   
-                        </div>                       
 
-                    </div>
+        <div class="menu-container-bottom" id="new-image-prompt-btn">
+            <div class="menu-btn" id="download" >
+                <button class="btn-mini" title="Baixar imagem"><i class="mdi mdi-download-box"></i></button>
+                <span>Baixar Imagem</span>
+            </div>
 
-                </div>
-        </div>
+        </div> 
+
+
+    </div>
   
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-draw-line">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>

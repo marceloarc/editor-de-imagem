@@ -274,6 +274,10 @@ $("#new-prompt").click(function () {
     widget.style.position = 'absolute';
     widget.style.top = adjustedTop + "px";
     widget.style.left = adjustedLeft + $(this).outerWidth() + 'px';
+    if ($(window).outerWidth() < 450) {
+        widget.style.top = "";
+        widget.style.bottom = "0px";
+    }
 })
 
 $("#undo").click(function () {
@@ -829,7 +833,7 @@ $("#addText").click(function () {
         verticalAlign: 'middle',
         stroke: 'black',
         strokeWidth: 0,
-        padding: 30,
+        padding: 10,
         name: 'text'
     });
     var bg = page.findOne(".background");
@@ -1462,6 +1466,10 @@ $("#add-square").on('click', function () {
 
 function adjustShapeBorder(shape) {
 
+    if(transformer.nodes()[0]===shape){
+        $("#shape-border").hide();
+        return;
+    }
     const className = shape.getClassName();
     const textPosition = shape.absolutePosition();
     const position = $(".konvajs-content").offset();
@@ -2697,7 +2705,7 @@ function fitStageIntoParentContainer() {
 $(function () {
     $(".btn-style").on('click', function () {
         saveState();
-        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var layer = stage.findOne("#layer-main");
         var text = transformer.nodes()[0];
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
@@ -2789,7 +2797,7 @@ $(function () {
 
     $(".font-item").click(function () {
         saveState();
-        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var layer = stage.findOne("#layer-main");
         var text = transformer.nodes()[0];
         var textContent = text.text();
         text.fontFamily($(this).attr("value"));

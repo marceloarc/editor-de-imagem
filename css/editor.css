@@ -63,6 +63,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     width: 100%;
+    border-bottom: 1px solid #3f4144;
 }
 
 .btn-mini{
@@ -172,7 +173,6 @@ select {
 }
 
 .widget-sm {
-    border-radius: 5px;
     line-height: 1;
     color: white;
     display: none;
@@ -181,7 +181,13 @@ select {
     margin: 0px;
     filter: drop-shadow(3px 10px 15px rgba(0, 0, 0, 1));
 }
+.b-r{
+    border-radius: 0px 5px 5px 0px;
+}
 
+.b-l{
+    border-radius: 5px 0px 0px 5px;  
+}
 .widget-lg {
     border-radius: 5px;
     line-height: 1;
