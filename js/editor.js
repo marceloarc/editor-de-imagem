@@ -1179,10 +1179,12 @@ function textAreaPosition(Text) {
 
 $('#bgcolor').on('input',
     function () {
-        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var layer = stage.findOne("#layer-main");
+        var page = layer.findOne("#" + $("#currentLayer").val());
+        var group = page.findOne(".grupo");
         cor = $('#bgcolor').val();
-        var group = layer.findOne(".grupo");
         var shape = group.findOne(".background");
+        console.log(shape)
         shape.setAttrs({
             fill: $('#bgcolor').val()
         });
@@ -1190,6 +1192,7 @@ $('#bgcolor').on('input',
         const colorButton = document.getElementById("bg-color-button");
 
         colorButton.style.backgroundColor = this.value;
+        updateLayerButton();
     });
 $('#bg-remove').on('click',
     function () {
@@ -2016,6 +2019,7 @@ $(function () {
         shadowBlur: 10,
         shadowOffset: { x: 3, y: 3 },
         shadowOpacity: 0.5,
+        id:"bg-"+Math.random()
     });
 
     group.add(background);
@@ -2664,17 +2668,18 @@ function fitStageIntoParentContainer() {
     pages.forEach((page, index) => {
 
         const group = page.findOne(".grupo");
+        page.width(originalStageWidth);
+        page.height(originalStageHeight);
 
         group.scale({ x: scale, y: scale });
         $('#zoom-slider').val(scale);
         zoom = scale;
-        // Centraliza o grupo
+        group.width((originalStageWidth));
+        group.height((originalStageHeight))
         group.position({
             x: (stageWidth - originalStageWidth * group.getAbsoluteScale().x) / 2, // Centraliza horizontalmente
             y: (stageHeight - originalStageHeight * group.getAbsoluteScale().y) / 2, // Centraliza verticalmente
         });
-    
-        // Encontra o background e garante suas dimensões e posicionamento
 
     
         const border = page.findOne(".border");
@@ -2693,9 +2698,9 @@ function fitStageIntoParentContainer() {
             })
         
         }
-    
+    console.log(page);
     })
-
+    
     layer.draw();
     stage.draw();
 }
@@ -2854,6 +2859,7 @@ $(function () {
             stage.findOne("#layer-main").batchDraw();
             $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
             $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
+            $("#edit-text-input").val($(this).val());
         }
         
     });
@@ -3234,12 +3240,7 @@ function addPage() {
     });
     $("#currentLayer").val(newLayer.id())
 
-    var background = layer.findOne(".background");
-    if (background) {
-        var bgCopy = background.clone();
-        group.add(bgCopy);
-        bgCopy.position({ x: 0, y: 0 })
-    }
+  
     newLayer.add(group);
     var border = stage.findOne(".border");
     newLayer.add(border);
