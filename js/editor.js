@@ -3225,11 +3225,31 @@ function addPage() {
     const userLayers = layers.filter(layer => layer.name() !== 'grupo');
     const newPageNumber = userLayers.length + 1;
 
-    var group = layer.findOne(".grupo").clone();
-
+    var group = new Konva.Group({
+        width: originalStageWidth,
+        height: originalStageHeight,
+        name: 'grupo',
+    });
+    var background = new Konva.Rect({
+        x: 0,
+        y: 0,
+        name: "background",
+        width: originalStageWidth,
+        height: originalStageHeight,
+        fill: 'white',
+        stroke: 'gray',
+        strokeWidth: 0,
+        shadowColor: 'rgba(0,0,0,0.3)',
+        shadowBlur: 10,
+        shadowOffset: { x: 3, y: 3 },
+        shadowOpacity: 0.5,
+        id:"bg-"+Math.random()
+    });
+    generateBackgroundEvents(background);
+    group.add(background);
     group.position({
         x: ($("#preview").width() - originalStageWidth) / 2,
-        y: ($("#preview").height() - originalStageHeight) / 2,
+        y: ($("#preview").height() - originalStageWidth) / 2,
     })
 
     const newLayer = new Konva.Group({
