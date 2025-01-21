@@ -1770,8 +1770,6 @@ function limitGroupPosition(group){
     const boundaryRight = previewOffset.left + previewWidth - 10; // Limite direito
     const boundaryTop = previewOffset.top-50;
     const boundaryBottom = previewOffset.top+previewHeight;
-    console.log(boundaryTop);
-    console.log(position.y)
 
     const adjustedWidth = group.width() * group.getAbsoluteScale().x;
     const adjustedHeight = group.height() * group.getAbsoluteScale().y;
@@ -2657,8 +2655,8 @@ function fitStageIntoParentContainer() {
         scaleY = stageHeight / originalStageHeight;
 
     }else{
-        scaleX = 1000 / originalStageWidth;
-        scaleY = 1000  / originalStageHeight;
+        scaleX = (stageWidth * 0.8)  / originalStageWidth;
+        scaleY = (stageHeight* 0.8)  / originalStageHeight;
         
     }
     var scale = Math.min(scaleX, scaleY); // Escolhe o menor fator para manter a proporção
@@ -3673,7 +3671,7 @@ $('#zoom-slider').on('input', function () {
 
     var border = layer.findOne(".border")
     group.position(newPosition);
-    console.log(group);
+
     border.setAttrs({
         listening: false,
         x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
@@ -3886,7 +3884,7 @@ detectElement.addEventListener("touchmove", function (e) {
             y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
         };
         const distanceChange = Math.abs(currentDistance - initialDistance);
-        console.log(distanceChange)
+
         var newScale = currentScale;
         if (distanceChange > 10) {
             if (currentDistance > initialDistance ) {
@@ -3898,10 +3896,7 @@ detectElement.addEventListener("touchmove", function (e) {
         }
         
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
-        // Ajusta o nível de zoom
-        
 
-        // Aplica o novo zoom
         group.scale({ x: clampedScale, y: clampedScale });
         var border = stage.findOne(".border");
         var newPosition;
@@ -3909,8 +3904,7 @@ detectElement.addEventListener("touchmove", function (e) {
             newPosition = {
                 x: stageCenter.x - group.width()/2 * clampedScale,
                 y: stageCenter.y - group.height()/2 * clampedScale,
-            };
-        
+            }; 
         
         }
         else{
