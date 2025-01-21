@@ -2049,17 +2049,24 @@ $(function () {
     let dragStartPosition = null; // Posição inicial do arrasto
     let initialGroupPosition = null; // Posição inicial do grupo antes do arrasto
     
-    stage.on('mousedown touchstart', (e) => {
+    stage.on('touchstart', (e) => {
         var page = stage.findOne("#"+$("#currentLayer").val());
         var group = page.findOne(".grupo");
         if (e.target === stage) {
-            isDraggingStage = true;
-            dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
-            initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
+            if (e.evt) {
+                if (e.evt.type.startsWith('touch')) {
+                    // Confirma que é um evento de toque
+                    if (e.evt.touches && e.evt.touches.length === 1) {
+                        isDraggingStage = true;
+                        dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
+                        initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
+                    }
+                }
+            }
         }
     });
     
-    stage.on('mousemove touchmove', (e) => {
+    stage.on('touchmove', (e) => {
         if (isDraggingStage) {
             var page = stage.findOne("#"+$("#currentLayer").val());
             var group = page.findOne(".grupo");
@@ -2086,7 +2093,7 @@ $(function () {
         }
     });
     
-    stage.on('mouseup touchend', () => {
+    stage.on('touchend', () => {
         isDraggingStage = false; // Finaliza o arrasto
     });
 

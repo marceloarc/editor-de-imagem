@@ -985,7 +985,7 @@ height: 100%;
 
   .wrapper .preview-img {
     width: 100vw;
-    height: 100%;
+    height: 80vh;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;
