@@ -55,24 +55,22 @@
             <div class="editor-panel">
                 <button id="new-prompt"><i
                     class="mdi mdi-file"></i><span class="btn-text">Arquivo</span></button>
-                <button title="Modelos" id="background-widget-btn"><i class="mdi mdi-image-album"
+                <button title="Modelos" id="model-widget-btn"><i class="mdi mdi-image-album"
                     aria-hidden="true"></i><span class="btn-text">Modelos</span></button>
                 <button id="add-image" title="Adicione uma imagem"><i
                         class="mdi mdi-file-image-plus"></i><span class="btn-text">Imagem</span></button>
                 <button id="widget-text" title="Adicione um texto"><i class="mdi mdi-format-textbox"></i>
                     <span class="btn-text">Texto</span></button>
-
+                <button title="Ícones" id="btn-widget-icon"><i class="mdi mdi-sticker"></i><span
+                        class="btn-text">Ícones</span></button>
+                <button title="Adicione uma figura geometrica" id="btn-widget-figures"><i
+                        class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Formas</span></button>
+                <button title="Planos de fundo" id="btn-widget-background"><i class="mdi mdi-image-filter-frames"></i><span
+                        class="btn-text">Fundo</span></button>
                 <button id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
                         aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
                 <button id="draw-line" title="Pincel e borracha" id="btn-widget-draw-line"><i class="mdi mdi-vector-line"
                      aria-hidden="true"></i><span class="btn-text">Linha</span></button>
-
-                <button title="Adicione uma figura geometrica" id="btn-widget-figures"><i
-                        class="mdi mdi-drawing" aria-hidden="true"></i><span class="btn-text">Figuras</span></button>
-                <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
-                        class="btn-text">Soon</span></button>
-                <button title="Em breve..." id=""><i class="mdi mdi-artboard"></i><span
-                        class="btn-text">Soon</span></button>
                 <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
                 <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
@@ -113,6 +111,7 @@
             </div>
         </div>
     </div>
+
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-bg">
         <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
         <div class="widget-body">
@@ -127,9 +126,19 @@
                 </div>
             </div>
         </div>
-
-
     </div>
+
+    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-bg2">
+        <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
+        <div class="widget-body">
+            <div class="slidecontainer">
+                <button title="Remover fundo" id="bg-remove" class="btn btn-small btn-danger">
+                    <i class="mdi mdi-close" style="font-size: 20px; color: white;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="text-center widget-sm widget-gray widget-fixed" id="widget-page">
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px;  margin-right:2px; left:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>
         <div class="widget-body">
@@ -175,20 +184,28 @@
             </div>
         </div>
     </div>
-    <div class="text-center widget-sm widget-gray widget-fixed" id="widget-figures">
-        <button type="button" class="close" style="color:white; margin-right:2px;">&times;</button>
+    <div class="text-center widget widget-fixed widget-gray" id="widget-figures">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Formas</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
         <div class="widget-body">
-            <div class="slidecontainer">
-                <button title="Adicione um triangulo" class="btn btn-small btn-left" id="add-tri"><i
-                        class="mdi mdi-triangle"></i></button>
-                <button title="Adicione um quadrado" class="btn btn-small btn-middle" id="add-square"><i
-                        class="mdi mdi-square"></i></button>
-                <button title="Adicione um retangulo" class="btn btn-small btn-middle" id="add-rect"><i
-                            class="mdi mdi-rectangle"></i></button>
-                <button title="Adicione um circulo" class="btn btn-small btn-middle" id="add-circle"><i
-                        class="mdi mdi-circle"></i></button>
-                        <button title="Adicione uma estrela" class="btn btn-small btn-right" id="add-star"><i
-                            class="mdi mdi-star"></i></button>
+    
+            <div class="list-btn-area" id="figure-btn-area">
+                <div class="item" id="add-tri">
+                    <img src="data:image/svg+xml;base64,CiAgICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiPgogICAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9ImNsaXAtMC42NDAxNzQyMzE0NzcyMjIzIj4KICAgICAgPHBhdGggZD0iTSAxNTAgMCBMIDMwMCAzMDAgTCAwIDMwMCBaIiAvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CgogIDwhLS0gUGF0aCBmb3IgdGhlIGZpbGwgLS0+CiAgPHBhdGggZD0iTSAxNTAgMCBMIDMwMCAzMDAgTCAwIDMwMCBaIiBmaWxsPSJyZ2JhKDE5MSwgMTkxLCAxOTEsIDEwMCkiIHRyYW5zZm9ybT0ic2NhbGUoMSwgMSkiLz4KCiAgPCEtLSBQYXRoIGZvciB0aGUgc3Ryb2tlLCBjbGlwcGVkIGJ5IHRoZSBzdGFyIHBhdGggLS0+CiAgPHBhdGggZD0iTSAxNTAgMCBMIDMwMCAzMDAgTCAwIDMwMCBaIiBmaWxsPSJub25lIiBzdHJva2U9IiMwYzBjMGMiIHN0cm9rZS13aWR0aD0iMCIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAtMC42NDAxNzQyMzE0NzcyMjIzKSIgdHJhbnNmb3JtPSJzY2FsZSgxLCAxKSIgc3Ryb2tlLWRhc2hhcnJheT0iIi8+CiAgICA8L3N2Zz4KICA=" alt="" />
+                </div>
+                <div class="item" id="add-square">
+                    <img src="data:image/svg+xml;base64,CiAgICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiPgogICAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9ImNsaXAtMC4yNjAxODUzMjI4Nzc2OTY0NyI+CiAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgMzAwIDAgTCAzMDAgMzAwIEwgMCAzMDAgWiIgLz4KICAgIDwvY2xpcFBhdGg+CiAgPC9kZWZzPgoKICA8IS0tIFBhdGggZm9yIHRoZSBmaWxsIC0tPgogIDxwYXRoIGQ9Ik0gMCAwIEwgMzAwIDAgTCAzMDAgMzAwIEwgMCAzMDAgWiIgZmlsbD0icmdiYSgxOTEsIDE5MSwgMTkxLCAxMDApIiB0cmFuc2Zvcm09InNjYWxlKDEsIDEpIi8+CgogIDwhLS0gUGF0aCBmb3IgdGhlIHN0cm9rZSwgY2xpcHBlZCBieSB0aGUgc3RhciBwYXRoIC0tPgogIDxwYXRoIGQ9Ik0gMCAwIEwgMzAwIDAgTCAzMDAgMzAwIEwgMCAzMDAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMGMwYzBjIiBzdHJva2Utd2lkdGg9IjAiIGNsaXAtcGF0aD0idXJsKCNjbGlwLTAuMjYwMTg1MzIyODc3Njk2NDcpIiB0cmFuc2Zvcm09InNjYWxlKDEsIDEpIiBzdHJva2UtZGFzaGFycmF5PSIiLz4KICAgIDwvc3ZnPgogIA==" alt="" />
+                </div>
+                <div class="item" id="add-circle">
+                    <img src="data:image/svg+xml;base64,CiAgICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiPgogICAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9ImNsaXAtMC4wMjA0OTU3OTY5NzAzNjY1MiI+CiAgICAgIDxwYXRoIGQ9Ik0gMTUwIDE1MCBtIC0xNTAsIDAgYSAxNTAsMTUwIDAgMSwwIDMwMCwwIGEgMTUwLDE1MCAwIDEsMCAtMzAwLDAiIC8+CiAgICA8L2NsaXBQYXRoPgogIDwvZGVmcz4KCiAgPCEtLSBQYXRoIGZvciB0aGUgZmlsbCAtLT4KICA8cGF0aCBkPSJNIDE1MCAxNTAgbSAtMTUwLCAwIGEgMTUwLDE1MCAwIDEsMCAzMDAsMCBhIDE1MCwxNTAgMCAxLDAgLTMwMCwwIiBmaWxsPSJyZ2JhKDE5MSwgMTkxLCAxOTEsIDEwMCkiIHRyYW5zZm9ybT0ic2NhbGUoMSwgMSkiLz4KCiAgPCEtLSBQYXRoIGZvciB0aGUgc3Ryb2tlLCBjbGlwcGVkIGJ5IHRoZSBzdGFyIHBhdGggLS0+CiAgPHBhdGggZD0iTSAxNTAgMTUwIG0gLTE1MCwgMCBhIDE1MCwxNTAgMCAxLDAgMzAwLDAgYSAxNTAsMTUwIDAgMSwwIC0zMDAsMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMGMwYzBjIiBzdHJva2Utd2lkdGg9IjAiIGNsaXAtcGF0aD0idXJsKCNjbGlwLTAuMDIwNDk1Nzk2OTcwMzY2NTIpIiB0cmFuc2Zvcm09InNjYWxlKDEsIDEpIiBzdHJva2UtZGFzaGFycmF5PSIiLz4KICAgIDwvc3ZnPgogIA==" alt="" />
+                </div>
+                <div class="item" id="add-star">
+                    <img src="data:image/svg+xml;base64,CiAgICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiPgogICAgPGRlZnM+CiAgICA8Y2xpcFBhdGggaWQ9ImNsaXAtMC4wNDM2MTk1NDkxNjA1NzA2NSI+CiAgICAgIDxwYXRoIGQ9Ik0gMTUwIDAgTCAxOTQuMDgzODkzOTIxOTM1NSA4OS4zMjM3MjU0MjE4Nzg5NSBMIDI5Mi42NTg0Nzc0NDQyNzMgMTAzLjY0NzQ1MDg0Mzc1Nzg4IEwgMjIxLjMyOTIzODcyMjEzNjUyIDE3My4xNzYyNzQ1NzgxMjEwNSBMIDIzOC4xNjc3ODc4NDM4NzEgMjcxLjM1MjU0OTE1NjI0MjEgTCAxNTAgMjI1IEwgNjEuODMyMjEyMTU2MTI5MDQ2IDI3MS4zNTI1NDkxNTYyNDIxNiBMIDc4LjY3MDc2MTI3Nzg2MzQ5IDE3My4xNzYyNzQ1NzgxMjEwOCBMIDcuMzQxNTIyNTU1NzI2OTU0IDEwMy42NDc0NTA4NDM3NTc5MiBMIDEwNS45MTYxMDYwNzgwNjQ1IDg5LjMyMzcyNTQyMTg3ODk1IFoiIC8+CiAgICA8L2NsaXBQYXRoPgogIDwvZGVmcz4KCiAgPCEtLSBQYXRoIGZvciB0aGUgZmlsbCAtLT4KICA8cGF0aCBkPSJNIDE1MCAwIEwgMTk0LjA4Mzg5MzkyMTkzNTUgODkuMzIzNzI1NDIxODc4OTUgTCAyOTIuNjU4NDc3NDQ0MjczIDEwMy42NDc0NTA4NDM3NTc4OCBMIDIyMS4zMjkyMzg3MjIxMzY1MiAxNzMuMTc2Mjc0NTc4MTIxMDUgTCAyMzguMTY3Nzg3ODQzODcxIDI3MS4zNTI1NDkxNTYyNDIxIEwgMTUwIDIyNSBMIDYxLjgzMjIxMjE1NjEyOTA0NiAyNzEuMzUyNTQ5MTU2MjQyMTYgTCA3OC42NzA3NjEyNzc4NjM0OSAxNzMuMTc2Mjc0NTc4MTIxMDggTCA3LjM0MTUyMjU1NTcyNjk1NCAxMDMuNjQ3NDUwODQzNzU3OTIgTCAxMDUuOTE2MTA2MDc4MDY0NSA4OS4zMjM3MjU0MjE4Nzg5NSBaIiBmaWxsPSJyZ2JhKDE5MSwgMTkxLCAxOTEsIDEwMCkiIHRyYW5zZm9ybT0ic2NhbGUoMSwgMSkiLz4KCiAgPCEtLSBQYXRoIGZvciB0aGUgc3Ryb2tlLCBjbGlwcGVkIGJ5IHRoZSBzdGFyIHBhdGggLS0+CiAgPHBhdGggZD0iTSAxNTAgMCBMIDE5NC4wODM4OTM5MjE5MzU1IDg5LjMyMzcyNTQyMTg3ODk1IEwgMjkyLjY1ODQ3NzQ0NDI3MyAxMDMuNjQ3NDUwODQzNzU3ODggTCAyMjEuMzI5MjM4NzIyMTM2NTIgMTczLjE3NjI3NDU3ODEyMTA1IEwgMjM4LjE2Nzc4Nzg0Mzg3MSAyNzEuMzUyNTQ5MTU2MjQyMSBMIDE1MCAyMjUgTCA2MS44MzIyMTIxNTYxMjkwNDYgMjcxLjM1MjU0OTE1NjI0MjE2IEwgNzguNjcwNzYxMjc3ODYzNDkgMTczLjE3NjI3NDU3ODEyMTA4IEwgNy4zNDE1MjI1NTU3MjY5NTQgMTAzLjY0NzQ1MDg0Mzc1NzkyIEwgMTA1LjkxNjEwNjA3ODA2NDUgODkuMzIzNzI1NDIxODc4OTUgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMGMwYzBjIiBzdHJva2Utd2lkdGg9IjAiIGNsaXAtcGF0aD0idXJsKCNjbGlwLTAuMDQzNjE5NTQ5MTYwNTcwNjUpIiB0cmFuc2Zvcm09InNjYWxlKDEsIDEpIiBzdHJva2UtZGFzaGFycmF5PSIiLz4KICAgIDwvc3ZnPgogIA==" alt="" />
+                </div>
             </div>
         </div>
     </div>
@@ -247,7 +264,7 @@
         </div>
     </div>
 
-    <div class="text-center widget widget-fixed widget-gray" id="add-background-widget">
+    <div class="text-center widget widget-fixed widget-gray" id="add-model-widget">
         <div class="widget-header">
 
             <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Modelos</i>
@@ -256,16 +273,54 @@
         </div>
         <div class="widget-body">
 
-            <div class="background-btn-area" id="background-btn-area">
+            <div class="model-btn-area" id="model-btn-area">
                 <div class="item item-proj" proj="assets/models/cartao de visita.gproj">
-                    <img class="item-background" src="images/models/cartao.png" alt="" />
+                    <img class="item-model" src="images/models/cartao.png" alt="" />
                 </div>
                 <div class="item item-proj" proj="assets/models/cartao de visita 2.gproj">
-                    <img class="item-background" src="images/models/cartao 2.png" alt="" />
+                    <img class="item-model" src="images/models/cartao 2.png" alt="" />
                 </div>
                 <div class="item item-proj" proj="assets/models/cartao de visita 3.gproj">
-                    <img class="item-background" src="images/models/cartao 3.png" alt="" />
+                    <img class="item-model" src="images/models/cartao 3.png" alt="" />
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center widget widget-fixed widget-gray" id="widget-icon">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Ícones</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+        <div class="widget-body">
+            <div class="input-search">
+                <input class="form-control" type="text" id="search-icon" placeholder="Buscar Ícones">
+                <span class="mdi mdi-magnify search-icon"></span>
+            </div>
+    
+            <div class="list-btn-area" id="icon-btn-area">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center widget widget-fixed widget-gray" id="widget-background">
+        <div class="widget-header">
+
+            <i class="mdi mdi-cursor-move" style="margin:10px; float:left; font-size:14px;"> Fundos</i>
+
+            <button type="button" class="close" id="close-edit" style="color:white;  margin-right:2px;">&times;</button>
+        </div>
+        <div class="widget-body">
+            <div class="input-search">
+                <input class="form-control" type="text" id="search-background" placeholder="Buscar Fundos">
+                <span class="mdi mdi-magnify search-icon"></span>
+            </div>
+    
+            <div class="list-btn-area" id="background-btn-area">
+
             </div>
         </div>
     </div>

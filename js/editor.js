@@ -168,7 +168,7 @@ function restoreState(stack) {
     state.forEach(layerJSON => {
         const layer = Konva.Node.create(layerJSON);
         const groups = Array.from(layer.find('Group'));
-        const userPages = groups.filter(layer => layer.name() !== 'grupo');
+        const userPages = groups.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
         userPages.forEach(page => {
             const group = page.findOne(".grupo");
             generateGroupEvents(group);
@@ -213,7 +213,11 @@ function restoreState(stack) {
                 } else if (obj instanceof Konva.Line) {
                     generateLineEvents(obj, layer);
                 }
-                else {
+                else if(obj.name()=="groupImage"){
+
+                    image = obj.findOne(".bgImage");
+                    restoreImage(image);
+                    generateBackgroundEvents(image);
                 }
                 if (currentShape) {
 
@@ -325,7 +329,8 @@ $(document).ready(function () {
     let isDragging = false;
     let isDragging2 = false;
     let startX, startY, scrollLeft, scrollTop;
-
+    getIcons();
+    getImages("background","background-btn-area");
     const $container = $('.editor-panel');
 
     $container.on('mousedown', function (e) {
@@ -569,7 +574,7 @@ $('#images-btn-area').on('click', '.item-image', function (e) {
     addImage(imageSrc);
 });
 
-$('#background-btn-area').on('click', '.item-background', function (e) {
+$('#model-btn-area').on('click', '.model-background', function (e) {
 
     $("#add-bg").click();
 });
@@ -997,7 +1002,7 @@ function generateTextEvents(text, layer) {
 function saveClippedArea() {
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
     const zip = new JSZip(); // Instância do ZIP
     const promises = []; // Lista de Promises para processamento das camadas
     var wasVisible = true;
@@ -1184,7 +1189,7 @@ $('#bgcolor').on('input',
         var group = page.findOne(".grupo");
         cor = $('#bgcolor').val();
         var shape = group.findOne(".background");
-        console.log(shape)
+
         shape.setAttrs({
             fill: $('#bgcolor').val()
         });
@@ -1197,10 +1202,20 @@ $('#bgcolor').on('input',
 $('#bg-remove').on('click',
     function () {
         saveState();
-        var layer = stage.findOne("#" + $("#currentLayer").val());
-        var shape = layer.findOne("#" + $('#bgcolor').attr("object-id"))
-        shape.destroy()
-        $("#widget-bg").fadeOut(100);
+        var layer = stage.findOne("#layer-main");
+        var page = layer.findOne("#" + $("#currentLayer").val());
+        var group = page.findOne(".grupo");
+        var bgImage = group.findOne(".bgImage");
+
+        if(bgImage){
+            bgImage.destroy()
+            var background = group.findOne(".background");
+            if(background){
+                background.opacity(1);
+                background.listening(true);
+            }
+        }
+        $("#widget-bg2").fadeOut(100);
         layer.draw();
         updateLayerButton();
     });
@@ -1811,20 +1826,223 @@ function limitGroupPosition(group){
                     name: 'border'
                 })
 }
+let typingTimer;
+let typingTimer2;
+const typingDelay = 500;
+let count = 20;
 
-$("#background-widget-btn").click(function () {
-    $("#add-background-widget").fadeIn(100);
-    $("#add-background-widget").fadeIn(100);
+function isDivFullyScrolled(div) {
+    const element = $(div)[0]; // Pega o DOM element da jQuery
+
+    // Calcula se a div está completamente rolada
+    return element.scrollTop + element.clientHeight >= element.scrollHeight;
+}
+
+$('#icon-btn-area').on('click', '.item', function (e) {
+
+    addImage($(this).attr("icon"));
+});
+
+$('#background-btn-area').on('click', '.item', function (e) {
+
+    addBackground($(this).attr("image"));
+});
+
+
+
+
+function addBackground(image){
+    saveState();
+    var layer = stage.findOne("#layer-main");
+    var page = layer.findOne("#" + $("#currentLayer").val());
+    var group = page.findOne(".grupo");
+    var bg = group.findOne(".background");
+    bg.opacity(0);
+    bg.listening(false);
+    var backgroundImageGroup = group.findOne(".groupImage");
+
+    if(backgroundImageGroup){
+        backgroundImageGroup.destroy();
+    }
+    const groupImage = new Konva.Group({
+        name:"groupImage",
+        x:0,
+        y:0,
+        clip: {
+            width: bg.width(), // Largura do clipping
+            height: bg.height(), // Altura do clipping
+        },
+    });
+    
+    var imageObj = new Image();
+    imageObj.src = image;
+    imageObj.onload = function () {
+        const groupWidth = group.width();
+        const groupHeight = group.height();
+    
+        const imageWidth = imageObj.width;
+        const imageHeight = imageObj.height;
+    
+        // Calcular a escala proporcional para o "fit"
+        const widthScale = groupWidth / imageWidth;
+        const heightScale = groupHeight / imageHeight;
+        const scale = Math.max(widthScale, heightScale); // Escolher o menor para ajustar sem cortar
+    
+        // Calcular a posição centralizada
+        const x = groupWidth / 2 - (imageWidth * scale) / 2;
+        const y = groupHeight / 2 - (imageHeight * scale) / 2;
+        
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        tempCanvas.width = imageObj.width;
+        tempCanvas.height = imageObj.height;
+
+        tempCtx.drawImage(imageObj, 0, 0);
+        const imageSrc = tempCanvas.toDataURL();
+        var bgImage = new Konva.Image({
+            image: imageObj,
+            x: x, // Centralizar horizontalmente
+            y: y, // Centralizar verticalmente
+            width: imageWidth * scale, // Redimensionar proporcionalmente
+            height: imageHeight * scale, // Redimensionar proporcionalmente
+            draggable: false,
+            name:"bgImage",
+            imageSrc: imageSrc
+        })
+
+        groupImage.add(bgImage);
+        generateBackgroundEvents(bgImage);
+        group.add(groupImage)
+        groupImage.moveToBottom()
+        layer.draw();
+        updateLayerButton();
+    }
+
+}
+
+$("#icon-btn-area").on("scroll", function () {
+    if (isDivFullyScrolled(this)) {
+        count += 10;
+        getIcons($("#search-icon").val())
+    } 
+});
+
+$("#search-icon").on("input", function () {
+    clearTimeout(typingTimer);
+    const searchTerm = $(this).val();
+
+    typingTimer = setTimeout(function () {
+        count = 20;
+        getIcons(searchTerm);
+        $(".icon-btn-area").scrollTop(0);
+    }, typingDelay);
+});
+
+$("#search-background").on("input", function () {
+    clearTimeout(typingTimer2);
+    const searchTerm = $(this).val();
+
+    typingTimer2 = setTimeout(function () {
+        count = 20;
+        getImages(searchTerm, "background-btn-area");
+        $("#background-btn-area").scrollTop(0);
+    }, 500);
+});
+
+function getImages(search = "",containerId){
+    const UNSPLASH_API_URL = "https://api.unsplash.com/search/photos";
+    const ACCESS_KEY = "RAXU1PptzmyPgMjOUO0MIO4mELSR-bVCNM_QmAqcVsk";
+    $("#"+containerId).html("");
+    $.ajax({
+        url: UNSPLASH_API_URL,
+        method: "GET",
+        data: {
+            query: search,
+            per_page: 20,
+            client_id: ACCESS_KEY
+        },
+        success: function (data) {
+            data.results.forEach((image) => {
+                console.log(image)
+                const IconElement = `
+                <div class="item" image="${image.urls.full}">
+                        <img src="${image.urls.thumb}" alt=""></img>
+                        <span class="image-autor">Foto por <a href="${image.user.links.html}" target="_blank">${image.user.name}</a> em <a href="https://unsplash.com/" target="_blank">Unsplash</a></span>
+                </div>
+            `;
+                $("#"+containerId).append(IconElement);
+            });
+        },
+        error: function (xhr) {
+            console.error("Erro ao buscar imagens:", xhr.responseText);
+        }
+    });
+}
+
+function getIcons(search = ""){
+    const apiKey = "qv3vrphna3SsguYXsQRAcgSX9ghfVCHZsoQst6sem0aUkwAK6cFez2pMBL8Irveg";
+    const url = `https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`;
+
+    $.ajax({
+        url: url,
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${apiKey}`
+        },
+        success: function (data) {
+            $("#icon-btn-area").html("");
+            // Processa os resultados e exibe os ícones
+            data.icons.forEach((icon) => {
+                const maxSize = icon.raster_sizes[icon.raster_sizes.length - 3];
+                const previewUrl = maxSize.formats[0].preview_url;
+                const IconElement = `
+                <div class="item" icon="${previewUrl}">
+                        <img src="${previewUrl}" alt="${icon.tags.join(', ')}" />
+                </div>
+            `;
+                $("#icon-btn-area").append(IconElement);
+            });
+        },
+        error: function (xhr) {
+            console.error("Erro na API", xhr.responseJSON);
+        }
+    });
+}
+
+
+$("#btn-widget-icon").click(function () {
+    $("#widget-icon").fadeIn(100);
     const windowWidth = $(window).width();
     const windowHeight = $(window).height();
 
-    const elementWidth = $("#add-background-widget").outerWidth();
-    const elementHeight = $("#add-background-widget").outerHeight();
+    const elementWidth = $("#widget-icon").outerWidth();
+    const elementHeight = $("#widget-icon").outerHeight();
 
     const left = (windowWidth - elementWidth) / 2;
     const top = (windowHeight - elementHeight) / 2;
 
-    $("#add-background-widget").css({
+    $("#widget-icon").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
+    
+})
+
+
+$("#model-widget-btn").click(function () {
+    $("#add-model-widget").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
+
+    const elementWidth = $("#add-model-widget").outerWidth();
+    const elementHeight = $("#add-model-widget").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#add-model-widget").css({
         position: 'absolute',
         left: left + 'px',
         top: top + 'px',
@@ -2102,7 +2320,7 @@ $(function () {
             stage.batchDraw();
         }
     });
-    
+    $(window).on("resize",fitStageIntoParentContainer());
     stage.on('touchend', () => {
         isDraggingStage = false; // Finaliza o arrasto
     });
@@ -2568,25 +2786,48 @@ function generateBackgroundEvents(background, layer) {
 
     background.on("click dbltap", function (e) {
         if (!drawMode && !drawingLineMode) {
-            $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
-            var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() - 40;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-
-            if ($(window).outerWidth() < 450) {
-                var position = $(".editor-panel").offset();
-                var positionTop = position.top - ($(".editor-panel").height() + 4);
-                widget.style.position = 'absolute';
-                widget.style.top = positionTop + "px";
-                widget.style.left = '0px';
-                widget.style.width = "100%";
-            } else {
-                widget.style.position = 'absolute';
-                widget.style.top = '50px';
-                widget.style.left = positionLeft + 'px';
+            if(background.getClassName()=="Image"){
+                $("#widget-bg2").fadeIn(100);
+                var position = $(".preview-img").offset();
+                var widget = document.getElementById('widget-bg2');
+                var positionTop = position.top + $(".preview-img").height() - 40;
+                var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+    
+                if ($(window).outerWidth() < 450) {
+                    var position = $(".editor-panel").offset();
+                    var positionTop = position.top - ($(".editor-panel").height() + 4);
+                    widget.style.position = 'absolute';
+                    widget.style.top = positionTop + "px";
+                    widget.style.left = '0px';
+                    widget.style.width = "100%";
+                } else {
+                    widget.style.position = 'absolute';
+                    widget.style.top = '50px';
+                    widget.style.left = positionLeft + 'px';
+                }
+    
+            }else
+            {
+                $("#widget-bg").fadeIn(100);
+                var position = $(".preview-img").offset();
+                var widget = document.getElementById('widget-bg');
+                var positionTop = position.top + $(".preview-img").height() - 40;
+                var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
+    
+                if ($(window).outerWidth() < 450) {
+                    var position = $(".editor-panel").offset();
+                    var positionTop = position.top - ($(".editor-panel").height() + 4);
+                    widget.style.position = 'absolute';
+                    widget.style.top = positionTop + "px";
+                    widget.style.left = '0px';
+                    widget.style.width = "100%";
+                } else {
+                    widget.style.position = 'absolute';
+                    widget.style.top = '50px';
+                    widget.style.left = positionLeft + 'px';
+                }
+    
             }
-
 
         }
     });
@@ -2616,36 +2857,14 @@ function generateBackgroundEvents(background, layer) {
     })
 
 
-    background.on("dragend", function (e) {
-        if (!drawMode) {
-            $("#widget-bg").fadeIn(100);
-            var position = $(".preview-img").offset();
-            var widget = document.getElementById('widget-bg');
-            var positionTop = position.top + $(".preview-img").height() + 10;
-            var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-
-            if ($(window).outerWidth() < 450) {
-                var position = $(".editor-panel").offset();
-                var positionTop = position.top - ($(".editor-panel").height() + 4);
-                widget.style.position = 'absolute';
-                widget.style.top = positionTop + "px";
-                widget.style.left = '0px';
-                widget.style.width = "100%";
-            } else {
-                widget.style.position = 'absolute';
-                widget.style.top = '50px';
-                widget.style.left = positionLeft + 'px';
-            }
-        }
-    });
 
 }
 
 function fitStageIntoParentContainer() {
     var layer = stage.findOne("#layer-main");
     var groups = Array.from(layer.find('Group'));
-    var pages = groups.filter(group => group.name() !== 'grupo');
-
+    var pages = groups.filter(group => group.name() !== 'grupo' && group.name() !== 'groupImage' );
+    console.log(pages);
     const stageParent = document.getElementById('preview'); // Container principal do stage
 
     // Dimensões do container pai (área visível no browser)
@@ -2698,7 +2917,7 @@ function fitStageIntoParentContainer() {
             })
         
         }
-    console.log(page);
+
     })
     
     layer.draw();
@@ -3201,7 +3420,7 @@ function getRandomInt(max) {
 function updatePageNumbers() {
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
 
     const sortedLayers = userLayers.sort((layer1, layer2) => {
         return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
@@ -3222,10 +3441,10 @@ function addPage() {
     saveState();
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
     const newPageNumber = userLayers.length + 1;
 
-    var group = new Konva.Group({
+    var NewGroup = new Konva.Group({
         width: originalStageWidth,
         height: originalStageHeight,
         name: 'grupo',
@@ -3246,8 +3465,8 @@ function addPage() {
         id:"bg-"+Math.random()
     });
     generateBackgroundEvents(background);
-    group.add(background);
-    group.position({
+    NewGroup.add(background);
+    NewGroup.position({
         x: ($("#preview").width() - originalStageWidth) / 2,
         y: ($("#preview").height() - originalStageWidth) / 2,
     })
@@ -3261,7 +3480,7 @@ function addPage() {
     $("#currentLayer").val(newLayer.id())
 
   
-    newLayer.add(group);
+    newLayer.add(NewGroup);
     var border = stage.findOne(".border");
     newLayer.add(border);
     layer.add(newLayer);
@@ -3299,7 +3518,7 @@ $(".btn-delete-layer").on('click', function (e) {
 
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
     let nextLayerId = userLayers[0].id();
     userLayers.forEach((page) => {
         if (page.id() === $("#selected-page").val() && userLayers.length > 1) {
@@ -3358,12 +3577,12 @@ function generateLayerThumbnail(layer) {
         var clone = group.clone();
 
         // Temporariamente ajusta a escala para 1
-        clone.scale({ x: 1, y: 1 });
+        clone.scale({ x: 0.3, y: 0.3 });
         const canvas = clone.toCanvas({
             x: background.getAbsolutePosition().x,
             y: background.getAbsolutePosition().y,
-            width: background.width(),
-            height: background.height(),
+            width: background.width() * 0.3,
+            height: background.height()* 0.3,
         });
 
 
@@ -3440,14 +3659,14 @@ function updateLayerButton() {
 function updateLayerButtons() {
     var layer = stage.findOne("#layer-main");
     var layers = Array.from(layer.find('Group'));
-    var userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    var userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
     var sortedLayers = userLayers.sort((layer1, layer2) => {
         return layer1.getAttr('pageNumber') - layer2.getAttr("pageNumber");
     });
     
     var imgPromises = [];
     sortedLayers.forEach((layer2) => {
-        if ((layer2.name() !== 'Grupo') && (layer2.id() !== undefined)) {
+        if ((layer2.name() !== 'grupo') && (layer2.id() !== undefined)) {
             imgPromises.push(
                 generateLayerThumbnail(layer2).then((imgData) => ({
                     imgData,
@@ -3516,7 +3735,7 @@ function updateLayerButtons() {
 function setActiveLayer(selectedLayerId) {
     const layer = stage.findOne("#layer-main");
     const layers = Array.from(layer.find('Group'));
-    const userLayers = layers.filter(layer => layer.name() !== 'grupo');
+    const userLayers = layers.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
     userLayers.forEach((layer) => {
         if (layer.id() === selectedLayerId) {
             layer.visible(true);
@@ -3588,14 +3807,14 @@ function copyShape(shape, layer) {
     if (shape.name() === "image") {
         var ShapeClone = shape.clone({
             id: 'imagecopy' + i.toString(),
-            y: shape.position().y - (shape.height() * shape.getAbsoluteScale().y),
+            y: shape.position().y - 40,
             name: shape.name(),
         });
         ShapeClone.cache();
     } else {
         var ShapeClone = shape.clone({
             id: i.toString() + "copy",
-            y: shape.position().y - (shape.height() * shape.getAbsoluteScale().y),
+            y: shape.position().y - 40,
             name: shape.name(),
         });
     }
@@ -3714,23 +3933,42 @@ $('#zoom-slider').on('input', function () {
 
 $("#btn-widget-figures").click(function () {
     $("#widget-figures").fadeIn(100);
-    var position = $(".preview-img").offset();
-    var widget = document.getElementById('widget-figures');
-    var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-    if ($(window).outerWidth() < 450) {
-        var position = $(".editor-panel").offset();
-        var positionTop = position.top - ($(".editor-panel").height() + 4);
-        widget.style.position = 'absolute';
-        widget.style.top = positionTop + "px";
-        widget.style.left = '0px';
-        widget.style.width = "100%";
-    } else {
-        widget.style.position = 'absolute';
-        widget.style.bottom = 0
-        widget.style.left = positionLeft + 'px';
-    }
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
 
+    const elementWidth = $("#widget-figures").outerWidth();
+    const elementHeight = $("#widget-figures").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#widget-figures").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
 })
+
+$("#btn-widget-background").click(function () {
+    $("#widget-background").fadeIn(100);
+    const windowWidth = $(window).width();
+    const windowHeight = $(window).height();
+
+    const elementWidth = $("#widget-background").outerWidth();
+    const elementHeight = $("#widget-background").outerHeight();
+
+    const left = (windowWidth - elementWidth) / 2;
+    const top = (windowHeight - elementHeight) / 2;
+
+    $("#widget-background").css({
+        position: 'absolute',
+        left: left + 'px',
+        top: top + 'px',
+    });
+})
+
+
+
 $('#reset-zoom').on('click', function () {
 
     if ($(window).outerWidth() < 450) {
