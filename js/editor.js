@@ -788,7 +788,7 @@ function generateImageWidget(image) {
 
     const adjustedTop = (stagePosition.top + (imagePosition.y));
     const adjustedLeft = (stagePosition.left + (imagePosition.x));
-
+    $(".slider-opacity").val(image.opacity());
     var positionTop = adjustedTop + (((image.height()) * image.getAbsoluteScale().y) + 50);
     var positionLeft = adjustedLeft + (((image.width()) / 2) * image.getAbsoluteScale().x) - ((widget.offsetWidth / 2));
     if ($(window).outerWidth() < 450) {
@@ -1092,7 +1092,7 @@ function generateTextWidget(Text) {
         $(".btn-outline").removeClass("selected");
     }
     var span = `<span>${Text.fontFamily()}</span><i class="mdi mdi-menu-down"></i>`
-    $("#opacity").val(Text.opacity());
+    $(".slider-opacity").val(Text.opacity());
     $("#text-font-edit").html(span);
     $("#text-font-edit").css("font-family", '"' + font + '"');
     $("#input-text-edit").css("font-family", '"' + font + '"');
@@ -3007,15 +3007,16 @@ $(function () {
 
 
 
-    $("#opacity").on('mousedown touchstart', function () {
+    $(".slider-opacity").on('mousedown touchstart', function () {
         saveState();
         updateLayerButton();
     });
-    $("#opacity").on('input', function () {
+    $(".slider-opacity").on('input', function () {
         var layer = stage.findOne("#" + $("#currentLayer").val());
         var text = transformer.nodes()[0];
-
-        text.opacity($(this).val());
+        if(text){
+            text.opacity($(this).val());
+        }
         layer.draw();
     });
 
