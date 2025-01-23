@@ -2482,6 +2482,7 @@ $(function () {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
                     if (!isZooming ) {
+                        console.log("entrou");
                         if(!transformer.nodes()[0]){
                             isDraggingStage = true;
                             dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
