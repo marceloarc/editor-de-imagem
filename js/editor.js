@@ -1977,7 +1977,7 @@ function getImages(search = "",containerId){
     });
 }
 
-function getIcons(search = "", countIcon) {
+function getIcons(search = "") {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
     const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${countIcon}`)}`;
 
