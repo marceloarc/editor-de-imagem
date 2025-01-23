@@ -4397,13 +4397,7 @@ detectElement.addEventListener("touchmove", function (e) {
                 y: stageCenter.y - group.height()/2 * clampedScale,
             });       
         }
-        else{
-            group.position({
-                x: touchCenter.x - relativeTouchCenter.x * clampedScale,
-                y: touchCenter.y - relativeTouchCenter.y * clampedScale,
-            });
-        }
-
+    
         // Atualiza borda de limite e outras propriedades
         const border = stage.findOne(".border");
         border.setAttrs({
