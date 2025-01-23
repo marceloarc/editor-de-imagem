@@ -4372,7 +4372,7 @@ detectElement.addEventListener("touchmove", function (e) {
         const distanceChange = Math.abs(currentDistance - initialDistance);
 
         let newScale = currentScale;
-        if (distanceChange > 5) {
+        if (distanceChange > 3) {
             newScale += (currentDistance > initialDistance ? 0.01 : -0.01);
             initialDistance = currentDistance;
         }
@@ -4387,10 +4387,19 @@ detectElement.addEventListener("touchmove", function (e) {
 
         // Atualiza escala e reposiciona grupo
         group.scale({ x: clampedScale, y: clampedScale });
-        group.position({
-            x: touchCenter.x - relativeTouchCenter.x * clampedScale,
-            y: touchCenter.y - relativeTouchCenter.y * clampedScale,
-        });
+
+        if(group.width()*group.getAbsoluteScale().x < $("#preview").outerWidth()){
+            group.position({
+                x: stageCenter.x - group.width()/2 * clampedScale,
+                y: stageCenter.y - group.height()/2 * clampedScale,
+            });       
+        }
+        else{
+            group.position({
+                x: touchCenter.x - relativeTouchCenter.x * clampedScale,
+                y: touchCenter.y - relativeTouchCenter.y * clampedScale,
+            });
+        }
 
         // Atualiza borda de limite e outras propriedades
         const border = stage.findOne(".border");
@@ -4417,6 +4426,7 @@ detectElement.addEventListener("touchmove", function (e) {
         group.getLayer().batchDraw();
     }
 });
+
 
 detectElement.addEventListener("touchend", function (e) {
     if (e.touches.length < 2) {
