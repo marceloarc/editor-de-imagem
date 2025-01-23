@@ -1830,8 +1830,8 @@ function limitGroupPosition(group){
 let typingTimer;
 let typingTimer2;
 const typingDelay = 500;
-let count = 20;
-
+let countIcon = 20;
+let countImage = 20;
 function isDivFullyScrolled(div) {
     const element = $(div)[0]; // Pega o DOM element da jQuery
 
@@ -1977,9 +1977,9 @@ function getImages(search = "",containerId){
     });
 }
 
-function getIcons(search = "", count = 20) {
+function getIcons(search = "", countIcon) {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
-    const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`)}`;
+    const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${countIcon}`)}`;
 
     console.log(url);
 
