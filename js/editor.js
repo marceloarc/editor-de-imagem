@@ -4378,7 +4378,11 @@ detectElement.addEventListener("touchmove", function (e) {
         }
 
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); // Limita o zoom
-
+        
+        const absoluteCenter = {
+            x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
+            y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
+        };
         // Transforma o centro dos dois toques para coordenadas relativas ao grupo
         const relativeTouchCenter = {
             x: (touchCenter.x - group.getAbsolutePosition().x) / currentScale,
@@ -4396,6 +4400,12 @@ detectElement.addEventListener("touchmove", function (e) {
                 x: stageCenter.x - group.width()/2 * clampedScale,
                 y: stageCenter.y - group.height()/2 * clampedScale,
             });       
+        }else{
+            newPosition = {
+                x: stageCenter.x - absoluteCenter.x * clampedScale,
+                y: stageCenter.y - absoluteCenter.y * clampedScale,
+            };
+          
         }
     
         // Atualiza borda de limite e outras propriedades
