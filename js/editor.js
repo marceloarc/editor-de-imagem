@@ -129,7 +129,7 @@ $('#input-import').on('change', function (e) {
     if (file) {
         const reader = new FileReader();
         reader.onload = function (e) {
-            try {
+         
                 const fileContent = JSON.parse(e.target.result);
 
                 // Extraia as informações
@@ -148,9 +148,8 @@ $('#input-import').on('change', function (e) {
                 fitStageIntoParentContainer();
                 updateundoRedoBtn();
                 updateLayerButtons();
-            } catch (err) {
-                console.error("Erro ao carregar o arquivo:", err.message);
-            }
+        
+            
         };
         reader.readAsText(file);
     }
@@ -216,8 +215,11 @@ function restoreState(stack) {
                 else if(obj.name()=="groupImage"){
 
                     image = obj.findOne(".bgImage");
-                    restoreImage(image);
-                    generateBackgroundEvents(image);
+                    if(image){
+                        restoreImage(image);
+                        generateBackgroundEvents(image);
+                    }
+    
                 }
                 if (currentShape) {
 
@@ -1206,7 +1208,7 @@ $('#bg-remove').on('click',
         var layer = stage.findOne("#layer-main");
         var page = layer.findOne("#" + $("#currentLayer").val());
         var group = page.findOne(".grupo");
-        var bgImage = group.findOne(".bgImage");
+        var bgImage = group.findOne(".groupImage");
 
         if(bgImage){
             bgImage.destroy()
