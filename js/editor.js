@@ -1581,6 +1581,33 @@ function generateShapeEvents(shape, layer) {
 
     shape.on('transform', function (e) {
         adjustShapeBorder(e.target);
+        const shape = e.target;
+
+        // Define a lógica ao transformar
+        if (shape.className === "Rect" || shape.className === "Image") {
+          const transform = shape.getTransform();
+      
+          // Obtendo altura e largura separadamente
+          const width = shape.width() * shape.scaleX();
+          const height = shape.height() * shape.scaleY();
+       
+          if (transformer.getActiveAnchor() === "middle-left" || transformer.getActiveAnchor() === "middle-right") {
+          
+            shape.width(width); // Mantém a largura real
+            shape.scaleX(1); // Zera a escala para evitar efeito cumulativo
+          } else if (transformer.getActiveAnchor() === "top-center" || transformer.getActiveAnchor() === "bottom-center") {
+            // Altera apenas altura
+            shape.height(height); // Mantém a altura real
+            shape.scaleY(1); // Zera a escala para evitar efeito cumulativo
+          } else {
+            // Caso padrão: aplica transformação normalmente
+            shape.width(width); // Aplica largura ajustada
+            shape.height(height); // Aplica altura ajustada
+            shape.scaleX(1);
+            shape.scaleY(1);
+          }
+
+        }
     })
 
     shape.on('mouseover touchstart', (e) => {
@@ -3193,13 +3220,13 @@ function addTransformer() {
         anchorFill: 'white',
         borderStroke: '#FFD843',
         borderStrokeWidth: "2",
-        centeredScaling: true,
+        centeredScaling: false,
         ignoreStroke: true,
         enabledAnchors: [
             'bottom-right', 'middle-right', 'middle-left',
             'bottom-center', 'top-center'
         ],
-        keepRatio: true,
+        keepRatio: false,
         draggable: true,
         nodes: [],
     });
