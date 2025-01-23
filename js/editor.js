@@ -25,7 +25,7 @@ const fontFamilies = [
     "Titillium Web", "Ubuntu", "Ubuntu Condensed", "Varela Round", "Vollkorn", 
     "Work Sans", "Yanone Kaffeesatz", "Zilla Slab", "Zilla Slab Highlight"
 ];
-let isZooming = false;
+
 let isMousePressed = false;
 const alignments = ["left", "center", "right", "justify"];
 let currentIndex = 0;
@@ -2481,13 +2481,14 @@ $(function () {
             if (e.evt) {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
-                    if (!isZooming) {
-                        console.log("entrou");
+                    if (e.evt.touches && e.evt.touches.length === 1) {
                         if(!transformer.nodes()[0]){
                             isDraggingStage = true;
                             dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
                             initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
                         }
+                    }else if (e.evt.touches && e.evt.touches.length === 2) {
+                        isDraggingStage = false;                     
                     }
                 }
             }
@@ -4334,10 +4335,10 @@ function setNewCanvas(userWidth, userHeight) {
 }
 
 let initialDistance = null;
+
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
         e.preventDefault();
-        isZooming = true;
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
         initialDistance = Math.hypot(
@@ -4426,9 +4427,7 @@ detectElement.addEventListener("touchmove", function (e) {
         // Atualiza zoom slider
         $("#zoom-slider").val(clampedScale);
 
-        if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
-            limitGroupPosition(group);
-        }
+
         group.getLayer().batchDraw();
     }
 });
@@ -4436,8 +4435,7 @@ detectElement.addEventListener("touchmove", function (e) {
 
 detectElement.addEventListener("touchend", function (e) {
     if (e.touches.length < 2) {
-        initialDistance = null;
-        isZooming = false;
+        initialDistance = null; // Resetar quando um dedo é retirado
     }
 });
 
