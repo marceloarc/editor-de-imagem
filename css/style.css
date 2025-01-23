@@ -11,7 +11,7 @@ body {
   align-items: center;
   justify-content: center;
   background: #2F3336;
-  font-family: "Helvetica Neue", Sans-Serif;;
+  font-family: "Helvetica Neue", Sans-Serif;
 }
 body::after {
   content: "";
@@ -413,6 +413,7 @@ height: 100%;
   margin: 0;
   padding: 10px;
   border-bottom: 1px solid rgb(66, 67, 68);
+  z-index: 9999999999999999999999999;
 }
 .layer-name {
   position: absolute;
@@ -1085,7 +1086,7 @@ height: 100%;
 
   .wrapper .preview-img {
     width: 100vw;
-    height: 80vh;
+    height: 75vh;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;

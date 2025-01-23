@@ -2049,14 +2049,28 @@ $("#icon-btn-area").on("scroll", function () {
     } 
 });
 
+$("#background-btn-area").on("scroll", function () {
+    if (isDivFullyScrolled(this)) {
+        countImage += 10;
+        if(countImage >= 30 ){
+            countImage = 30;  
+        }
+        if($("#search-background").val() != ""){
+            getImages($("#search-background").val(), "background-btn-area");
+        }else{
+            getImages("background", "background-btn-area");
+        }
+
+    } 
+});
+
 $("#search-icon").on("input", function () {
     clearTimeout(typingTimer);
     const searchTerm = $(this).val();
 
     typingTimer = setTimeout(function () {
-        count = 20;
+        countIcon = 20;
         getIcons(searchTerm);
-        $(".icon-btn-area").scrollTop(0);
     }, typingDelay);
 });
 
@@ -2080,21 +2094,23 @@ $("#search-background").on("input", function () {
     const searchTerm = $(this).val();
 
     typingTimer2 = setTimeout(function () {
-        count = 20;
+        countImage = 20;
         getImages(searchTerm, "background-btn-area");
-        $("#background-btn-area").scrollTop(0);
+    
     }, 500);
 });
 
 function getImages(search = "",containerId){
     const ACCESS_KEY = "RAXU1PptzmyPgMjOUO0MIO4mELSR-bVCNM_QmAqcVsk";
-    $("#"+containerId).html("");
-    const PROXY_URL = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=20&client_id=${ACCESS_KEY}`)}`;
-
+    
+    const PROXY_URL = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=${countImage}&client_id=${ACCESS_KEY}`)}`;
+  
     $.ajax({
         url: PROXY_URL,
         method: 'GET',
         success: function (data) {
+            console.log(data);
+            $("#"+containerId).html("");
             data.results.forEach((image) => {
 
                 const IconElement = `
@@ -2116,7 +2132,6 @@ function getIcons(search = "") {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
     const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${countIcon}`)}`;
 
-    $("#icon-btn-area").html("");  // Limpa o container de ícones
     $.ajax({
         url: url,
         method: "GET",
@@ -2125,7 +2140,7 @@ function getIcons(search = "") {
         },
         success: function (data) {
 
-            // Processa os resultados e exibe os ícones
+            $("#icon-btn-area").html("");  // Limpa o container de ícones
             data.icons.forEach((icon) => {
                 const maxSize = icon.raster_sizes[icon.raster_sizes.length - 3];
                 const previewUrl = maxSize.formats[0].preview_url;
