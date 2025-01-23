@@ -333,6 +333,7 @@ height: 100%;
 .input-search{
   z-index: 999999999999999999999999999;
   position:relative;
+  margin-bottom: 5px;
 }
 
 .search-icon{

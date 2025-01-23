@@ -257,7 +257,7 @@ textarea:focus {
 }
 
 #input-text-edit::selection {
-    color: rgba(0, 0, 0, 0.0);
+
     background-color: rgba(51, 144, 255, 0.5)
 }
 

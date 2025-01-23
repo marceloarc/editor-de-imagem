@@ -1,3 +1,31 @@
+const fontFamilies = [
+    "Abel", "Abril Fatface", "Alex Brush", "Great Vibes", "Acme", "Allerta", 
+    "Bungee Shade", "Press Start 2P", "Italiana", "Mountains of Christmas", 
+    "Pattaya", "Petit Formal Script", "Pinyon Script", "Sarina", "Sofia", 
+    "Special Elite", "Ultra", "Permanent Marker", "Caesar Dressing", "Chewy", 
+    "Cinzel", "Courgette", "Dynalight", "Fontdiner Swanky", "Holtwood One SC", 
+    "Megrim", "Artifika", "Barrio", "Berkshire Swash", "Bigelow Rules", 
+    "Margarine", "Modak", "Monofett", "Monoton", "Alegreya", "Alegreya Sans", 
+    "Anton", "Archivo", "Archivo Black", "Archivo Narrow", "Arimo", "Arvo", 
+    "Asap", "Asap Condensed", "Bitter", "Bowlby One SC", "Bree Serif", "Cabin", 
+    "Cairo", "Catamaran", "Crete Round", "Crimson Text", "Cuprum", "Dancing Script", 
+    "Dosis", "Droid Sans", "Droid Serif", "EB Garamond", "Exo", "Exo 2", 
+    "Faustina", "Fira Sans", "Fjalla One", "Francois One", "Gloria Hallelujah", 
+    "Hind", "Inconsolata", "Indie Flower", "Josefin Sans", "Julee", "Karla", 
+    "Lato", "Libre Baskerville", "Libre Franklin", "Lobster", "Lora", "Mada", 
+    "Manuale", "Maven Pro", "Merriweather", "Merriweather Sans", "Montserrat", 
+    "Montserrat Subrayada", "Mukta Vaani", "Muli", "Noto Sans", "Noto Serif", 
+    "Nunito", "Open Sans", "Open Sans Condensed:300", "Oswald", "Oxygen", 
+    "PT Sans", "PT Sans Caption", "PT Sans Narrow", "PT Serif", "Pacifico", 
+    "Passion One", "Pathway Gothic One", "Play", "Playfair Display", "Poppins", 
+    "Questrial", "Quicksand", "Raleway", "Roboto", "Roboto Condensed", "Roboto Mono", 
+    "Roboto Slab", "Ropa Sans", "Rubik", "Saira", "Saira Condensed", "Saira Extra Condensed", 
+    "Saira Semi Condensed", "Sedgwick Ave", "Sedgwick Ave Display", "Shadows Into Light", 
+    "Signika", "Slabo 27px", "Source Code Pro", "Source Sans Pro", "Spectral", 
+    "Titillium Web", "Ubuntu", "Ubuntu Condensed", "Varela Round", "Vollkorn", 
+    "Work Sans", "Yanone Kaffeesatz", "Zilla Slab", "Zilla Slab Highlight"
+];
+
 let isMousePressed = false;
 const alignments = ["left", "center", "right", "justify"];
 let currentIndex = 0;
@@ -328,6 +356,19 @@ document.addEventListener("keydown", (e) => {
 });
 
 $(document).ready(function () {
+
+
+    const $fontContainer = $("#font-select");
+
+    fontFamilies.forEach(font => {
+        const fontItem = `
+            <span class="font-item" value="${font}" style="font-family: '${font}'; display: block;">
+                ${font}
+            </span>`;
+            $fontContainer.append(fontItem);
+    });
+
+
     let isDragging = false;
     let isDragging2 = false;
     let startX, startY, scrollLeft, scrollTop;
@@ -848,7 +889,7 @@ $("#addText").click(function () {
 
     Text.x((bg.x() + bg.width() / 2) - Text.width() / 2)
     Text.y((bg.y() + bg.height() / 2) - Text.height() / 2)
-
+    Text.width(Text.getWidth()+50);
     const group = page.findOne(".grupo");
     group.add(Text);
     transformer.nodes([Text]);
@@ -888,6 +929,47 @@ function generateTextEvents(text, layer) {
 
     text.on('transform', function (e) {
         adjustShapeBorder(e.target)
+        const text = e.target;
+        // Obtendo altura e largura separadamente
+        const MIN_WIDTH = 20;
+        const MIN_FONT_SIZE = 6;
+        if (transformer.getActiveAnchor() === "middle-left" || transformer.getActiveAnchor() === "middle-right") {
+        
+            text.setAttrs({
+                width: Math.max(text.width() * text.scaleX(), MIN_WIDTH),
+                scaleX: 1,
+                scaleY: 1,
+              });
+        } else if (transformer.getActiveAnchor() === "top-center" || transformer.getActiveAnchor() === "bottom-center") {
+
+        }else if (transformer.getActiveAnchor() === "bottom-right") {
+            const currentFontSize = text.fontSize(); // Tamanho atual da fonte
+            const currentScaleX = text.scaleX(); // Captura o fator de escala atual
+            const currentWidth = text.width(); // Largura atual do texto
+        
+            // Calcula o novo tamanho da fonte com base na escala aplicada
+            const newFontSize = Math.max(currentFontSize * currentScaleX, MIN_FONT_SIZE);
+        
+            // Calcula a nova largura com base na escala e adiciona um offset para evitar quebra de linha
+            const newWidth = currentWidth * currentScaleX;
+        
+            text.setAttrs({
+                fontSize: newFontSize, // Define o novo tamanho da fonte
+                width: newWidth, // Ajusta a largura do texto
+                scaleX: 1, // Reseta a escala para evitar acúmulo
+                scaleY: 1, // Reseta a escala no eixo Y também
+            });
+        
+            // Ajusta a posição X do texto se o alinhamento não for à esquerda
+            if (text.align() !== "left") {
+                let deltaX = (newWidth - currentWidth) / 2; // Para alinhamento 'center'
+                if (text.align() === "right") {
+                    deltaX *= -1; // Ajusta para alinhamento à direita
+                }
+        
+                text.x(text.x() - deltaX); // Move o texto para manter o alinhamento visual
+            }
+        }
     })
 
 
@@ -905,6 +987,7 @@ function generateTextEvents(text, layer) {
             }
         }
         $("#draggable").fadeIn(100);
+
         transformer.nodes([e.target]);
         generateTextWidget(e.target);
     });
@@ -1128,6 +1211,8 @@ function textAreaPosition(Text) {
     var position = $(".konvajs-content").offset();
     const adjustedTop = (position.top + (textPosition.y));
     const adjustedLeft = (position.left + textPosition.x);
+    $("#input-text-edit").css("wordWrap", "break-word");
+    $("#input-text-edit").css("whiteSpace", "pre-wrap");
     $("#input-text-edit").css("position", "absolute");
     $("#input-text-edit").css("display", "block");
     $("#input-text-edit").css("z-index", "999999")
@@ -1139,18 +1224,17 @@ function textAreaPosition(Text) {
     $("#input-text-edit").css("outline", "none");
     $("#input-text-edit").css("resize", "none");
     $("#input-text-edit").css("background", "none");
-    $("#input-text-edit").css("color", "rgba(0, 0, 0, 0.0)");
+    $("#input-text-edit").css("transform-origin", "top left");
     $("#input-text-edit").css("caret-color", Text.fill());
+    $("#input-text-edit").css("color", Text.fill());
     $("#input-text-edit").css("line-height", Text.lineHeight());
     $("#input-text-edit").css("text-align", Text.align());
-    $("#input-text-edit").css("transform-origin", "top left");
     $("#input-text-edit").css("width", ((Text.width() * Text.getAbsoluteScale().x) + 'px'));
     $("#input-text-edit").css("height", ((Text.height() * Text.getAbsoluteScale().y) + 'px'));
     $("#input-text-edit").css("top", adjustedTop);
     $("#input-text-edit").css("left", adjustedLeft);
-
     var textarea = document.getElementById('input-text-edit');
-
+    Text.visible(false);
     textarea.addEventListener('keydown', function (e) {
 
         if (e.keyCode === 27) {
@@ -1549,11 +1633,10 @@ function adjustShapeBorder(shape) {
         adjustedTop = position.top + minY;
         adjustedLeft = position.left + minX;
     }
+    $("#shape-border").css("transform-origin", "top left");
     // A    // Aplica os tamanhos ao elemento HTML
     $("#shape-border").width(scaledWidth);
     $("#shape-border").height(scaledHeight);
-
-
 
 
     const positionTop = adjustedTop + (scaledHeight / 2) - (toolbox.offsetHeight / 2);
@@ -1564,6 +1647,14 @@ function adjustShapeBorder(shape) {
         top: `${positionTop}px`,
         left: `${positionLeft}px`,
     });
+
+    var textarea = document.getElementById('shape-border');
+    var rotation = shape.rotation();
+    var transform1 = '';
+    if (rotation) {
+        transform1 += 'rotateZ(' + rotation + 'deg)';
+    }
+    textarea.style.transform = transform1;
 
 }
 
@@ -1969,6 +2060,21 @@ $("#search-icon").on("input", function () {
     }, typingDelay);
 });
 
+$("#search-font").on("input", function () {
+    const searchTerm = $(this).val().toLowerCase(); // Obtém o texto digitado em minúsculas
+    const filteredFonts = fontFamilies.filter(font => font.toLowerCase().includes(searchTerm)); // Filtra fontes que contêm o termo pesquisado
+
+    
+    $("#font-select").html(""); 
+    filteredFonts.forEach(font => {
+        $("#font-select").append(`
+            <span class="font-item" value="${font}" style="font-family: '${font}'; display: block;">
+                ${font}
+            </span>
+        `);
+    });
+});
+
 $("#search-background").on("input", function () {
     clearTimeout(typingTimer2);
     const searchTerm = $(this).val();
@@ -2010,8 +2116,7 @@ function getIcons(search = "") {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
     const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${countIcon}`)}`;
 
-    console.log(url);
-
+    $("#icon-btn-area").html("");  // Limpa o container de ícones
     $.ajax({
         url: url,
         method: "GET",
@@ -2019,7 +2124,6 @@ function getIcons(search = "") {
             Authorization: `Bearer ${apiKey}`  // Adiciona o cabeçalho Authorization
         },
         success: function (data) {
-            $("#icon-btn-area").html("");  // Limpa o container de ícones
 
             // Processa os resultados e exibe os ícones
             data.icons.forEach((icon) => {
@@ -3049,7 +3153,7 @@ $(function () {
         layer.draw();
     });
 
-    $(".font-item").click(function () {
+    $('#font-select').on('click', '.font-item', function (e) {
         saveState();
         var layer = stage.findOne("#layer-main");
         var text = transformer.nodes()[0];
@@ -3108,8 +3212,21 @@ $(function () {
         if(text){
             text.text($(this).val());
             stage.findOne("#layer-main").batchDraw();
-            $("#input-text-edit").css("width", (text.width() * text.getAbsoluteScale().x + 'px'));
-            $("#input-text-edit").css("height", (text.height() * text.getAbsoluteScale().y + 'px'));
+            var textPosition = text.absolutePosition();
+            var position = $(".konvajs-content").offset();
+            const adjustedTop = (position.top + (textPosition.y));
+            const adjustedLeft = (position.left + textPosition.x);
+
+            $("#input-text-edit").css("font-size", (text.fontSize() * text.getAbsoluteScale().x) + "px");
+
+            $("#input-text-edit").css("padding", (text.padding() * text.getAbsoluteScale().x) + "px");
+         
+            $("#input-text-edit").css("line-height", text.lineHeight());
+            $("#input-text-edit").css("text-align", text.align());
+            $("#input-text-edit").css("width", ((text.width() * text.getAbsoluteScale().x) + 'px'));
+            $("#input-text-edit").css("height", ((text.height() * text.getAbsoluteScale().y) + 'px'));
+            $("#input-text-edit").css("top", adjustedTop);
+            $("#input-text-edit").css("left", adjustedLeft);
             $("#edit-text-input").val($(this).val());
         }
         
@@ -3224,7 +3341,7 @@ function addTransformer() {
         ignoreStroke: true,
         enabledAnchors: [
             'bottom-right', 'middle-right', 'middle-left',
-            'bottom-center', 'top-center'
+            
         ],
         keepRatio: false,
         draggable: true,
