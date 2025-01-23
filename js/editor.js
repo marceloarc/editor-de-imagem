@@ -587,6 +587,7 @@ function addImage(imageSrc) {
     var page = layer.findOne("#" + $("#currentLayer").val());
     var group = page.findOne(".grupo");
     imageObj.src = imageSrc;
+    imageObj.crossOrigin = "anonymous";
     imageObj.onload = function () {
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
@@ -1876,6 +1877,7 @@ function addBackground(image){
     
     var imageObj = new Image();
     imageObj.src = image;
+    imageObj.crossOrigin = "anonymous";
     imageObj.onload = function () {
         const groupWidth = group.width();
         const groupHeight = group.height();
@@ -1910,7 +1912,6 @@ function addBackground(image){
             name:"bgImage",
             imageSrc: imageSrc
         })
-
         groupImage.add(bgImage);
         generateBackgroundEvents(bgImage);
         group.add(groupImage)
@@ -1918,7 +1919,7 @@ function addBackground(image){
         layer.draw();
         updateLayerButton();
     }
-
+    
 }
 
 $("#icon-btn-area").on("scroll", function () {
@@ -1951,64 +1952,66 @@ $("#search-background").on("input", function () {
 });
 
 function getImages(search = "",containerId){
-    const UNSPLASH_API_URL = "https://api.unsplash.com/search/photos";
+    const UNSPLASH_API_URL = "https://proxy-server-bsgpwlgv7-marceloarcs-projects.vercel.app/api/proxy?url=https://api.unsplash.com/search/photos";
     const ACCESS_KEY = "RAXU1PptzmyPgMjOUO0MIO4mELSR-bVCNM_QmAqcVsk";
     $("#"+containerId).html("");
+    const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=20&client_id=${ACCESS_KEY}`)}`;
+
     $.ajax({
-        url: UNSPLASH_API_URL,
-        method: "GET",
-        data: {
-            query: search,
-            per_page: 20,
-            client_id: ACCESS_KEY
-        },
+        url: PROXY_URL,
+        method: 'GET',
         success: function (data) {
             data.results.forEach((image) => {
-                console.log(image)
+
                 const IconElement = `
                 <div class="item" image="${image.urls.full}">
-                        <img src="${image.urls.thumb}" alt=""></img>
+                        <img crossorigin="anonymous" src="${image.urls.thumb}" alt=""></img>
                         <span class="image-autor">Foto por <a href="${image.user.links.html}" target="_blank">${image.user.name}</a> em <a href="https://unsplash.com/" target="_blank">Unsplash</a></span>
                 </div>
             `;
                 $("#"+containerId).append(IconElement);
             });
         },
-        error: function (xhr) {
-            console.error("Erro ao buscar imagens:", xhr.responseText);
+        error: function (xhr, status, error) {
+            console.error("Erro:", xhr.responseText);
         }
     });
 }
 
-function getIcons(search = ""){
-    const apiKey = "qv3vrphna3SsguYXsQRAcgSX9ghfVCHZsoQst6sem0aUkwAK6cFez2pMBL8Irveg";
-    const url = `https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`;
+function getIcons(search = "", count = 20) {
+    const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
+    const url = `https://proxy-server-bsgpwlgv7-marceloarcs-projects.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`)}`;
+
+    console.log(url);
 
     $.ajax({
         url: url,
         method: "GET",
         headers: {
-            Authorization: `Bearer ${apiKey}`
+            Authorization: `Bearer ${apiKey}`  // Adiciona o cabeçalho Authorization
         },
         success: function (data) {
-            $("#icon-btn-area").html("");
+            $("#icon-btn-area").html("");  // Limpa o container de ícones
+
             // Processa os resultados e exibe os ícones
             data.icons.forEach((icon) => {
                 const maxSize = icon.raster_sizes[icon.raster_sizes.length - 3];
                 const previewUrl = maxSize.formats[0].preview_url;
+                
                 const IconElement = `
-                <div class="item" icon="${previewUrl}">
-                        <img src="${previewUrl}" alt="${icon.tags.join(', ')}" />
-                </div>
-            `;
-                $("#icon-btn-area").append(IconElement);
+                    <div class="item" icon="${previewUrl}">
+                        <img src="${previewUrl}" crossorigin="anonymous" alt="${icon.tags.join(', ')}" />
+                    </div>
+                `;
+                $("#icon-btn-area").append(IconElement);  // Adiciona os ícones ao container
             });
         },
         error: function (xhr) {
-            console.error("Erro na API", xhr.responseJSON);
+            console.error("Erro na API", xhr.responseJSON);  // Exibe erros da API
         }
     });
 }
+
 
 
 $("#btn-widget-icon").click(function () {
@@ -2864,7 +2867,7 @@ function fitStageIntoParentContainer() {
     var layer = stage.findOne("#layer-main");
     var groups = Array.from(layer.find('Group'));
     var pages = groups.filter(group => group.name() !== 'grupo' && group.name() !== 'groupImage' );
-    console.log(pages);
+
     const stageParent = document.getElementById('preview'); // Container principal do stage
 
     // Dimensões do container pai (área visível no browser)
