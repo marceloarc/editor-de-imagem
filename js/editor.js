@@ -1952,10 +1952,9 @@ $("#search-background").on("input", function () {
 });
 
 function getImages(search = "",containerId){
-    const UNSPLASH_API_URL = "https://proxy-server-bsgpwlgv7-marceloarcs-projects.vercel.app/api/proxy?url=https://api.unsplash.com/search/photos";
     const ACCESS_KEY = "RAXU1PptzmyPgMjOUO0MIO4mELSR-bVCNM_QmAqcVsk";
     $("#"+containerId).html("");
-    const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=20&client_id=${ACCESS_KEY}`)}`;
+    const PROXY_URL = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=20&client_id=${ACCESS_KEY}`)}`;
 
     $.ajax({
         url: PROXY_URL,
@@ -1980,7 +1979,7 @@ function getImages(search = "",containerId){
 
 function getIcons(search = "", count = 20) {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
-    const url = `https://proxy-server-bsgpwlgv7-marceloarcs-projects.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`)}`;
+    const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${count}`)}`;
 
     console.log(url);
 
