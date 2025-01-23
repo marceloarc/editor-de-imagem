@@ -25,7 +25,7 @@ const fontFamilies = [
     "Titillium Web", "Ubuntu", "Ubuntu Condensed", "Varela Round", "Vollkorn", 
     "Work Sans", "Yanone Kaffeesatz", "Zilla Slab", "Zilla Slab Highlight"
 ];
-
+let isZooming = false;
 let isMousePressed = false;
 const alignments = ["left", "center", "right", "justify"];
 let currentIndex = 0;
@@ -2481,7 +2481,7 @@ $(function () {
             if (e.evt) {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
-                    if (!isZooming ) {
+                    if (!isZooming) {
                         console.log("entrou");
                         if(!transformer.nodes()[0]){
                             isDraggingStage = true;
@@ -4334,7 +4334,6 @@ function setNewCanvas(userWidth, userHeight) {
 }
 
 let initialDistance = null;
-let isZooming = false;
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
         e.preventDefault();
