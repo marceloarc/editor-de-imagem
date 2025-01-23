@@ -4378,7 +4378,7 @@ detectElement.addEventListener("touchmove", function (e) {
         }
 
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); // Limita o zoom
-        
+
         const absoluteCenter = {
             x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
             y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
@@ -4401,10 +4401,10 @@ detectElement.addEventListener("touchmove", function (e) {
                 y: stageCenter.y - group.height()/2 * clampedScale,
             });       
         }else{
-            newPosition = {
+            group.position({
                 x: stageCenter.x - absoluteCenter.x * clampedScale,
                 y: stageCenter.y - absoluteCenter.y * clampedScale,
-            };
+            });
           
         }
     
