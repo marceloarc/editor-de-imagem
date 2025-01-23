@@ -4348,80 +4348,72 @@ detectElement.addEventListener("touchstart", function (e) {
 
 detectElement.addEventListener("touchmove", function (e) {
     if (e.touches.length === 2 && initialDistance) {
-        // Calcular a distância atual entre os dedos
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
+
+        // Calcular distância atual entre os dedos
         const currentDistance = Math.hypot(
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
         );
         e.preventDefault();
 
+        var layer = stage.findOne("#" + $("#currentLayer").val());
+        var group = layer.findOne(".grupo");
 
-        var layer = stage.findOne("#" + $("#currentLayer").val())
-        var group = layer.findOne('.grupo');
-        // Obtém a escala atual do grupo
-        let currentScale = group.scaleX(); // Presume escala uniforme
-        const stageCenter = {
-            x: stage.width() / 2,
-            y: stage.height() / 2,
+        // Calcula o centro dos dois toques
+        const touchCenter = {
+            x: (touch1.clientX + touch2.clientX) / 2,
+            y: (touch1.clientY + touch2.clientY) / 2,
         };
-        const absoluteCenter = {
-            x: (stageCenter.x - group.getAbsolutePosition().x) / currentScale,
-            y: (stageCenter.y - group.getAbsolutePosition().y) / currentScale,
-        };
+
+        // Obtem escala atual e distância entre os toques
+        let currentScale = group.scaleX();
         const distanceChange = Math.abs(currentDistance - initialDistance);
 
-        var newScale = currentScale;
-        if (distanceChange > 10) {
-            if (currentDistance > initialDistance ) {
-                newScale = currentScale + 0.01;
-            } else if (currentDistance < initialDistance ) {
-                newScale = currentScale - 0.01;
-            }
+        let newScale = currentScale;
+        if (distanceChange > 5) {
+            newScale += (currentDistance > initialDistance ? 0.01 : -0.01);
             initialDistance = currentDistance;
         }
-        
-        const clampedScale = Math.max(0.1, Math.min(newScale, 5)); 
 
+        const clampedScale = Math.max(0.1, Math.min(newScale, 5)); // Limita o zoom
+
+        // Transforma o centro dos dois toques para coordenadas relativas ao grupo
+        const relativeTouchCenter = {
+            x: (touchCenter.x - group.getAbsolutePosition().x) / currentScale,
+            y: (touchCenter.y - group.getAbsolutePosition().y) / currentScale,
+        };
+
+        // Atualiza escala e reposiciona grupo
         group.scale({ x: clampedScale, y: clampedScale });
-        var border = stage.findOne(".border");
-        var newPosition;
-        if(group.width()*group.getAbsoluteScale().x < $("#preview").outerWidth()){
-            newPosition = {
-                x: stageCenter.x - group.width()/2 * clampedScale,
-                y: stageCenter.y - group.height()/2 * clampedScale,
-            }; 
-        
-        }
-        else{
-            newPosition = {
-                x: stageCenter.x - absoluteCenter.x * clampedScale,
-                y: stageCenter.y - absoluteCenter.y * clampedScale,
-            };
-          
-        }
-    
-        group.position(newPosition);
-    
+        group.position({
+            x: touchCenter.x - relativeTouchCenter.x * clampedScale,
+            y: touchCenter.y - relativeTouchCenter.y * clampedScale,
+        });
+
+        // Atualiza borda de limite e outras propriedades
+        const border = stage.findOne(".border");
         border.setAttrs({
             listening: false,
-            x: group.getAbsolutePosition().x - ($("#preview").width() / 2),
-            y: group.getAbsolutePosition().y - ($("#preview").width() / 2),
-            width: (originalStageWidth * clampedScale) + $("#preview").width(),
-            height: (originalStageHeight * clampedScale) + $("#preview").width(),
+            x: group.getAbsolutePosition().x - $("#preview").width() / 2,
+            y: group.getAbsolutePosition().y - $("#preview").width() / 2,
+            width: originalStageWidth * clampedScale + $("#preview").width(),
+            height: originalStageHeight * clampedScale + $("#preview").width(),
             stroke: 'rgba(44, 44, 46, 0.87)',
             strokeWidth: $("#preview").width(),
-            draggable: false, // Para manter a borda fixa
-            name: 'border'
-        })
-    
-        // Atualiza o slider de zoom (se necessário)
+            draggable: false,
+            name: 'border',
+        });
+
+        // Atualiza zoom slider
         $("#zoom-slider").val(clampedScale);
-    
-        if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+
+        // Limita posição se sair dos limites
+        if (group.width() * group.getAbsoluteScale().x > $("#preview").outerWidth()) {
             limitGroupPosition(group);
         }
+
         group.getLayer().batchDraw();
     }
 });
