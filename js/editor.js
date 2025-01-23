@@ -4376,7 +4376,10 @@ detectElement.addEventListener("touchmove", function (e) {
             newScale += (currentDistance > initialDistance ? 0.01 : -0.01);
             initialDistance = currentDistance;
         }
-
+        const stageCenter = {
+            x: stage.width() / 2,
+            y: stage.height() / 2,
+        };
         const clampedScale = Math.max(0.1, Math.min(newScale, 5)); // Limita o zoom
 
         const absoluteCenter = {
@@ -4388,10 +4391,7 @@ detectElement.addEventListener("touchmove", function (e) {
             x: (touchCenter.x - group.getAbsolutePosition().x) / currentScale,
             y: (touchCenter.y - group.getAbsolutePosition().y) / currentScale,
         };
-        const stageCenter = {
-            x: stage.width() / 2,
-            y: stage.height() / 2,
-        };
+
         // Atualiza escala e reposiciona grupo
         group.scale({ x: clampedScale, y: clampedScale });
 
