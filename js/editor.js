@@ -1924,7 +1924,7 @@ function addBackground(image){
 
 $("#icon-btn-area").on("scroll", function () {
     if (isDivFullyScrolled(this)) {
-        count += 10;
+        countIcon += 10;
         getIcons($("#search-icon").val())
     } 
 });
