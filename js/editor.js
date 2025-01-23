@@ -4384,7 +4384,10 @@ detectElement.addEventListener("touchmove", function (e) {
             x: (touchCenter.x - group.getAbsolutePosition().x) / currentScale,
             y: (touchCenter.y - group.getAbsolutePosition().y) / currentScale,
         };
-
+        const stageCenter = {
+            x: stage.width() / 2,
+            y: stage.height() / 2,
+        };
         // Atualiza escala e reposiciona grupo
         group.scale({ x: clampedScale, y: clampedScale });
 
