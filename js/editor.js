@@ -2481,7 +2481,7 @@ $(function () {
             if (e.evt) {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
-                    if (e.evt.touches && e.evt.touches.length === 1) {
+                    if (!isZooming ) {
                         if(!transformer.nodes()[0]){
                             isDraggingStage = true;
                             dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
@@ -4333,10 +4333,11 @@ function setNewCanvas(userWidth, userHeight) {
 }
 
 let initialDistance = null;
-
+let isZooming = false;
 detectElement.addEventListener("touchstart", function (e) {
     if (e.touches.length === 2) {
         e.preventDefault();
+        isZooming = true;
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
         initialDistance = Math.hypot(
@@ -4425,7 +4426,9 @@ detectElement.addEventListener("touchmove", function (e) {
         // Atualiza zoom slider
         $("#zoom-slider").val(clampedScale);
 
-
+        if(group.width()*group.getAbsoluteScale().x > $("#preview").outerWidth()){
+            limitGroupPosition(group);
+        }
         group.getLayer().batchDraw();
     }
 });
@@ -4433,7 +4436,8 @@ detectElement.addEventListener("touchmove", function (e) {
 
 detectElement.addEventListener("touchend", function (e) {
     if (e.touches.length < 2) {
-        initialDistance = null; // Resetar quando um dedo é retirado
+        initialDistance = null;
+        isZooming = false;
     }
 });
 
