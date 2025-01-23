@@ -4421,10 +4421,6 @@ detectElement.addEventListener("touchmove", function (e) {
         // Atualiza zoom slider
         $("#zoom-slider").val(clampedScale);
 
-        // Limita posição se sair dos limites
-        if (group.width() * group.getAbsoluteScale().x > $("#preview").outerWidth()) {
-            limitGroupPosition(group);
-        }
 
         group.getLayer().batchDraw();
     }
