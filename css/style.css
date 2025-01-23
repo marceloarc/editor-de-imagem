@@ -134,6 +134,8 @@ body::after {
   background-color: rgba(200, 200, 200, 0.0);
   border: 1px solid #FFD843;
   margin: 0;
+  height: 64px;
+  width: 108px;
   border-radius: 5px;
 }
 .check-visible{
@@ -142,14 +144,12 @@ body::after {
 }
 
 .pages-container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
 }
 
 .pages-wrapper{
   position: absolute;
-  width: 100%;
+  width:100%;
   display: flex;
   flex-direction: row;
     align-items: center;
@@ -160,7 +160,7 @@ body::after {
   overflow: auto;
   transform: translateX(-50%);
   background: rgba(47, 51, 54, 0.5);
-  background-blend-mode:darken;
+  background-blend-mode: screen;
 }
 
 
@@ -168,8 +168,8 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 70px;
+  width: 108px;
+  height: 64px;
   border-radius: 5px;
   background-color: rgba(66, 67, 68, 1);
   outline: 0;
@@ -202,8 +202,9 @@ height: 100%;
 .layer {
   outline: none;
   position: relative;
-  width: 100px;
-  height: 70px;
+  width: 108px;
+  height: 64px;
+
   font-size: 16px;
   color: #6c757d;
   background: rgba(255, 255, 255, 0.0);
@@ -235,6 +236,7 @@ height: 100%;
   max-width:100%;
   border-radius: 5px;
   max-height: 100%;
+  object-fit: contain !important;
 }
 
 .upload-div {
@@ -284,13 +286,68 @@ height: 100%;
 
 }
 
-.background-btn-area {
+.model-btn-area {
   height: 300px;
   overflow-y: auto;
   margin-top: 5px;
 }
 
-.background-btn-area .item {
+
+.list-btn-area .item {
+  cursor: pointer;
+  display: block;
+  position: relative;
+  float: left;
+  overflow: hidden;
+  -webkit-transition: all .3s ease-out;
+  transition: all .3s ease-out;
+  margin: 0 auto;
+
+}
+
+.list-btn-area .item:hover
+{
+  background-color: #aaa;
+}
+
+.list-btn-area {
+  height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 5px;
+}
+
+.list-btn-area .item img {
+  cursor: pointer;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  border-radius: 5px;
+}
+.list-btn-area .item:hover > .image-autor {
+  display: block;
+}
+.input-search{
+  z-index: 999999999999999999999999999;
+  position:relative;
+}
+
+.search-icon{
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  right: 0;
+  top:50%;
+  transform: translateY(-50%);
+  text-align: center;
+  color:black;
+  font-size: 22px;
+}
+
+.model-btn-area .item {
   cursor: pointer;
   width: 50%;
   height: 100px;
@@ -324,13 +381,28 @@ height: 100%;
   left: 5px;
 }
 
+
+.image-autor{
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  margin-inline: auto; 
+  width: fit-content;
+  bottom:20px;
+  font-size:10px;
+  display: none;
+}
+
+.image-autor a{
+  color: #8abbff;
+}
 .images-btn-area .item img {
   width: 100%;
   height: 100px;
   object-fit: cover;
   margin: 2px;
 }
-.item-background{
+.item-model{
   width: 100%;
   margin: 2px;
 }
@@ -339,9 +411,8 @@ height: 100%;
   width: 100%;
   margin: 0;
   padding: 10px;
-  background: rgba(47, 51, 54, 0.5);
+  border-bottom: 1px solid rgb(66, 67, 68);
 }
-
 .layer-name {
   position: absolute;
   bottom: 5px;
@@ -440,8 +511,8 @@ height: 100%;
 }
 
 .editor-panel::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
+  width: 2px;
+  height: 2px;
   background-color: transparent;
 }
 
@@ -463,6 +534,37 @@ height: 100%;
 }
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 5px;
+  border-bottom: 1px solid #3f4144;
+  border-radius: 0px 5px 5px 0px;
+}
+.menu-container-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 5px;
+  border-radius: 0px 5px 5px 0px;
+}
+.menu-btn{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  cursor: pointer;
+  margin-right: 5px;
+}
+.menu-btn:hover{
+  background: rgb(64, 65, 66);
 }
 
 .btn-delete-layer{
@@ -490,7 +592,6 @@ height: 100%;
 }
 .container2 .wrapper {
   display: flex;
-  overflow: scroll;
   height: 90%;
   border-left: 0;
   border-right: 0;
@@ -812,7 +913,7 @@ height: 100%;
   overflow: auto;
   align-items: center;
   justify-content: center;
-  background: #232527;
+  background: #23252700;
 }
 
 .preview-img::-webkit-scrollbar {
@@ -898,7 +999,24 @@ height: 100%;
 .btn-mini-wrapper{
   text-align: end;
 }
+.btn-export-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 30px;
+  border-radius: 5px;
+  padding: 5px;
+  text-align: end;
+  color: #000 !important;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn-export-wrapper span{
 
+  font-size: 18px;
+  margin-right: 3px;
+}
 .btn-yellow:hover {
   color: black;
   background: #ddbe3f;
@@ -918,7 +1036,7 @@ height: 100%;
     opacity: 0 !important;
     display: none !important;
   }
-  .footer {
+  .footer{
     display: none !important;
   }
   .logo{
@@ -928,7 +1046,9 @@ height: 100%;
     justify-content: center;
     align-items: center;
   }
-
+  .pages-wrapper{
+    justify-content:flex-start;
+  }
   .row2{
     padding:0px !important;
   }
@@ -964,7 +1084,7 @@ height: 100%;
 
   .wrapper .preview-img {
     width: 100vw;
-    height: 70vh;
+    height: 80vh;
     margin-left: 0px;
     margin-right: 0px;
     object-fit: contain;
@@ -1010,19 +1130,27 @@ height: 100%;
     flex-wrap: wrap-reverse;
 
   }
-
-  .wrapper .editor-panel {
-    justify-content: flex-start;
-    flex-direction: row;
-    height: 100px;
-    overflow-x: auto;
-    margin: 20px 0px 20px 0px;
-    width: 100%;
+  .footer{
+    display: none !important;
   }
-
+  .pages-wrapper{
+    transform:translate(-50%,-55%);
+    justify-content:flex-start;
+  }
+  .wrapper .editor-panel {
+    justify-content: space-between;
+    flex-direction: row;
+    height: 70px;
+    overflow-x: auto;
+    width: 100%;
+    position:fixed;
+    bottom:0;
+    left:0;
+    background-color: rgba(47, 51, 54, 0.5);
+  }
   .wrapper .preview-img {
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     margin-left: 0px;
     margin-right: 0px;
 
