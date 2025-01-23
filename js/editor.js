@@ -708,25 +708,33 @@ function generateImageEvents(image, layer) {
     image.on('dragstart transformstart', (e) => {
 
         if (drawMode || drawingLineMode) {
-            image.stopDrag();
+            e.target.stopDrag();
             return;
         }
         if (e.evt) {
             if (e.evt.type.startsWith('touch')) {
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                    image.stopDrag();
+                    e.target.stopDrag();
                     return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    if(transformer.nodes()[0] != e.target){
+                        e.target.stopDrag();
+                        return;
+                    }
                 }
             }
         }
 
+            $("#widget-image").fadeOut(100);
+
+
         saveState();
-        transformer.nodes([e.target]);
-        $("#widget-image").fadeOut(100);
+      
         layer.draw();
     });
-    image.on('mouseover touchstart', (e) => {
+    image.on('mouseover', (e) => {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
             return;
@@ -771,10 +779,19 @@ function generateImageEvents(image, layer) {
                 }
             }
         }
-        $("#widget-image").fadeIn(100);
+        
+
         updateLayerButton();
-        generateImageWidget(e.target)
+        if(transformer.nodes()[0]===e.target){
+            generateImageWidget(e.target)
+        }
+
         layer.draw();
+    });
+
+    image.on('mousedown', (e) => {
+        transformer.nodes([e.target]);
+        generateImageWidget(e.target)
     });
 
     image.on('dragend', (e) => {
@@ -814,7 +831,10 @@ function generateImageEvents(image, layer) {
 
             }
         }
-        generateImageWidget(e.target)
+        if(transformer.nodes()[0]===e.target){
+            generateImageWidget(e.target)
+        }
+
         layer.draw();
     });
 
@@ -870,7 +890,7 @@ $("#addText").click(function () {
 
     var Text = new Konva.Text({
         text: $("#input-text").val(),
-        fontFamily: $("#text-font").val(),
+        fontFamily: fontFamilies[0],
         x: 200,
         y: stageHeight / 2,
         align: "left",
@@ -931,7 +951,7 @@ function generateTextEvents(text, layer) {
         adjustShapeBorder(e.target)
         const text = e.target;
         // Obtendo altura e largura separadamente
-        const MIN_WIDTH = 20;
+        const MIN_WIDTH = 50;
         const MIN_FONT_SIZE = 6;
         if (transformer.getActiveAnchor() === "middle-left" || transformer.getActiveAnchor() === "middle-right") {
         
@@ -942,7 +962,7 @@ function generateTextEvents(text, layer) {
               });
         } else if (transformer.getActiveAnchor() === "top-center" || transformer.getActiveAnchor() === "bottom-center") {
 
-        }else if (transformer.getActiveAnchor() === "bottom-right") {
+        }else if ((transformer.getActiveAnchor() === "bottom-right")||(transformer.getActiveAnchor() === "bottom-left")||(transformer.getActiveAnchor() === "top-left")||(transformer.getActiveAnchor() === "top-right")) {
             const currentFontSize = text.fontSize(); // Tamanho atual da fonte
             const currentScaleX = text.scaleX(); // Captura o fator de escala atual
             const currentWidth = text.width(); // Largura atual do texto
@@ -951,8 +971,8 @@ function generateTextEvents(text, layer) {
             const newFontSize = Math.max(currentFontSize * currentScaleX, MIN_FONT_SIZE);
         
             // Calcula a nova largura com base na escala e adiciona um offset para evitar quebra de linha
-            const newWidth = currentWidth * currentScaleX;
-        
+            const newWidth = Math.max(currentWidth * currentScaleX, MIN_WIDTH);
+            
             text.setAttrs({
                 fontSize: newFontSize, // Define o novo tamanho da fonte
                 width: newWidth, // Ajusta a largura do texto
@@ -1011,7 +1031,12 @@ function generateTextEvents(text, layer) {
         textAreaPosition(e.target)
     });
 
-    text.on('mouseover touchstart', (e) => {
+    text.on('mousedown', (e) => {
+        transformer.nodes([e.target]);
+        generateTextWidget(e.target);
+    });
+
+    text.on('mouseover', (e) => {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
             return;
@@ -1042,7 +1067,7 @@ function generateTextEvents(text, layer) {
     text.on('dragstart', (e) => {
 
         if (drawMode || drawingLineMode) {
-            text.stopDrag();
+            e.target.stopDrag();
             return;
         }
 
@@ -1050,16 +1075,24 @@ function generateTextEvents(text, layer) {
             if (e.evt.type.startsWith('touch')) {
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                    text.stopDrag();
+                    e.target.stopDrag();
                     return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    if(transformer.nodes()[0] != e.target){
+                        e.target.stopDrag();
+                        return;
+                    }
                 }
             }
         }
 
-        $("#draggable").fadeIn(100);
+        if(transformer.nodes()[0]===e.target){
+            $("#draggable").fadeIn(100);
+        }
+
 
         saveState();
-        transformer.nodes([]);
         groupTrans.moveToTop();
         $("#draggable").fadeOut(100);
         $("#widget-fonts").fadeOut(100);
@@ -1079,8 +1112,10 @@ function generateTextEvents(text, layer) {
                 }
             }
         }
-        transformer.nodes([e.target]);
-        $("#draggable").fadeIn(100);
+        if(transformer.nodes()[0]===e.target){
+            $("#draggable").fadeIn(100);
+        }
+
         generateTextWidget(e.target)
         updateLayerButton();
     })
@@ -1701,7 +1736,7 @@ function generateShapeEvents(shape, layer) {
         }
     })
 
-    shape.on('mouseover touchstart', (e) => {
+    shape.on('mouseover', (e) => {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
             return;
@@ -1764,14 +1799,20 @@ function generateShapeEvents(shape, layer) {
                 }
             }
         }
+        if(transformer.nodes()[0]===e.target){
+            generateShapeWidget(e.target);
+        }
 
-        generateShapeWidget(e.target);
+    
         updateLayerButton();
     });
-
+    shape.on('mousedown', (e) => {
+        transformer.nodes([e.target]);
+        generateShapeWidget(e.target);
+    });
     shape.on('dragstart', (e) => {
         if (drawMode || drawingLineMode) {
-            shape.stopDrag();
+            e.target.stopDrag();
             return;
         }
 
@@ -1779,8 +1820,14 @@ function generateShapeEvents(shape, layer) {
             if (e.evt.type.startsWith('touch')) {
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                    shape.stopDrag();
+                    e.target.stopDrag();
                     return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    if(transformer.nodes()[0] != e.target){
+                        e.target.stopDrag();
+                        return;
+                    }
                 }
             }
         }
@@ -1788,7 +1835,6 @@ function generateShapeEvents(shape, layer) {
         saveState();
 
         $("#widget-shape").fadeOut(100);
-        transformer.nodes([e.target]);
         groupTrans.moveToTop();
         layer.draw();
     });
@@ -1902,16 +1948,16 @@ function limitGroupPosition(group){
     const position = target.getAbsolutePosition(); // Posição atual do objeto
 
 
+    const adjustedWidth = group.width() * group.getAbsoluteScale().x;
+    const adjustedHeight = group.height() * group.getAbsoluteScale().y;
     const previewOffset = $("#preview").offset();
     const previewWidth = $("#preview").outerWidth();
     const previewHeight = $("#preview").outerHeight();
     const boundaryLeft = previewOffset.left + 10; // Limite esquerdo
     const boundaryRight = previewOffset.left + previewWidth - 10; // Limite direito
-    const boundaryTop = previewOffset.top-50;
-    const boundaryBottom = previewOffset.top+previewHeight;
+    const boundaryTop = (previewOffset.top+(previewHeight / 2)) ;
+    const boundaryBottom = (previewOffset.top+(previewHeight / 2)) ;
 
-    const adjustedWidth = group.width() * group.getAbsoluteScale().x;
-    const adjustedHeight = group.height() * group.getAbsoluteScale().y;
 
     // Define os novos valores
     let newX = position.x;
@@ -1927,14 +1973,12 @@ function limitGroupPosition(group){
     }
 
     // Restrição para o limite superior
-    if (newY < boundaryTop) {
+    if (newY > boundaryTop) {
         newY = boundaryTop;
     }
-    // Restrição para o limite inferior
-    if (newY + adjustedHeight > boundaryBottom) {
+    if (newY + adjustedHeight < boundaryBottom) {
         newY = boundaryBottom - adjustedHeight;
     }
-
     // Define a posição restrita final
     target.setAbsolutePosition({ x: newX, y: newY });
                 border.setAttrs({
@@ -2430,14 +2474,19 @@ $(function () {
     stage.on('touchstart', (e) => {
         var page = stage.findOne("#"+$("#currentLayer").val());
         var group = page.findOne(".grupo");
-        if (e.target === stage) {
+        if(e.target===stage){
+            transformer.nodes([]);
+        }
+        if (!drawMode && !drawingLineMode) {
             if (e.evt) {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
                     if (e.evt.touches && e.evt.touches.length === 1) {
-                        isDraggingStage = true;
-                        dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
-                        initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
+                        if(!transformer.nodes()[0]){
+                            isDraggingStage = true;
+                            dragStartPosition = stage.getPointerPosition(); // Captura a posição inicial do cursor
+                            initialGroupPosition = group.getAbsolutePosition(); // Captura a posição inicial do grupo
+                        }
                     }
                 }
             }
@@ -2793,9 +2842,7 @@ $(function () {
                 $("#widget-figures").fadeOut(100);
                 $("#widget-draw-line").fadeOut(100);
             }
-            if (e.target.name() != "background") {
-                transformer.nodes([e.target]);
-            }
+
             if (e.target.name() != "line") {
                 $("#widget-bg").fadeOut(100);
                 $("#widget-draw-line").fadeOut(100);
@@ -2829,7 +2876,7 @@ $(function () {
 
 function generateLineEvents(line, layer) {
 
-    line.on("mousedown touchstart", function (e) {
+    line.on("click tap", function (e) {
         if (drawMode || drawingLineMode) {
             return;
         }
@@ -2845,8 +2892,12 @@ function generateLineEvents(line, layer) {
         generateLineWidget(e.target);
         transformer.nodes([e.target])
     })
+    line.on("mousedown", function (e) {
 
-    line.on('mouseover touchstart', function (e) {
+        generateLineWidget(e.target);
+        transformer.nodes([e.target])
+    })
+    line.on('mouseover', function (e) {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
             return;
@@ -2884,19 +2935,26 @@ function generateLineEvents(line, layer) {
             if (e.evt.type.startsWith('touch')) {
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                    line.stopDrag();
+                    e.target.stopDrag();
                     return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    if(transformer.nodes()[0] != e.target){
+                        e.target.stopDrag();
+                        return;
+                    }
                 }
             }
         }
         saveState();
-        generateLineWidget(e.target);
-        transformer.nodes([e.target])
-     
+        $("#widget-draw-line").fadeOut(100);
     })
 
     line.on('transformend dragend', function(e){
         updateLayerButton();
+        if(transformer.nodes()[0]=== e.target){
+            generateLineWidget(e.target);
+        }
     })
 
 }
@@ -2982,7 +3040,7 @@ function generateBackgroundEvents(background, layer) {
         }
     });
 
-    background.on('mouseover touchstart', function (e) {
+    background.on('mouseover', function (e) {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
             return;
@@ -3002,10 +3060,16 @@ function generateBackgroundEvents(background, layer) {
         adjustShapeBorder(e.target)
     })
 
+    
+
     background.on('mouseout touchend', function (e) {
         $("#shape-border").hide();
     })
 
+
+    background.on('mousedown touchstart', function (e) {
+        transformer.nodes([]);
+    })
 
 
 }
