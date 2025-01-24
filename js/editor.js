@@ -3071,6 +3071,7 @@ $(function () {
                 lineJoin: 'round',
                 lineCap: 'round',
                 name:"line",
+                hitStrokeWidth: 50,
                 listening: true,
                 id:"line"+Math.random(),
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
