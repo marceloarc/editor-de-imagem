@@ -552,9 +552,6 @@ $(document).ready(function () {
         }
     });
 
-    $("#models-category").click(function () {
-        $("#widget-products").fadeIn(100);
-    })
     $("#add-image").click(function () {
         if (drawMode) {
             $("#draw").click();
@@ -2260,15 +2257,12 @@ $(".item-proj").on('click', function () {
             dataType: 'json',
             success: function (fileContent) {
                 try {
-                    // Extraia as informações do arquivo JSON
                     const { resolution, layers } = fileContent;
-
-                    // Redimensione o stage, se necessário
+    
                     if (resolution) {
                         setNewCanvasSize(resolution.width, resolution.height);
                         title = resolution.title;
                     }
-    
     
                     restoreState(layers);
                     redoStack.length = 0;
