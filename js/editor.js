@@ -3380,7 +3380,7 @@ function generateLineEvents(line, layer) {
     })
     line.on('dragstart', function(e){
         if (drawMode || drawingLineMode) {
-            $("#shape-border").hide();
+            e.target.stopDrag();
             return;
         }
 
@@ -3459,7 +3459,7 @@ function generateLineEvents(line, layer) {
 
     line.on("dragmove", function (e) {
         if (drawMode || drawingLineMode) {
-            $("#shape-border").hide();
+            e.target.stopDrag();
             return;
         }
 
