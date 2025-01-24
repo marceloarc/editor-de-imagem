@@ -10,6 +10,7 @@ body {
     float: right;
 }
 
+
 @font-face {
     font-family: 'Vacation Planner Regular';
     font-style: normal;
@@ -386,9 +387,7 @@ textarea:focus {
     z-index: 99999999;
 }
 
-.loading {
-    display: none;
-}
+
 
 .figure1 {
 

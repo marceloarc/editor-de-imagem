@@ -2249,13 +2249,19 @@ function generateShapeWidget(shape) {
 }
 
 $(".item-proj").on('click', function () {
-    const filePath = $(this).attr("proj"); // Obtém o caminho do arquivo
+    var link = $(this).attr("proj");
+    const filePath = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`${link}`)}`; // Obtém o caminho do arquivo
+    
     if (filePath) {
+        $(".loading").css("display", "flex")
+        .hide()
+        .fadeIn(100);
         $.ajax({
             url: filePath,
             method: 'GET',
             dataType: 'json',
             success: function (fileContent) {
+                $(".loading").fadeOut(100);
                 try {
                     const { resolution, layers } = fileContent;
     
@@ -2275,6 +2281,7 @@ $(".item-proj").on('click', function () {
                 }
             },
             error: function (xhr, status, error) {
+                $(".loading").fadeOut(100);
                 console.error("Erro ao carregar o arquivo:", error);
             }
         });
@@ -2350,7 +2357,9 @@ $('#icon-btn-area').on('click', '.item', function (e) {
 });
 
 $('#background-btn-area').on('click', '.item', function (e) {
-
+    $(".loading").css("display", "flex")
+    .hide()
+    .fadeIn(100);
     addBackground($(this).attr("image"));
 });
 
@@ -2358,6 +2367,7 @@ $('#background-btn-area').on('click', '.item', function (e) {
 
 
 function addBackground(image){
+
     saveState();
     var layer = stage.findOne("#layer-main");
     var page = layer.findOne("#" + $("#currentLayer").val());
@@ -2423,6 +2433,7 @@ function addBackground(image){
         groupImage.moveToBottom()
         layer.draw();
         updateLayerButton();
+        $(".loading").fadeOut(100);
     }
     
 }
@@ -2489,16 +2500,20 @@ function getImages(search = "",containerId){
     const ACCESS_KEY = "RAXU1PptzmyPgMjOUO0MIO4mELSR-bVCNM_QmAqcVsk";
     
     const PROXY_URL = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.unsplash.com/search/photos?query=${search}&per_page=${countImage}&client_id=${ACCESS_KEY}`)}`;
-  
     $.ajax({
         url: PROXY_URL,
         method: 'GET',
         success: function (data) {
             $("#"+containerId).html("");
             data.results.forEach((image) => {
-
+                var url;
+                if(originalStageWidth >= 2000){
+                    url = image.urls.full
+                }else{
+                    url = image.urls.regular
+                }
                 const IconElement = `
-                <div class="item" image="${image.urls.full}">
+                <div class="item" image="${url}">
                         <img crossorigin="anonymous" src="${image.urls.thumb}" alt=""></img>
                         <span class="image-autor">Foto por <a href="${image.user.links.html}" target="_blank">${image.user.name}</a> em <a href="https://unsplash.com/" target="_blank">Unsplash</a></span>
                 </div>
@@ -4941,6 +4956,7 @@ function setNewCanvas(userWidth, userHeight) {
     originalStageHeight = userHeight;
 
     cleanStage();
+    getImages("background","background-btn-area");
     $("#project-title").text(title)
     $("#project-info").text(userWidth + " x " + userHeight)
     fitStageIntoParentContainer();
