@@ -621,6 +621,24 @@ $('#input-image').on('change', function (e) {
     $(this).val('');
 });
 
+function attachTransformer(node){
+    var className = node.getClassName();
+
+    if(className==="Line"){
+        updateHandles(node);
+        transformer.nodes([]);
+    }else{
+        stage.find('.handle').forEach((node) => {
+            node.destroy()
+        })
+        var border = stage.findOne(".lineBorder");
+        if(border){
+            border.destroy();
+        }
+        transformer.nodes([node]);
+    }
+}
+
 $('#images-btn-area').on('click', '.remove-image-btn', function (e) {
     var item = $(this).parent();
 
@@ -678,7 +696,7 @@ function addImage(imageSrc) {
         generateImageEvents(image, layer);
 
         stage.draw();
-        transformer.nodes([image]);
+        attachTransformer(image);
         sliders.forEach(function (attr) {
             $("#" + attr).attr("object-id", image.id())
             $("#" + attr).prop("disabled", false);
@@ -715,7 +733,7 @@ function generateImageEvents(image, layer) {
             }
         }
 
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
         $("#widget-image").fadeIn(100);
 
         generateImageWidget(e.target)
@@ -809,7 +827,7 @@ function generateImageEvents(image, layer) {
         if (drawMode || drawingLineMode) {
             return;
         }
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
         generateImageWidget(e.target)
     });
 
@@ -1120,7 +1138,7 @@ $("#addText").click(function () {
     Text.width(Text.getWidth()+50);
     const group = page.findOne(".grupo");
     group.add(Text);
-    transformer.nodes([Text]);
+    attachTransformer(Text);
     groupTrans.moveToTop();
 
     generateTextEvents(Text, layer)
@@ -1216,7 +1234,7 @@ function generateTextEvents(text, layer) {
         }
         $("#draggable").fadeIn(100);
 
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
         generateTextWidget(e.target);
     });
 
@@ -1243,7 +1261,7 @@ function generateTextEvents(text, layer) {
         if (drawMode || drawingLineMode) {
             return;
         }
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
         generateTextWidget(e.target);
     });
 
@@ -1687,7 +1705,7 @@ function updateHandles(line) {
         const newY = points[points.length - 1] + 50;
         points.push(newX, newY); // Adiciona novo ponto
         line.points(points); // Atualiza a linha
-        updateHandles(line); // Atualiza os handles
+        attachTransformer(line);
         layer.batchDraw();
         updateLayerButton();
     });
@@ -1767,7 +1785,7 @@ $("#add-tri").on('click', function () {
     shape.x((bg.x() + bg.width() / 2) - shape.radius() / 2)
     shape.y((bg.y() + bg.height() / 2) - shape.radius() / 2)
     group.add(shape)
-    transformer.nodes([shape]);
+    attachTransformer(shape);
     layer.draw();
 
     generateShapeWidget(shape);
@@ -1802,7 +1820,7 @@ $("#add-star").on("click", function () {
     });
     var bg = layer.findOne(".background");
     group.add(shape)
-    transformer.nodes([shape]);
+    attachTransformer(shape);
     layer.draw();
     shape.x((bg.x() + bg.width() / 2) - shape.innerRadius() / 2)
     shape.y((bg.y() + bg.height() / 2) - shape.innerRadius() / 2)
@@ -1841,7 +1859,7 @@ $("#add-rect").on('click', function () {
     shape.y((bg.y() + bg.height() / 2) - shape.height() / 2)
 
     group.add(shape)
-    transformer.nodes([shape]);
+    attachTransformer(shape);
     layer.draw();
     generateShapeEvents(shape, layer);
     generateShapeWidget(shape);
@@ -1905,7 +1923,7 @@ $("#add-square").on('click', function () {
     shape.y((bg.y() + bg.height() / 2) - shape.height() / 2)
 
     group.add(shape)
-    transformer.nodes([shape]);
+    attachTransformer(shape);
     layer.draw();
     generateShapeEvents(shape, layer);
     generateShapeWidget(shape);
@@ -2090,7 +2108,7 @@ function generateShapeEvents(shape, layer) {
         }
 
         generateShapeWidget(e.target)
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
     });
 
 
@@ -2116,7 +2134,7 @@ function generateShapeEvents(shape, layer) {
         updateLayerButton();
     });
     shape.on('mousedown', (e) => {
-        transformer.nodes([e.target]);
+        attachTransformer(e.target);
         generateShapeWidget(e.target);
     });
     shape.on('dragstart', (e) => {
@@ -2623,7 +2641,7 @@ $("#add-circle").on('click', function () {
     shape.x((bg.x() + bg.width() / 2) - shape.radius() / 2)
     shape.y((bg.y() + bg.height() / 2) - shape.radius() / 2)
     group.add(shape)
-    transformer.nodes([shape]);
+    attachTransformer(shape);
 
     layer.draw();
 
@@ -3133,7 +3151,7 @@ $(function () {
             }
 
             line.points(points); // Atualiza os pontos na linha
-            updateHandles(line)
+            attachTransformer(line);
             // Força um desenho seguro da camada
             layer.batchDraw();
         }
@@ -3181,7 +3199,7 @@ $(function () {
             $("#draw-color").attr("disabled", true);
             return;
         }
-        if ((e.target.name() === 'image') || (e.target.name() === 'text') || (e.target.name() === 'background') || (e.target.name() === 'draw')) {
+        if ((e.target.name() === 'image') || (e.target.name() === 'text') || (e.target.name() === 'background') || (e.target.name() === 'draw')|| (e.target.name() === 'line')) {
             if (drawMode || drawingLineMode) {
                 return;
             }
@@ -3200,23 +3218,21 @@ $(function () {
                 $("#draggable").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
                 $("#widget-fonts").fadeOut(100);
-                $("#widget-draw-line").fadeOut(100);
             }
             if ((e.target.name() != 'background') || (drawMode)) {
                 $("#widget-bg").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
-                $("#widget-draw-line").fadeOut(100);
             }
             if (e.target.name() != 'draw') {
                 $("#widget-bg").fadeOut(100);
                 $("#widget-shape").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
-                $("#widget-draw-line").fadeOut(100);
+
             }
             if (e.target.name() != 'image') {
                 $("#widget-image").fadeOut(100);
                 $("#widget-figures").fadeOut(100);
-                $("#widget-draw-line").fadeOut(100);
+    
             }
 
             if (e.target.name() != "line") {
@@ -3356,14 +3372,14 @@ function generateLineEvents(line, layer) {
         }
         createPreciseBorder(e.target);
         generateLineWidget(e.target);
-        updateHandles(e.target)
+        attachTransformer(e.target);
     })
     line.on("mousedown", function (e) {
         if (drawMode || drawingLineMode) {
             return;
         }
         generateLineWidget(e.target);
-        updateHandles(e.target)
+        attachTransformer(e.target);
     })
     line.on('dragstart', function(e){
         if (drawMode || drawingLineMode) {
@@ -3411,22 +3427,11 @@ function generateLineEvents(line, layer) {
                     $("#shape-border").hide();
                     return;
                 }
-                if (e.evt.touches && e.evt.touches.length === 1) {
-                    var handle = stage.findOne('.handle')
-        
-                    if(handle){
-                        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
-                        if (line != e.target) {
-                            e.target.stopDrag();   
-                            return;
-                        }    
-                    }                    
-                }
+
             }
         }
         
     })
-
 
     line.on('mouseover', function (e) {
         if (drawMode || drawingLineMode) {
@@ -3487,7 +3492,7 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
-        updateHandles(e.target)
+        attachTransformer(e.target);
         var border = stage.findOne(".lineBorder");
         if(border){
             border.x(e.target.x());
@@ -4619,7 +4624,7 @@ function copyShape(shape, layer) {
     var group = layer.findOne(".grupo");
     group.add(ShapeClone)
     groupTrans.moveToTop();
-    transformer.nodes([ShapeClone]);
+    attachTransformer(ShapeClone);
     ShapeClone.zIndex(shape.zIndex() + 1);
     ShapeClone.fire("click");
     layer.draw();
