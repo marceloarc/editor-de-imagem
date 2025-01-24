@@ -3028,6 +3028,7 @@ $(function () {
                 strokeWidth: parseInt(lineSize),
                 listening: true,
                 id: "line" + Math.random(),
+                hitStrokeWidth: 50, 
                 draggable: true,
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
