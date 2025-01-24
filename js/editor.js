@@ -325,6 +325,28 @@ $(document).on('mouseup touchend', function () {
     isMousePressed = false;
 });
 
+$("#add-handle").click(function(){
+    stage.find('.handle').forEach((node) => {
+        node.fire("click");
+    })
+})
+$("#round-line").click(function(){
+    var handle = stage.findOne('.handle')
+
+    if(handle){
+        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+
+        if(line.lineJoin()=="miter"){
+            line.lineJoin("round");
+            line.lineCap("round");
+        }else{
+            line.lineJoin("miter");
+            line.lineCap("butt");
+        }
+    }
+    
+
+})
 
 document.addEventListener("keydown", (e) => {
     if ((e.key === "Delete")) {
@@ -451,7 +473,6 @@ $(document).ready(function () {
             $("#draw").click();
         }
         if (parent.attr('id') == "widget-draw-line") {
-            drawingLineMode = false;
             $(".editor").css("cursor", "")
             $("#draw-line").css("background", 'transparent');
         }
@@ -538,9 +559,6 @@ $(document).ready(function () {
         if (drawMode) {
             $("#draw").click();
         }
-        if (drawingLineMode) {
-            $("#draw-line").click();
-        }
         $("#add-image-widget").fadeIn(100);
         const windowWidth = $(window).width();
         const windowHeight = $(window).height();
@@ -598,7 +616,6 @@ $(document).ready(function () {
 });
 var sliders = ['brightness', 'contrast'];
 var drawMode = false;
-var drawingLineMode = false;
 $('#input-image').on('change', function (e) {
     var imagens = $("#input-image")[0].files;
     $(imagens).each(function (index, value) {
@@ -720,7 +737,7 @@ $("#widget-bg-btn").click(function () {
 function generateImageEvents(image, layer) {
     image.on('click tap', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -741,7 +758,7 @@ function generateImageEvents(image, layer) {
     });
     image.on('dragstart transformstart', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             e.target.stopDrag();
             return;
         }
@@ -769,7 +786,7 @@ function generateImageEvents(image, layer) {
         layer.draw();
     });
     image.on('mouseover', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             $("#shape-border").hide();
             return;
         }
@@ -801,7 +818,7 @@ function generateImageEvents(image, layer) {
     })
 
     image.on('transformend dragend', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -824,7 +841,7 @@ function generateImageEvents(image, layer) {
     });
 
     image.on('mousedown', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
         attachTransformer(e.target);
@@ -833,7 +850,7 @@ function generateImageEvents(image, layer) {
 
     image.on('dragend', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -1221,7 +1238,7 @@ function generateTextEvents(text, layer) {
 
     text.on('click tap', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
         if (e.evt) {
@@ -1240,7 +1257,7 @@ function generateTextEvents(text, layer) {
 
     text.on('dblclick dbltap', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -1258,7 +1275,7 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('mousedown', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
         attachTransformer(e.target);
@@ -1266,7 +1283,7 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('mouseover', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             $("#shape-border").hide();
             return;
         }
@@ -1295,7 +1312,7 @@ function generateTextEvents(text, layer) {
     });
     text.on('dragstart', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             e.target.stopDrag();
             return;
         }
@@ -1329,7 +1346,7 @@ function generateTextEvents(text, layer) {
     });
     text.on('dragend', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -1659,6 +1676,7 @@ function updateHandles(line) {
             line.points(points); // Atualiza a linha
             layer.batchDraw();
             createPreciseBorder(line);
+
         });
         handle.on('dragend', () => {
             updateLayerButton();
@@ -1687,10 +1705,11 @@ function updateHandles(line) {
 
     // Adiciona um botão no final da linha para expandi-la
     const addHandle = new Konva.Circle({
-        x: points[points.length - 2] +line.x(),
-        y: points[points.length - 1]+line.y(),
+        x: 0,
+        y: 0,
         radius: 12,
         fill: 'white',
+        opacity:0,
         stroke:"green",
         strokeWidth:1,
         draggable: false,
@@ -2064,7 +2083,7 @@ function generateShapeEvents(shape, layer) {
     })
 
     shape.on('mouseover', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             $("#shape-border").hide();
             return;
         }
@@ -2093,7 +2112,7 @@ function generateShapeEvents(shape, layer) {
 
     shape.on('click tap', (e) => {
 
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -2113,7 +2132,7 @@ function generateShapeEvents(shape, layer) {
 
 
     shape.on('dragend', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             return;
         }
 
@@ -2138,7 +2157,7 @@ function generateShapeEvents(shape, layer) {
         generateShapeWidget(e.target);
     });
     shape.on('dragstart', (e) => {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             e.target.stopDrag();
             return;
         }
@@ -2652,6 +2671,62 @@ $("#add-circle").on('click', function () {
     updateLayerButton();
 })
 
+function findLinesInsideShape(parent, shape) {
+    // Verifica se o shape é um retângulo ou círculo
+    const shapeType = shape.getClassName();
+    if (shapeType !== 'Rect' && shapeType !== 'Circle') {
+      throw new Error('Shape precisa ser Konva.Rect ou Konva.Circle');
+    }
+  
+    // Função para verificar se um ponto está dentro do Retângulo
+    const isPointInsideRect = (point, rect) => {
+      const box = rect.getClientRect();
+      return (
+        point.x >= box.x &&
+        point.x <= box.x + box.width &&
+        point.y >= box.y &&
+        point.y <= box.y + box.height
+      );
+    };
+  
+    // Função para verificar se um ponto está dentro do Círculo
+    const isPointInsideCircle = (point, circle) => {
+      const radius = circle.radius();
+      const center = {
+        x: circle.x(),
+        y: circle.y(),
+      };
+      const distance = Math.hypot(point.x - center.x, point.y - center.y);
+      return distance <= radius;
+    };
+  
+    // Função para verificar todos os pontos de uma linha
+    const isLineInsideShape = (line, shape) => {
+      const points = line.points();
+      const linePoints = [];
+      for (let i = 0; i < points.length; i += 2) {
+        linePoints.push({ x: points[i], y: points[i + 1] });
+      }
+  
+      for (const point of linePoints) {
+        if (
+          (shapeType === 'Rect' && isPointInsideRect(point, shape)) ||
+          (shapeType === 'Circle' && isPointInsideCircle(point, shape))
+        ) {
+          return true;
+        }
+      }
+      return false;
+    };
+  
+    // Busca todas as linhas no parent
+    const lines = parent.find('.Line');
+  
+    // Filtra e retorna as linhas que estão dentro do shape
+    return lines.filter((line) => isLineInsideShape(line, shape));
+  }
+  
+
 function cleanStage() {
     const layer = stage.findOne("#layer-main");
     const Groups = Array.from(layer.find('Group'));
@@ -2860,7 +2935,7 @@ $(function () {
                 border.destroy();
             }
         }
-        if (!drawMode && !drawingLineMode) {
+        if (!drawMode) {
             if (e.evt) {
                 if (e.evt.type.startsWith('touch')) {
                     // Confirma que é um evento de toque
@@ -2928,7 +3003,6 @@ $(function () {
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
-            stage.listening(false);
 
 
 
@@ -2949,6 +3023,10 @@ $(function () {
             DrawCursorRadius.x(adjustedPosition.x)
             DrawCursorRadius.y(adjustedPosition.y)
             DrawCursorRadius.radius((size / 2)*group.getAbsoluteScale().x);
+            if(mode=="eraser"){
+                DrawCursorRadius.radius(1);
+            }
+
             DrawCursorRadius.moveToTop();
             if (mode == 'brush') {
                 DrawCursorRadius.fill(color);
@@ -2959,14 +3037,7 @@ $(function () {
                 DrawCursorRadius.fill('rgba(0, 0, 0, 0.0)');
                 DrawCursorRadius.strokeWidth(1);
             }
-        } else {
-            if(drawingLineMode){
-                $(".editor").css("cursor", "url('images/cross.cur'), auto")
-            }else{
-                
-            }
-
-        }
+        } 
     })
     var lineId;
     var drawingLine = false;
@@ -2990,19 +3061,37 @@ $(function () {
                 x: (pointerPosition.x - position.x) / scale.x,
                 y: (pointerPosition.y - position.y) / scale.y
             };
-
+            if(mode==="eraser"){
+                return;
+            }
             lastLine = new Konva.Line({
                 stroke: color,
                 strokeWidth:parseInt(size),
-                globalCompositeOperation:
-                    mode === 'brush' ? 'source-over' : 'destination-out',
+                globalCompositeOperation:'source-over',
                 lineJoin: 'round',
                 lineCap: 'round',
                 name:"line",
-                listening: false,
+                listening: true,
                 id:"line"+Math.random(),
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
+            lastLine.on("click tap", function (e) {
+                if (drawMode) {
+                    if(mode=="eraser"){
+                        e.target.destroy();
+                    }
+                    return;
+                }
+        
+            })
+            lastLine.on("mousedown", function (e) {
+                if (drawMode) {
+                    if(mode=="eraser"){
+                        e.target.destroy();
+                    }
+                    return;
+                }
+            })
             group.add(lastLine);
             const DrawCursorRadius = stage.findOne("#DrawCursorRadius");
             DrawCursorRadius.moveToTop();
@@ -3021,40 +3110,6 @@ $(function () {
                 }
             });
         }
-
-        if (drawingLineMode) {
-            saveState();
-
-            const pointerPosition = stage.getPointerPosition();
-            if (!group) return;
-
-            const scale = group.getAbsoluteScale();
-            const position = group.getAbsolutePosition(); 
-
-            const adjustedPosition = {
-                x: (pointerPosition.x - position.x) / scale.x,
-                y: (pointerPosition.y - position.y) / scale.y
-            };
-            drawingLine = true;
-
-            const line = new Konva.Line({
-                stroke: lineColor,
-                name: "line",
-                strokeWidth: parseInt(lineSize),
-                listening: true,
-                id: "line" + Math.random(),
-                hitStrokeWidth: 50, 
-                draggable: true,
-                points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
-            });
-            
-            generateLineEvents(line)
-            
-            lineId = line.id();
-            group.add(line);
-            page.draw();
-
-        }
     });
     let isHandlingEvent = false;
 
@@ -3062,7 +3117,7 @@ $(function () {
         isPaint = false;
         drawingLine = false;
         lineId = 0;
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             updateLayerButton();
         }
     });
@@ -3105,7 +3160,9 @@ $(function () {
             if (!isPaint) {
                 return;
             }
-       
+            if(mode==="eraser"){
+                return;
+            }
 
             const newPoints = lastLine.points().concat([adjustedPosition.x, adjustedPosition.y]);
             lastLine.points(newPoints);
@@ -3168,7 +3225,7 @@ $(function () {
 
         if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'line')&& (e.target.name() != 'handle')) {
 
-            if (drawMode || drawingLineMode) {
+            if (drawMode) {
                 return;
             }
 
@@ -3197,7 +3254,7 @@ $(function () {
             return;
         }
         if ((e.target.name() === 'image') || (e.target.name() === 'text') || (e.target.name() === 'background') || (e.target.name() === 'draw')|| (e.target.name() === 'line')) {
-            if (drawMode || drawingLineMode) {
+            if (drawMode) {
                 return;
             }
             sliders.forEach(function (attr) {
@@ -3355,7 +3412,11 @@ function createPreciseBorder(line) {
 function generateLineEvents(line, layer) {
 
     line.on("click tap", function (e) {
-        if (drawMode || drawingLineMode) {
+        console.log(e.target)
+        if (drawMode) {
+            if(mode=="eraser"){
+                e.target.destroy();
+            }
             return;
         }
 
@@ -3372,14 +3433,20 @@ function generateLineEvents(line, layer) {
         attachTransformer(e.target);
     })
     line.on("mousedown", function (e) {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
+            if(mode=="eraser"){
+                e.target.destroy();
+            }
             return;
         }
         generateLineWidget(e.target);
         attachTransformer(e.target);
     })
     line.on('dragstart', function(e){
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
+            if(mode=="eraser"){
+                e.target.destroy();
+            }
             e.target.stopDrag();
             return;
         }
@@ -3412,7 +3479,11 @@ function generateLineEvents(line, layer) {
     })
 
     line.on('touchstart', function(e){
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
+        
+            if(mode=="eraser"){
+                e.target.destroy();
+            }
             $("#shape-border").hide();
             return;
         }
@@ -3431,7 +3502,7 @@ function generateLineEvents(line, layer) {
     })
 
     line.on('mouseover', function (e) {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             $("#shape-border").hide();
             return;
         }
@@ -3458,7 +3529,7 @@ function generateLineEvents(line, layer) {
     })
 
     line.on("dragmove", function (e) {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             e.target.stopDrag();
             return;
         }
@@ -3512,7 +3583,7 @@ function generateLineWidget(line) {
 
     var position = $(".konvajs-content").offset();
     var widget = document.getElementById('widget-draw-line');
-    var positionLeft = position.left + ($(".konvajs-content").width() / 2 - (widget.offsetWidth));
+    var positionLeft = position.left + ($(".konvajs-content").width() / 2 - (widget.offsetWidth/2));
 
     if ($(window).outerWidth() < 450) {
         var position = $(".editor-panel").offset();
@@ -3540,7 +3611,7 @@ function generateLineWidget(line) {
 function generateBackgroundEvents(background, layer) {
 
     background.on("click dbltap", function (e) {
-        if (!drawMode && !drawingLineMode) {
+        if (!drawMode) {
             if(background.getClassName()=="Image"){
                 $("#widget-bg2").fadeIn(100);
                 var position = $(".preview-img").offset();
@@ -3588,7 +3659,7 @@ function generateBackgroundEvents(background, layer) {
     });
 
     background.on('mouseover', function (e) {
-        if (drawMode || drawingLineMode) {
+        if (drawMode) {
             $("#shape-border").hide();
             return;
         }
@@ -3912,9 +3983,6 @@ $('#widget-text').on('click', function () {
     if (drawMode) {
         $("#draw").click();
     }
-    if (drawingLineMode) {
-        $("#draw-line").click();
-    }
     $("#add-text-widget").fadeIn(100);
     var position = $(this).offset();
     var widget = document.getElementById('add-text-widget');
@@ -4033,50 +4101,32 @@ $("#btn-text-settings").click(function () {
 });
 
 $("#draw-line").on("click", function () {
-    sliders.forEach(function (attr) {
-        $("#" + attr).prop("disabled", true);
+    var page = stage.findOne("#" + $("#currentLayer").val());
+    const parent = page.findOne(".grupo"); // Supondo que exista um grupo ou retângulo como pai
+    const parentBox = parent.getClientRect(); // Obtém a dimensão do parent
+    const line = new Konva.Line({
+        stroke: "black",
+        name: "line",
+        strokeWidth: 20,
+        listening: true,
+        lineJoin: 'miter',
+        lineCap: 'butt',
+        id: "line" + Math.random(),
+        hitStrokeWidth: 50, 
+        draggable: true,
+        points: [0, 0, parentBox.width/2, 0], // Define uma linha horizontal com base na largura do pai
     });
-    $(this).css('background-color', "#424344");
-    lineColor = $("#line-color").val();
-    lineSize = $("#line-size").val();
-    $("#line-size-text").text(" " + lineSize);
-    if (!drawingLineMode) {
-        if (drawMode) {
-            $("#draw").click();
-        }
-        var layer = stage.findOne("#" + $("#currentLayer").val());
-        drawingLineMode = true;
-        $("#widget-draw-line").fadeIn(100);
-
-        const colorButton = document.getElementById("line-color-button");
-
-        colorButton.style.backgroundColor = lineColor;
-        var position = $(".preview-img").offset();
-        var widget = document.getElementById('widget-draw-line');
-        var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
-
-        if ($(window).outerWidth() < 450) {
-            var position = $(".editor-panel").offset();
-            var positionTop = position.top - ($(".editor-panel").height() + 4);
-            widget.style.position = 'absolute';
-            widget.style.top = positionTop + "px";
-            widget.style.left = '0px';
-            widget.style.bottom = '';
-            widget.style.width = "100%";
-        } else {
-            widget.style.position = 'absolute';
-            widget.style.bottom = 0;
-            widget.style.top = '';
-            widget.style.left = positionLeft + 'px';
-        }
-
-    } else {
-        $(".editor").css("cursor", "")
-        $(this).css('background', "transparent");
-        $("#widget-draw-line").fadeOut(100);
-        drawingLineMode = false;
+    
+    parent.add(line);
+    line.position({x:(parent.width()/2) -parentBox.width/4 ,y:parent.height()/2});
+    generateLineEvents(line)
+    updateHandles(line);
+    createPreciseBorder(line);
+    generateLineWidget(line);
+    parent.draw();
+    if(drawMode){
+        $("#draw").click();
     }
-
 });
 
 $("#draw").on("click", function () {
@@ -4089,9 +4139,6 @@ $("#draw").on("click", function () {
     size = $("#brush-size").val();
     $("#brush-size-text").text(" " + size);
     if (!drawMode) {
-        if (drawingLineMode) {
-            $("#draw-line").click();
-        }
         var layer = stage.findOne("#layer-main");
         drawMode = true;
         $("#widget-draw").fadeIn(100);
@@ -4125,15 +4172,18 @@ $("#draw").on("click", function () {
         var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
-            var position = $(".editor-panel").offset();
-            var positionTop = position.top - ($(".editor-panel").height() + 4);
+            var position = $(".preview-img").offset();
+            var positionTop = position.top - ($(".preview-img").height() + 4);
             widget.style.position = 'absolute';
             widget.style.top = positionTop + "px";
             widget.style.left = '0px';
+            widget.style.bottom = '';
             widget.style.width = "100%";
         } else {
             widget.style.position = 'absolute';
-            widget.style.bottom = 0;
+            widget.style.top = '50px';
+            widget.style.bottom = '';
+            widget.style.right = '';
             widget.style.left = positionLeft + 'px';
         }
 
@@ -5138,7 +5188,7 @@ $(document).on('mousedown touchstart', function (e) {
         $(e.target).closest(selector).length
     );
 
-    if (!isClickAllowed && !drawingLineMode) {
+    if (!isClickAllowed) {
         var transformers = stage.find('Transformer');
         if (transformers.length > 0) {
             for (var i = 0; i < transformers.length; i++) {
