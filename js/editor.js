@@ -4172,8 +4172,8 @@ $("#draw").on("click", function () {
         var positionLeft = position.left + ($(".preview-img").width() / 2 - (widget.offsetWidth / 2));
 
         if ($(window).outerWidth() < 450) {
-            var position = $(".preview-img").offset();
-            var positionTop = position.top - ($(".preview-img").height() + 4);
+            var position = $(".editor-panel").offset();
+            var positionTop = position.top - ($(".editor-panel").height() + 4);
             widget.style.position = 'absolute';
             widget.style.top = positionTop + "px";
             widget.style.left = '0px';
