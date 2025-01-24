@@ -1504,6 +1504,7 @@ function textAreaPosition(Text) {
     $("#input-text-edit").css("overflow", "hidden");
     $("#input-text-edit").css("outline", "none");
     $("#input-text-edit").css("resize", "none");
+    $("#input-text-edit").css("font-style", Text.fontStyle());
     $("#input-text-edit").css("background", "none");
     $("#input-text-edit").css("transform-origin", "top left");
     $("#input-text-edit").css("caret-color", Text.fill());
