@@ -2646,7 +2646,6 @@ $("#add-circle").on('click', function () {
         id: i.toString() + 'circle',
         fill: Konva.Util.getRandomColor(),
         radius: 100 + Math.random() * 20,
-        shadowBlur: 10,
         stroke: null,
         strokeWidth: 0,
         fakeShapeId: 'stage',
