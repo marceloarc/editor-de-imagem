@@ -898,7 +898,6 @@ function getLineGuideStops(skipShape) {
           return;
         }
         var box = guideItem.getClientRect();
-        console.log(box)
         // and we can snap to all edges of shapes
         vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
         horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
@@ -1641,7 +1640,7 @@ function updateHandles(line) {
             points[i + 1] = handle.y()-line.y();
             line.points(points); // Atualiza a linha
             layer.batchDraw();
-    
+            createPreciseBorder(line);
         });
         handle.on('dragend', () => {
             updateLayerButton();
@@ -3282,7 +3281,12 @@ function calculateLineBoundingBox(line) {
 }
 function createPreciseBorder(line) {
     var layer = stage.findOne("#layer-main");
-    var group  = layer.findOne(".grupo");
+    var page = layer.findOne("#"+$("#currentLayer").val())
+    var group  = page.findOne(".grupo");
+    var border1 = stage.findOne(".lineBorder");
+    if(border1){
+        border1.destroy();
+    }
     const points = line.points(); // Obtém os pontos da linha
     const strokeWidth = line.strokeWidth() || 0;
 
@@ -3305,7 +3309,7 @@ function createPreciseBorder(line) {
 
         // Vetor normal perpendicular
         const normalX = (-(dy / length) * offset);
-        const normalY = (dx / length) * offset;
+        const normalY = ((dx / length) * offset);
 
         // Adiciona pontos deslocados para cima e para baixo
         pathPoints.push(x1 + normalX, y1 + normalY); // Lado superior
@@ -3329,8 +3333,8 @@ function createPreciseBorder(line) {
         closed: true, // Fecha o contorno
         listening: false, // Não capturar eventos
     });
-
     group.add(border);
+    border.moveToTop();
     layer.batchDraw();
 }
 
@@ -3349,7 +3353,7 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
-        createPreciseBorder(line);
+        createPreciseBorder(e.target);
         generateLineWidget(e.target);
         updateHandles(e.target)
     })
@@ -3389,6 +3393,7 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
+        saveState();
 
     })
 
@@ -3437,8 +3442,8 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
-        createPreciseBorder(line)
-        $("#shape-border").show();
+
+        createPreciseBorder(e.target)
     })
 
     line.on('mouseout', function (e) {
@@ -4169,7 +4174,7 @@ $("#line-color,#line-size").on('input', function () {
         var line = stage.findOne("#"+handle.getAttr('attachedTo'));
         if (line instanceof Konva.Line) {
             line.stroke($("#line-color").val());
-            line.strokeWidth($("#line-size").val());
+            line.strokeWidth(parseInt($("#line-size").val()));
         }
     
     }
