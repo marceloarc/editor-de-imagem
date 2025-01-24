@@ -69,7 +69,7 @@
                         class="btn-text">Fundo</span></button>
                 <button id="draw" title="Pincel e borracha" id="btn-widget-draw"><i class="mdi mdi-brush"
                         aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
-                <button id="draw-line" title="Pincel e borracha" id="btn-widget-draw-line"><i class="mdi mdi-vector-line"
+                <button id="draw-line" title="Desenhar uma linha" id="btn-widget-draw-line"><i class="mdi mdi-vector-line"
                      aria-hidden="true"></i><span class="btn-text">Linha</span></button>
                 <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
                         class="btn-text">Soon</span></button>
@@ -627,7 +627,7 @@
                 <div class="row2">
 
                
-                    <div style="position: relative; display: inline-block; width: 45px; height: 45px;">
+                    <div style="position: relative; display: inline-block; ">
                         <button id="line-color-button" class="btn btn-small btn-color" style="border: 1px white;">
                             <i class="mdi mdi-format-color-fill" style="font-size: 20px; color: #555;"></i>
                         </button>
@@ -635,12 +635,13 @@
                             style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
                             value="#000000">
                     </div>
-
+                    <button title="Deletar linha" class="btn-delete btn btn-small"><i
+                        class="fa-solid fa-trash-can"></i></button>
 
                     <div class="row">
                         <span class="name">Tamanho </span>
                         <span id="line-size-text"> 0 </span>
-                        <input type="range" min="1" max="100" class="slider" id="line-size" step="1" value="1">
+                        <input type="range" min="1" max="100" class="slider" id="line-size" step="1" value="10">
                     </div>
                 </div>
 

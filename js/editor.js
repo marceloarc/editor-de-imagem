@@ -194,6 +194,7 @@ function restoreState(stack) {
     });
     state.forEach(layerJSON => {
         const layer = Konva.Node.create(layerJSON);
+        generateLayerEvents(layer);
         const groups = Array.from(layer.find('Group'));
         const userPages = groups.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
         userPages.forEach(page => {
@@ -327,12 +328,26 @@ $(document).on('mouseup touchend', function () {
 
 document.addEventListener("keydown", (e) => {
     if ((e.key === "Delete")) {
+        var layer = stage.findOne("#" + $("#currentLayer").val());
         if (transformer.nodes().length > 0) {
             saveState();
-            var layer = stage.findOne("#" + $("#currentLayer").val());
             var shape = transformer.nodes()[0];
             deleteShape(shape, layer);
             updateLayerButton();
+        }
+        var handle = stage.findOne('.handle')
+
+        if(handle){
+            var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+            if (line instanceof Konva.Line) {
+                deleteShape(line, layer);
+                handle.destroy();
+                var border = stage.findOne(".lineBorder");
+                if(border){
+                    border.destroy();
+                }
+            }
+        
         }
     }
     if ((e.ctrlKey && e.key === "c")) {
@@ -437,6 +452,7 @@ $(document).ready(function () {
         }
         if (parent.attr('id') == "widget-draw-line") {
             drawingLineMode = false;
+            $(".editor").css("cursor", "")
             $("#draw-line").css("background", 'transparent');
         }
         if (parent.hasClass('layers-header')) {
@@ -790,6 +806,9 @@ function generateImageEvents(image, layer) {
     });
 
     image.on('mousedown', (e) => {
+        if (drawMode || drawingLineMode) {
+            return;
+        }
         transformer.nodes([e.target]);
         generateImageWidget(e.target)
     });
@@ -839,6 +858,196 @@ function generateImageEvents(image, layer) {
     });
 
 }
+
+
+function getLineGuideStops(skipShape) {
+    // we can snap to stage borders and the center of the stage
+    var vertical = [0, stage.width() / 2, stage.width()];
+    var horizontal = [0, stage.height() / 2, stage.height()];
+
+    // and we snap over edges and center of each object on the canvas
+    stage.find('.text').forEach((guideItem) => {
+      if (guideItem === skipShape) {
+        return;
+      }
+      var box = guideItem.getClientRect();
+      // and we can snap to all edges of shapes
+      vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+      horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+    });
+    stage.find('.draw').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return;
+        }
+        var box = guideItem.getClientRect();
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      });
+      stage.find('.image').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return;
+        }
+        var box = guideItem.getClientRect();
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      });
+      stage.find('.line').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return;
+        }
+        var box = guideItem.getClientRect();
+        console.log(box)
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      });
+    return {
+      vertical: vertical.flat(),
+      horizontal: horizontal.flat(),
+    };
+  }
+
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  var GUIDELINE_OFFSET = 5;
+
+
+  function getObjectSnappingEdges(node) {
+    var box = node.getClientRect();
+    var absPos = node.absolutePosition();
+
+    return {
+      vertical: [
+        {
+          guide: Math.round(box.x),
+          offset: Math.round(absPos.x - box.x),
+          snap: 'start',
+        },
+        {
+          guide: Math.round(box.x + box.width / 2),
+          offset: Math.round(absPos.x - box.x - box.width / 2),
+          snap: 'center',
+        },
+        {
+          guide: Math.round(box.x + box.width),
+          offset: Math.round(absPos.x - box.x - box.width),
+          snap: 'end',
+        },
+      ],
+      horizontal: [
+        {
+          guide: Math.round(box.y),
+          offset: Math.round(absPos.y - box.y),
+          snap: 'start',
+        },
+        {
+          guide: Math.round(box.y + box.height / 2),
+          offset: Math.round(absPos.y - box.y - box.height / 2),
+          snap: 'center',
+        },
+        {
+          guide: Math.round(box.y + box.height),
+          offset: Math.round(absPos.y - box.y - box.height),
+          snap: 'end',
+        },
+      ],
+    };
+  }
+
+
+
+function getGuides(lineGuideStops, itemBounds) {
+    var resultV = [];
+    var resultH = [];
+
+    lineGuideStops.vertical.forEach((lineGuide) => {
+      itemBounds.vertical.forEach((itemBound) => {
+        var diff = Math.abs(lineGuide - itemBound.guide);
+        // if the distance between guild line and object snap point is close we can consider this for snapping
+        if (diff < GUIDELINE_OFFSET) {
+          resultV.push({
+            lineGuide: lineGuide,
+            diff: diff,
+            snap: itemBound.snap,
+            offset: itemBound.offset,
+          });
+        }
+      });
+    });
+
+    lineGuideStops.horizontal.forEach((lineGuide) => {
+      itemBounds.horizontal.forEach((itemBound) => {
+        var diff = Math.abs(lineGuide - itemBound.guide);
+        if (diff < GUIDELINE_OFFSET) {
+          resultH.push({
+            lineGuide: lineGuide,
+            diff: diff,
+            snap: itemBound.snap,
+            offset: itemBound.offset,
+          });
+        }
+      });
+    });
+
+    var guides = [];
+
+    // find closest snap
+    var minV = resultV.sort((a, b) => a.diff - b.diff)[0];
+    var minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+    if (minV) {
+      guides.push({
+        lineGuide: minV.lineGuide,
+        offset: minV.offset,
+        orientation: 'V',
+        snap: minV.snap,
+      });
+    }
+    if (minH) {
+      guides.push({
+        lineGuide: minH.lineGuide,
+        offset: minH.offset,
+        orientation: 'H',
+        snap: minH.snap,
+      });
+    }
+    return guides;
+  }
+
+
+function drawGuides(guides) {
+    const layer = stage.findOne("#layer-main");
+    guides.forEach((lg) => {
+      if (lg.orientation === 'H') {
+        var line = new Konva.Line({
+          points: [-6000, 0, 6000, 0],
+          stroke: 'rgb(255, 166, 0)',
+          strokeWidth: 1,
+          name: 'guid-line',
+          dash: [4, 6],
+        });
+        layer.add(line);
+        line.absolutePosition({
+          x: 0,
+          y: lg.lineGuide,
+        });
+      } else if (lg.orientation === 'V') {
+        var line = new Konva.Line({
+          points: [0, -6000, 0, 6000],
+          stroke: 'rgb(255, 196, 0)',
+          strokeWidth: 1,
+          name: 'guid-line',
+          dash: [4, 6],
+        });
+        layer.add(line);
+        line.absolutePosition({
+          x: lg.lineGuide,
+          y: 0,
+        });
+      }
+    });
+  }
 
 
 function generateImageWidget(image) {
@@ -1032,6 +1241,9 @@ function generateTextEvents(text, layer) {
     });
 
     text.on('mousedown', (e) => {
+        if (drawMode || drawingLineMode) {
+            return;
+        }
         transformer.nodes([e.target]);
         generateTextWidget(e.target);
     });
@@ -1395,6 +1607,104 @@ $("#btn-text-edit").click(function () {
     widget.style.left = positionLeft + 'px';
 
 })
+
+function updateHandles(line) {
+    var layer = stage.findOne("#layer-main");
+    var page = layer.findOne("#" + $("#currentLayer").val());
+    var group = page.findOne(".grupo");
+
+    stage.find('.handle').forEach((node) => {
+        node.destroy()
+    })
+    // Adiciona handles em cada ponto da linha
+    const points = line.points();
+    for (let i = 0; i < points.length; i += 2) {
+        const x = points[i];
+        const y = points[i + 1];
+        
+        const handle = new Konva.Circle({
+            x:x+line.x(),
+            y:y+line.y(),
+            radius: 8,
+            fill: 'white',
+            draggable: true,
+            stroke:"blue",
+            strokeWidth:1,
+            name: 'handle',
+            attachedTo:line.id(),
+            scaleX:1,
+            scaleY:1,
+        });
+
+        handle.on('dragmove', () => {
+            points[i] = handle.x()-line.x();
+            points[i + 1] = handle.y()-line.y();
+            line.points(points); // Atualiza a linha
+            layer.batchDraw();
+    
+        });
+        handle.on('dragend', () => {
+            updateLayerButton();
+        })
+        handle.on('mousedown touchstart',(e)=>{
+            saveState();
+            $(".editor").css("cursor", "url('images/hand2.cur'), auto")
+        })
+        handle.on('mouseover',(e)=>{
+
+            $(".editor").css("cursor", "url('images/hand1.cur'), auto")
+        })
+        handle.on('mouseup', (e) => {
+            $(".editor").css("cursor", "url('images/hand1.cur'), auto")
+        })
+        handle.on('mouseout', (e) => {
+            $(".editor").css("cursor", "")
+        })
+        
+       group.add(handle);
+       handle.scale({
+        x: 1 / group.getAbsoluteScale().x, // Inverte a escala do parent
+        y: 1 / group.getAbsoluteScale().y,
+    });
+    }
+
+    // Adiciona um botão no final da linha para expandi-la
+    const addHandle = new Konva.Circle({
+        x: points[points.length - 2] +line.x(),
+        y: points[points.length - 1]+line.y(),
+        radius: 12,
+        fill: 'white',
+        stroke:"green",
+        strokeWidth:1,
+        draggable: false,
+        attachedTo:line.id(),
+        name: 'handle',
+    });
+
+    // Clique no botão para adicionar novos pontos
+    addHandle.on('click tap', () => {
+        saveState();
+        const newX = points[points.length - 2] + 50; // Define novas coordenadas
+        const newY = points[points.length - 1] + 50;
+        points.push(newX, newY); // Adiciona novo ponto
+        line.points(points); // Atualiza a linha
+        updateHandles(line); // Atualiza os handles
+        layer.batchDraw();
+        updateLayerButton();
+    });
+    addHandle.on('mouseover',(e)=>{
+        $(".editor").css("cursor", "url('images/hand3.cur'), auto")
+    })
+
+    addHandle.on('mouseout',(e)=>{
+        $(".editor").css("cursor", "")
+    })
+    group.add(addHandle);
+    addHandle.scale({
+        x: 1 / group.getAbsoluteScale().x, // Inverte a escala do parent
+        y: 1 / group.getAbsoluteScale().y,
+    });
+}
 
 $('#draw-color').on('input',
     function () {
@@ -2153,7 +2463,6 @@ function getImages(search = "",containerId){
         url: PROXY_URL,
         method: 'GET',
         success: function (data) {
-            console.log(data);
             $("#"+containerId).html("");
             data.results.forEach((image) => {
 
@@ -2224,6 +2533,49 @@ $("#btn-widget-icon").click(function () {
     
 })
 
+
+function generateLayerEvents(layer){
+    layer.on('dragmove', function (e) {
+        // clear all previous lines on the screen
+        layer.find('.guid-line').forEach((l) => l.destroy());
+
+        // find possible snapping lines
+        var lineGuideStops = getLineGuideStops(e.target);
+        // find snapping points of current object
+        var itemBounds = getObjectSnappingEdges(e.target);
+        // now find where can we snap current object
+        var guides = getGuides(lineGuideStops, itemBounds);
+
+        // do nothing of no snapping
+        if (!guides.length) {
+          return;
+        }
+
+        drawGuides(guides);
+
+        var absPos = e.target.absolutePosition();
+        // now force object position
+        guides.forEach((lg) => {
+          switch (lg.orientation) {
+            case 'V': {
+              absPos.x = lg.lineGuide + lg.offset;
+              break;
+            }
+            case 'H': {
+              absPos.y = lg.lineGuide + lg.offset;
+              break;
+            }
+          }
+        });
+        e.target.absolutePosition(absPos);
+      });
+
+      layer.on('dragend', function (e) {
+        // clear all previous lines on the screen
+        layer.find('.guid-line').forEach((l) => l.destroy());
+      });
+
+}
 
 $("#model-widget-btn").click(function () {
     $("#add-model-widget").fadeIn(100);
@@ -2392,6 +2744,10 @@ $(function () {
        
     });
 
+
+
+
+
     var page = new Konva.Group({
         id: "layer" + getRandomInt(1000),
         name: "Pagina 1",
@@ -2417,6 +2773,9 @@ $(function () {
     });
 
     var clipRect = { x: ($("#preview").width() - 800) / 2, y: ($("#preview").height() - 600) / 2, width: 800, height: 600 };
+
+    generateLayerEvents(layer);
+
 
     var background = new Konva.Rect({
         x: 0,
@@ -2476,6 +2835,13 @@ $(function () {
         var group = page.findOne(".grupo");
         if(e.target===stage){
             transformer.nodes([]);
+            stage.find('.handle').forEach((node) => {
+                node.destroy()
+            })
+            var border = stage.findOne(".lineBorder");
+            if(border){
+                border.destroy();
+            }
         }
         if (!drawMode && !drawingLineMode) {
             if (e.evt) {
@@ -2545,7 +2911,6 @@ $(function () {
         var layer = stage.findOne("#layer-main");
         var page = layer.findOne("#" + $("#currentLayer").val());
         var group = page.findOne(".grupo");
-
         if (drawMode) {
             var pointerPosition = stage.getPointerPosition();
             if (!pointerPosition) return;
@@ -2581,8 +2946,12 @@ $(function () {
                 DrawCursorRadius.strokeWidth(1);
             }
         } else {
+            if(drawingLineMode){
+                $(".editor").css("cursor", "url('images/cross.cur'), auto")
+            }else{
+                
+            }
 
-            $(".editor").css("cursor", "")
         }
     })
     var lineId;
@@ -2609,16 +2978,15 @@ $(function () {
             };
 
             lastLine = new Konva.Line({
-                points: [adjustedPosition.x, adjustedPosition.y],
                 stroke: color,
-                strokeWidth: size,
+                strokeWidth:parseInt(size),
                 globalCompositeOperation:
                     mode === 'brush' ? 'source-over' : 'destination-out',
                 lineJoin: 'round',
                 lineCap: 'round',
-                width:"100",
-                height:"100",
+                name:"line",
                 listening: false,
+                id:"line"+Math.random(),
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
             group.add(lastLine);
@@ -2646,10 +3014,9 @@ $(function () {
             const pointerPosition = stage.getPointerPosition();
             if (!group) return;
 
-            const scale = group.getAbsoluteScale(); // Obter a escala real do grupo
-            const position = group.getAbsolutePosition(); // Obter posição do grupo no canvas
+            const scale = group.getAbsoluteScale();
+            const position = group.getAbsolutePosition(); 
 
-            // Ajustar a posição do pointer para considerar transformações do grupo
             const adjustedPosition = {
                 x: (pointerPosition.x - position.x) / scale.x,
                 y: (pointerPosition.y - position.y) / scale.y
@@ -2659,15 +3026,15 @@ $(function () {
             const line = new Konva.Line({
                 stroke: lineColor,
                 name: "line",
-                strokeWidth: lineSize,
+                strokeWidth: parseInt(lineSize),
                 listening: true,
                 id: "line" + Math.random(),
-                width:"100",
-                height:"100",
                 draggable: true,
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
             });
+            
             generateLineEvents(line)
+            
             lineId = line.id();
             group.add(line);
             page.draw();
@@ -2766,7 +3133,7 @@ $(function () {
             }
 
             line.points(points); // Atualiza os pontos na linha
-
+            updateHandles(line)
             // Força um desenho seguro da camada
             layer.batchDraw();
         }
@@ -2784,7 +3151,7 @@ $(function () {
 
     stage.on('click tap dragstart', function (e) {
 
-        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'line')) {
+        if ((e.target.name() != 'image') && (e.target.name() != 'button-up') && (e.target.name() != 'draw') && (e.target.name() != 'button-down') && ((e.target.name() != 'text')) && (e.target.name() != 'button-edit') && (e.target.name() != 'button-copy') && (e.target.name() != 'line')&& (e.target.name() != 'handle')) {
 
             if (drawMode || drawingLineMode) {
                 return;
@@ -2797,6 +3164,13 @@ $(function () {
             $("#widget-figures").fadeOut(100);
             $("#widget-draw-line").fadeOut(100);
             transformer.nodes([]);
+            stage.find('.handle').forEach((node) => {
+                node.destroy()
+            })
+            var border = stage.findOne(".lineBorder");
+            if(border){
+                border.destroy();
+            }
             $("#shape-border").hide();
             sliders.forEach(function (attr) {
                 $("#" + attr).attr("object-id", "0")
@@ -2876,6 +3250,90 @@ $(function () {
 
 });
 
+function calculateLineBoundingBox(line) {
+    const points = line.points(); // Pontos locais da linha
+    const strokeWidth = line.strokeWidth() || 0;
+
+    // Inicializa limites com os valores dos primeiros pontos
+    let minX = points[0];
+    let minY = points[1];
+    let maxX = points[0];
+    let maxY = points[1];
+
+    // Itera pelos pontos (x, y)
+    for (let i = 2; i < points.length; i += 2) {
+        const x = points[i];
+        const y = points[i + 1];
+
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
+
+    // Expande pelos valores de strokeWidth
+    const halfStrokeWidth = strokeWidth / 2;
+    return {
+        x: minX - halfStrokeWidth,
+        y: minY - halfStrokeWidth,
+        width: (maxX - minX) + strokeWidth,
+        height: (maxY - minY) + strokeWidth,
+    };
+}
+function createPreciseBorder(line) {
+    var layer = stage.findOne("#layer-main");
+    var group  = layer.findOne(".grupo");
+    const points = line.points(); // Obtém os pontos da linha
+    const strokeWidth = line.strokeWidth() || 0;
+
+    const offset = strokeWidth / 2; // Deslocamento para os dois lados
+    const pathPoints = [];
+
+    // Calcula as normais para cada segmento da linha
+    for (let i = 0; i < points.length - 2; i += 2) {
+        const x1 = points[i];
+        const y1 = points[i + 1];
+        const x2 = points[i + 2];
+        const y2 = points[i + 3];
+
+        // Vetor direção do segmento
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+
+        // Comprimento do vetor
+        const length = Math.sqrt(dx * dx + dy * dy);
+
+        // Vetor normal perpendicular
+        const normalX = (-(dy / length) * offset);
+        const normalY = (dx / length) * offset;
+
+        // Adiciona pontos deslocados para cima e para baixo
+        pathPoints.push(x1 + normalX, y1 + normalY); // Lado superior
+        pathPoints.push(x1 - normalX, y1 - normalY); // Lado inferior
+    }
+
+    // Fechar o caminho nos extremos
+    const lastX = points[points.length - 2];
+    const lastY = points[points.length - 1];
+    pathPoints.push(lastX + offset, lastY + offset);
+    pathPoints.push(lastX - offset, lastY - offset);
+
+    // Cria um Shape de contorno baseado no Path
+    const border = new Konva.Line({
+        points: pathPoints,
+        name:"lineBorder",
+        x: line.x(),
+        y:line.y(),
+        stroke: '#FFD843',
+        strokeWidth: 2,
+        closed: true, // Fecha o contorno
+        listening: false, // Não capturar eventos
+    });
+
+    group.add(border);
+    layer.batchDraw();
+}
+
 function generateLineEvents(line, layer) {
 
     line.on("click tap", function (e) {
@@ -2891,14 +3349,79 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
+        createPreciseBorder(line);
         generateLineWidget(e.target);
-        transformer.nodes([e.target])
+        updateHandles(e.target)
     })
     line.on("mousedown", function (e) {
-
+        if (drawMode || drawingLineMode) {
+            return;
+        }
         generateLineWidget(e.target);
-        transformer.nodes([e.target])
+        updateHandles(e.target)
     })
+    line.on('dragstart', function(e){
+        if (drawMode || drawingLineMode) {
+            $("#shape-border").hide();
+            return;
+        }
+
+        if (e.evt) {
+            if (e.evt.type.startsWith('touch')) {
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    var border = stage.findOne(".lineBorder");
+                    if(border){
+                        border.destroy();
+                    }
+                    return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    var handle = stage.findOne('.handle')
+        
+                    if(handle){
+                        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+                        if (line != e.target) {
+                            e.target.stopDrag();   
+                        }    
+                    }                    
+                    return;
+                }
+            }
+        }
+
+    })
+
+    line.on('touchstart', function(e){
+        if (drawMode || drawingLineMode) {
+            $("#shape-border").hide();
+            return;
+        }
+
+        if (e.evt) {
+            if (e.evt.type.startsWith('touch')) {
+                // Confirma que é um evento de toque
+                if (e.evt.touches && e.evt.touches.length === 2) {
+                    $("#shape-border").hide();
+                    return;
+                }
+                if (e.evt.touches && e.evt.touches.length === 1) {
+                    var handle = stage.findOne('.handle')
+        
+                    if(handle){
+                        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+                        if (line != e.target) {
+                            e.target.stopDrag();   
+                            return;
+                        }    
+                    }                    
+                }
+            }
+        }
+        
+    })
+
+
     line.on('mouseover', function (e) {
         if (drawMode || drawingLineMode) {
             $("#shape-border").hide();
@@ -2914,22 +3437,21 @@ function generateLineEvents(line, layer) {
                 }
             }
         }
-
+        createPreciseBorder(line)
         $("#shape-border").show();
-        adjustShapeBorder(e.target);
     })
 
-    line.on('mouseout touchend', function (e) {
+    line.on('mouseout', function (e) {
+        var border = stage.findOne(".lineBorder");
+        if(border){
+            border.destroy();
+        }
         $("#shape-border").hide();
     })
 
     line.on("dragmove", function (e) {
-        adjustShapeBorder(e.target);
-    })
-
-    line.on("transformstart dragstart", function (e) {
         if (drawMode || drawingLineMode) {
-            line.stopDrag();
+            $("#shape-border").hide();
             return;
         }
 
@@ -2937,19 +3459,34 @@ function generateLineEvents(line, layer) {
             if (e.evt.type.startsWith('touch')) {
                 // Confirma que é um evento de toque
                 if (e.evt.touches && e.evt.touches.length === 2) {
-                    e.target.stopDrag();
+                    var border = stage.findOne(".lineBorder");
+                    if(border){
+                        border.destroy();
+                    }
                     return;
                 }
                 if (e.evt.touches && e.evt.touches.length === 1) {
-                    if(transformer.nodes()[0] != e.target){
+                    var handle = stage.findOne('.handle')
+        
+                    if(handle){
+                        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+                        if (line != e.target) {
+                            e.target.stopDrag();
+                            return;
+                        }    
+                    }else{
                         e.target.stopDrag();
                         return;
-                    }
+                    }                    
                 }
             }
         }
-        saveState();
-        $("#widget-draw-line").fadeOut(100);
+        updateHandles(e.target)
+        var border = stage.findOne(".lineBorder");
+        if(border){
+            border.x(e.target.x());
+            border.y(e.target.y());
+        }
     })
 
     line.on('transformend dragend', function(e){
@@ -3071,6 +3608,9 @@ function generateBackgroundEvents(background, layer) {
 
     background.on('mousedown touchstart', function (e) {
         transformer.nodes([]);
+        stage.find('.handle').forEach((node) => {
+            node.destroy()
+        })
     })
 
 
@@ -3523,6 +4063,7 @@ $("#draw-line").on("click", function () {
         }
 
     } else {
+        $(".editor").css("cursor", "")
         $(this).css('background', "transparent");
         $("#widget-draw-line").fadeOut(100);
         drawingLineMode = false;
@@ -3592,6 +4133,7 @@ $("#draw").on("click", function () {
     } else {
         $(this).css('background', "transparent");
         $("#widget-draw").fadeOut(100);
+        $(".editor").css("cursor", "")
         drawMode = false;
         var DrawCursorRadius = stage.findOne("#DrawCursorRadius");
         if (DrawCursorRadius) {
@@ -3621,11 +4163,15 @@ $("#line-color,#line-size").on('input', function () {
 
     const colorButton = document.getElementById("line-color-button");
 
-    var line = transformer.nodes()[0];
+    var handle = stage.findOne('.handle')
 
-    if (line instanceof Konva.Line) {
-        line.stroke($("#line-color").val());
-        line.strokeWidth($("#line-size").val());
+    if(handle){
+        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+        if (line instanceof Konva.Line) {
+            line.stroke($("#line-color").val());
+            line.strokeWidth($("#line-size").val());
+        }
+    
     }
 
     $("#line-size-text").text(" " + lineSize + " ");
@@ -4020,16 +4566,31 @@ $(".btn-delete").click(function () {
     saveState();
     var layer = stage.findOne("#" + $("#currentLayer").val());
     var shape = transformer.nodes()[0];
+    var handle = stage.findOne('.handle')
 
+    if(handle){
+        var line = stage.findOne("#"+handle.getAttr('attachedTo'));
+        if (line instanceof Konva.Line) {
+            deleteShape(line, layer);
+            handle.destroy();
+            var border = stage.findOne(".lineBorder");
+            if(border){
+                border.destroy();
+            }
+        }
+    
+    }
     deleteShape(shape, layer);
     updateLayerButton();
 })
 
 function deleteShape(shape, layer) {
-    shape.destroy();
+    if(shape){
+        shape.destroy();
 
-    stage.fire('click');
-    layer.draw();
+        stage.fire('click');
+        layer.draw();
+    }
 }
 
 function copyShape(shape, layer) {
@@ -4575,6 +5136,13 @@ $(document).on('mousedown touchstart', function (e) {
             for (var i = 0; i < transformers.length; i++) {
                 transformers[i].nodes([]);
                 $("#shape-border").hide();
+                stage.find('.handle').forEach((node) => {
+                    node.destroy()
+                })
+                var border = stage.findOne(".lineBorder");
+                if(border){
+                    border.destroy();
+                }
             }
 
             // Esconda os widgets
