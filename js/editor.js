@@ -2897,10 +2897,7 @@ $(function () {
 
                 limitGroupPosition(group)
                         
-            }else{
-                group.stopDrag();
             }
-
             stage.batchDraw();
         }
     });
