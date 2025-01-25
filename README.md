@@ -1,6 +1,6 @@
 # Grafika
 
-Bem-vindo ao Grafika! Grafika é um editor canvas que foi desenvolvido com **HTML**, **CSS**, **jQuery** e o framework **Konva.js**. Com ele, você pode criar e editar imagens diretamente no navegador.
+Bem-vindo ao Grafika! O Grafika é um editor de canvas desenvolvido com HTML, CSS, jQuery e o framework Konva.js. Com ele, você pode criar e editar imagens diretamente no navegador de maneira simples e intuitiva.
 [Demo](https://marceloarc.github.io/editor-de-imagem/)
 ---
 
