@@ -4948,7 +4948,9 @@ function setNewCanvasSize(userWidth, userHeight) {
     $("#project-info").text(userWidth + " x " + userHeight)
     fitStageIntoParentContainer();
     stage.batchDraw();
-
+    setTimeout(() => {
+        updateLayerButtons();
+    }, 1000);
 }
 
 function readjustBackground() {
