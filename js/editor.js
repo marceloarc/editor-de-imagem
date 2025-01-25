@@ -29,6 +29,7 @@ const fontFamilies = [
 let isMousePressed = false;
 const alignments = ["left", "center", "right", "justify"];
 let currentIndex = 0;
+let currentBackground;
 const undoStack = [];
 const redoStack = [];
 const icons = ["fa-align-left", "fa-align-center", "fa-align-right", "fa-align-justify"];
@@ -2380,6 +2381,7 @@ function addBackground(image){
     if(backgroundImageGroup){
         backgroundImageGroup.destroy();
     }
+    console.log(bg.width())
     const groupImage = new Konva.Group({
         name:"groupImage",
         x:0,
@@ -2425,6 +2427,7 @@ function addBackground(image){
             height: imageHeight * scale, // Redimensionar proporcionalmente
             draggable: false,
             name:"bgImage",
+            url:image,
             imageSrc: imageSrc
         })
         groupImage.add(bgImage);
@@ -3746,7 +3749,18 @@ function fitStageIntoParentContainer() {
 
     
         const border = page.findOne(".border");
-
+        const background = group.findOne(".background");
+      
+        if(background){
+           background.setAttrs({
+                listening: false,
+                x: 0,
+                y: 0,
+                width: parseInt(originalStageWidth),
+                height: parseInt(originalStageHeight),
+            })
+        
+        }
         if(border){
             border.setAttrs({
                 listening: false,
@@ -3761,9 +3775,15 @@ function fitStageIntoParentContainer() {
             })
         
         }
+        const backgroundImage = group.findOne(".bgImage");
+
+        if(backgroundImage){         
+            addBackground(backgroundImage.getAttr("url"));
+        }
+    
 
     })
-    
+
     layer.draw();
     stage.draw();
 }
@@ -4864,7 +4884,7 @@ $("#resize-stage").click(function () {
     }
 })
 
-$("#resize-stage-prompt-btn").click(function () {
+$(".resize-stage-prompt-btn").click(function () {
     $("#resize-stage-prompt").fadeIn(100);
     const windowWidth = $(window).width();
     const windowHeight = $(window).height();
@@ -4874,8 +4894,8 @@ $("#resize-stage-prompt-btn").click(function () {
 
     const left = (windowWidth - elementWidth) / 2;
     const top = (windowHeight - elementHeight) / 2;
-    $("#resize-input-width").val(stageWidth);
-    $("#resize-input-height").val(stageHeight);
+    $("#resize-input-width").val(originalStageWidth);
+    $("#resize-input-height").val(originalStageHeight);
     $("#resize-stage-prompt").css({
         position: 'absolute',
         left: left + 'px',

@@ -648,7 +648,7 @@ height: 100%;
 
 .editor-panel {
   display: flex;
-  width: 70px;
+  width: 80px;
   position: relative;
   overflow-x: hidden;
   overflow-y:auto;
@@ -1069,12 +1069,7 @@ height: 100%;
   color: black;
   background: #ddbe3f;
 }
-@media screen and (min-width: 1024px){
-  
-  .wrapper .editor-panel {
-    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
-  }
-}
+
 @media screen and (max-width: 719px) {
   .container2 {
     width: auto;
