@@ -1416,7 +1416,7 @@ function saveClippedArea() {
 
 
 function generateTextWidget(Text) {
-
+    console.log(Text.fontStyle())
     var font = Text.fontFamily();
     if ((Text.fontStyle() == "") || (Text.fontStyle() == "normal")) {
         $("#input-text-edit").css("font-style", "normal");
@@ -1424,6 +1424,7 @@ function generateTextWidget(Text) {
         $(".btn-style").removeClass("selected");
     } else if (Text.fontStyle() == "bold") {
         $("#input-text-edit").css("font-weight", "bold");
+        $("#input-text-edit").css("font-style", "normal");
         $(".btn-style").removeClass("selected");
         $(".btn-style[value='bold']").addClass("selected");
     } else if (Text.fontStyle() == "italic") {
