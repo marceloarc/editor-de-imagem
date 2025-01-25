@@ -1,6 +1,6 @@
-# Editor de Imagem Online
+# Grafika
 
-Bem-vindo ao Editor de Imagem Online! Este editor simples e intuitivo foi desenvolvido com **HTML**, **CSS**, **jQuery** e o framework **Konva.js**. Com ele, você pode criar e editar imagens diretamente no navegador.
+Bem-vindo ao Grafika! Grafika é um editor canvas que foi desenvolvido com **HTML**, **CSS**, **jQuery** e o framework **Konva.js**. Com ele, você pode criar e editar imagens diretamente no navegador.
 [Demo](https://marceloarc.github.io/editor-de-imagem/)
 ---
 
