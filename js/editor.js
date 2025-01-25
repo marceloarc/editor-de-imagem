@@ -1416,7 +1416,7 @@ function saveClippedArea() {
 
 
 function generateTextWidget(Text) {
-    console.log(Text.fontStyle())
+    
     var font = Text.fontFamily();
     if ((Text.fontStyle() == "") || (Text.fontStyle() == "normal")) {
         $("#input-text-edit").css("font-style", "normal");
@@ -2362,17 +2362,17 @@ $('#background-btn-area').on('click', '.item', function (e) {
     $(".loading").css("display", "flex")
     .hide()
     .fadeIn(100);
-    addBackground($(this).attr("image"));
+    var page = stage.findOne("#"+$("#currentLayer").val());  
+    addBackground(page,$(this).attr("image"));
 });
 
 
 
 
-function addBackground(image){
+function addBackground(page,image){
 
     saveState();
     var layer = stage.findOne("#layer-main");
-    var page = layer.findOne("#" + $("#currentLayer").val());
     var group = page.findOne(".grupo");
     var bg = group.findOne(".background");
     bg.opacity(0);
@@ -2382,7 +2382,7 @@ function addBackground(image){
     if(backgroundImageGroup){
         backgroundImageGroup.destroy();
     }
-    console.log(bg.width())
+   
     const groupImage = new Konva.Group({
         name:"groupImage",
         x:0,
@@ -3778,8 +3778,8 @@ function fitStageIntoParentContainer() {
         }
         const backgroundImage = group.findOne(".bgImage");
 
-        if(backgroundImage){         
-            addBackground(backgroundImage.getAttr("url"));
+        if(backgroundImage){     
+            addBackground(page,backgroundImage.getAttr("url"));
         }
     
 
@@ -4309,16 +4309,16 @@ function addPage() {
     const newPageNumber = userLayers.length + 1;
 
     var NewGroup = new Konva.Group({
-        width: originalStageWidth,
-        height: originalStageHeight,
+        width: parseInt(originalStageWidth),
+        height: parseInt(originalStageHeight),
         name: 'grupo',
     });
     var background = new Konva.Rect({
         x: 0,
         y: 0,
         name: "background",
-        width: originalStageWidth,
-        height: originalStageHeight,
+        width: parseInt(originalStageWidth),
+        height: parseInt(originalStageHeight),
         fill: 'white',
         stroke: 'gray',
         strokeWidth: 0,
@@ -4350,8 +4350,9 @@ function addPage() {
     layer.add(newLayer);
     updatePageNumbers();
     stage.draw();
-    fitStageIntoParentContainer();
     updateLayerButtons();
+    fitStageIntoParentContainer();
+   
 }
 
 $("#layers").on('click', '#add-layer', function () {
