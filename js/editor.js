@@ -2508,9 +2508,9 @@ function getImages(search = "",containerId){
             data.results.forEach((image) => {
                 var url;
                 if(originalStageWidth >= 2000){
-                    url = image.urls.full
+                    url = image.urls.raw+"&w=2160&fit=max";
                 }else{
-                    url = image.urls.regular
+                    url = image.urls.raw+"&w=2160&fit=max";
                 }
                 const IconElement = `
                 <div class="item" image="${url}">
@@ -3422,7 +3422,6 @@ function createPreciseBorder(line) {
 function generateLineEvents(line, layer) {
 
     line.on("click tap", function (e) {
-        console.log(e.target)
         if (drawMode) {
             if(mode=="eraser"){
                 e.target.destroy();
