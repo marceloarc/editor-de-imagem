@@ -200,7 +200,6 @@ function restoreState(stack) {
         const userPages = groups.filter(layer => layer.name() !== 'grupo' &&  layer.name() !== 'groupImage');
         userPages.forEach(page => {
             const group = page.findOne(".grupo");
-            generateGroupEvents(group);
             const objects = group.getChildren();
             objects.forEach(obj => {
                 if (obj instanceof Konva.Text) {
