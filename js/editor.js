@@ -369,6 +369,7 @@ document.addEventListener("keydown", (e) => {
                 if(border){
                     border.destroy();
                 }
+                updateLayerButton();
             }
         
         }
@@ -3084,7 +3085,7 @@ $(function () {
                 lineJoin: 'round',
                 lineCap: 'round',
                 name:"line",
-                hitStrokeWidth: 50,
+                hitStrokeWidth: parseInt(size) < 50 ? 50 : size,
                 listening: true,
                 id:"line"+Math.random(),
                 points: [adjustedPosition.x, adjustedPosition.y, adjustedPosition.x, adjustedPosition.y]
@@ -4258,6 +4259,7 @@ $("#line-color,#line-size").on('input', function () {
         if (line instanceof Konva.Line) {
             line.stroke($("#line-color").val());
             line.strokeWidth(parseInt($("#line-size").val()));
+            line.hitStrokeWidth(Math.max(parseInt($("#line-size").val()),50))
         }
     
     }
@@ -4266,15 +4268,6 @@ $("#line-color,#line-size").on('input', function () {
 
     colorButton.style.backgroundColor = this.value;
 })
-
-function generateGroupEvents(group){
-    
-    group.on("dragmove", function (e) {
-        if(e.target === group){
-
-        }
-    });
-}
 
 
 function getRandomInt(max) {
