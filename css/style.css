@@ -347,8 +347,7 @@ height: 100%;
   overflow: hidden;
   -webkit-transition: all .3s ease-out;
   transition: all .3s ease-out;
-  margin: 0 auto;
-
+  margin: 5px;
 }
 
 .list-btn-area .item:hover
