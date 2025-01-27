@@ -656,7 +656,7 @@ $('#input-image').on('change', function (e) {
             var src = URL.createObjectURL(value);
             const pictureElement = `
                 <div class="item">
-                        <img class="item-image" src="${src}" alt="Image ${index + 1}" />
+                        <img loading="lazy" class="item-image" src="${src}" alt="Image ${index + 1}" />
                         <div class="remove-image-btn" ><i class="mdi mdi-close-circle-outline"></i></div>
                 </div>
             `;
@@ -675,7 +675,20 @@ function attachTransformer(node){
     if(className==="Line"){
         updateHandles(node);
         transformer.nodes([]);
+    }else if(className=="Image"){
+        transformer.centeredScaling(true);
+        transformer.keepRatio(true);
+        stage.find('.handle').forEach((node) => {
+            node.destroy()
+        })
+        var border = stage.findOne(".lineBorder");
+        if(border){
+            border.destroy();
+        }
+        transformer.nodes([node]);
     }else{
+        transformer.centeredScaling(false);
+        transformer.keepRatio(false);
         stage.find('.handle').forEach((node) => {
             node.destroy()
         })
@@ -2389,6 +2402,7 @@ function isDivFullyScrolled(div) {
 $('#icon-btn-area').on('click', '.item', function (e) {
 
     addImage($(this).attr("icon"));
+    $("#widget-icon").fadeOut(100);
 });
 
 $('#background-btn-area').on('click', '.item', function (e) {
@@ -2397,6 +2411,7 @@ $('#background-btn-area').on('click', '.item', function (e) {
     .fadeIn(100);
     var page = stage.findOne("#"+$("#currentLayer").val());  
     addBackground(page,$(this).attr("image"));
+    $("#widget-background").fadeOut(100);
 });
 
 
@@ -2551,7 +2566,7 @@ function getImages(search = "",containerId){
                 }
                 const IconElement = `
                 <div class="item" image="${url}">
-                        <img crossorigin="anonymous" src="${image.urls.thumb}" alt=""></img>
+                        <img loading="lazy" crossorigin="anonymous" src="${image.urls.thumb}" alt=""></img>
                         <span class="image-autor">Foto por <a href="${image.user.links.html}" target="_blank">${image.user.name}</a> em <a href="https://unsplash.com/" target="_blank">Unsplash</a></span>
                 </div>
             `;
@@ -2572,13 +2587,13 @@ function generateQrCode(size,data){
         method: 'GET',
         success: function (data) {
             addImage(data);
+            $("#widget-qr").fadeOut(100);
         },
         error: function (xhr, status, error) {
             console.error("Erro:", xhr.responseText);
         }
     });
 }
-
 
 function getIcons(search = "") {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
@@ -2599,7 +2614,7 @@ function getIcons(search = "") {
                 
                 const IconElement = `
                     <div class="item" icon="${previewUrl}">
-                        <img src="${previewUrl}" crossorigin="anonymous" alt="${icon.tags.join(', ')}" />
+                        <img loading="lazy" src="${previewUrl}" crossorigin="anonymous" alt="${icon.tags.join(', ')}" />
                     </div>
                 `;
                 $("#icon-btn-area").append(IconElement);  // Adiciona os ícones ao container
@@ -4532,7 +4547,7 @@ function updateLayerButton() {
                 <span class="layer-name">${layer.getAttr("pageNumber")}</span>
                 <button class="btn-page-options" title="Opções" layer_id="${layerId}"><i
                     class="mdi mdi-dots-vertical" aria-hidden="true"></i></button>
-                <img src="${imgData}" class="layer-img" alt="Layer Image" style="">
+                <img loading="lazy" src="${imgData}" class="layer-img" alt="Layer Image" style="">
         `;
         $(`.layer[layer-id="${layerId}"]`).append(buttonHtml);
 
@@ -4598,7 +4613,7 @@ function updateLayerButtons() {
                 <span class="layer-name">${layer.getAttr("pageNumber")}</span>
                 <button class="btn-page-options" title="Opções" layer_id="${layerId}"><i
                     class="mdi mdi-dots-vertical" aria-hidden="true"></i></button>
-                <img src="${imgData}" class="layer-img" alt="Layer Image" style="">
+                <img loading="lazy" src="${imgData}" class="layer-img" alt="Layer Image" style="">
             </li>
         `;
             $("#layers").append(buttonHtml);
