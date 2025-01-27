@@ -981,6 +981,24 @@ function getLineGuideStops(skipShape) {
         vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
         horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
       });
+      stage.find('.background').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return;
+        }
+        var box = guideItem.getClientRect();
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      });
+      stage.find('.borderImage').forEach((guideItem) => {
+        if (guideItem === skipShape) {
+          return;
+        }
+        var box = guideItem.getClientRect();
+        // and we can snap to all edges of shapes
+        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      });
     return {
       vertical: vertical.flat(),
       horizontal: horizontal.flat(),
@@ -1427,7 +1445,7 @@ function saveClippedArea() {
                 const group = layer.findOne(".grupo");
                 const background = group.findOne(".background");
                 const originalScale = group.scale(); // Salva a escala original
-
+                background.strokeWidth(0);
                 // Temporariamente ajusta a escala para 1
                 group.scale({ x: 1, y: 1 });
 
@@ -1444,8 +1462,7 @@ function saveClippedArea() {
                     zip.file(`${layer.name() || "layer"}_${index + 1}.png`, blob);
                     resolve();
                 });
-
-                // Restaura a escala do grupo
+                background.strokeWidth(2);
                 group.scale(originalScale);
             })
         );
@@ -2828,9 +2845,9 @@ function cleanStage() {
         id: "background" + getRandomInt(1000),
         name: "background",
         fill: "white",
+        stroke: '#FFD843',
         x: 0,
         y: 0,
-        stroke: 'gray',
         strokeWidth: 2,
     });
     generateBackgroundEvents(background, layer);
@@ -2900,8 +2917,8 @@ $(function () {
     $(".header").text(title + " - " + stageWidth + "x" + stageHeight)
     stage = new Konva.Stage({
         container: 'container',
-        width: $("#preview").width(),
-        height: $("#preview").height(),
+        width: parseInt($("#preview").width()),
+        height: parseInt($("#preview").height()),
         id: "stage",
 
     });
@@ -2943,7 +2960,7 @@ $(function () {
 
     var clipRect = { x: ($("#preview").width() - 800) / 2, y: ($("#preview").height() - 600) / 2, width: 800, height: 600 };
 
-    generateLayerEvents(layer);
+ 
 
 
     var background = new Konva.Rect({
@@ -2953,11 +2970,9 @@ $(function () {
         width: 800,
         height: 600,
         fill: 'white',
-        stroke: 'gray',
-        strokeWidth: 0,
+        stroke: '#FFD843',
+        strokeWidth: 2,
         shadowColor: 'rgba(0,0,0,0.3)',
-        shadowBlur: 10,
-        shadowOffset: { x: 3, y: 3 },
         shadowOpacity: 0.5,
         id:"bg-"+Math.random()
     });
@@ -2979,10 +2994,10 @@ $(function () {
         listening: false,
         x: background.getAbsolutePosition().x - $("#preview").width() / 2,
         y: background.getAbsolutePosition().y - $("#preview").width() / 2,
-        width: clipRect.width + $("#preview").width(),
-        height: clipRect.height + $("#preview").width(),
+        width: parseInt(clipRect.width + $("#preview").width()),
+        height: parseInt(clipRect.height + $("#preview").width()),
         stroke: 'rgba(44, 44, 46, 0.87)',
-        strokeWidth: $("#preview").width(),
+        strokeWidth: parseInt($("#preview").width()),
         draggable: false, // Para manter a borda fixa
         name: 'border'
     });
@@ -3394,8 +3409,10 @@ $(function () {
     
     fitStageIntoParentContainer();
     updateLayerButtons()
+    setTimeout(() => {
+        generateLayerEvents(layer);
+    }, 1000);
     stage.draw();
-
 });
 
 function calculateLineBoundingBox(line) {
@@ -4376,12 +4393,8 @@ function addPage() {
         width: parseInt(originalStageWidth),
         height: parseInt(originalStageHeight),
         fill: 'white',
-        stroke: 'gray',
-        strokeWidth: 0,
-        shadowColor: 'rgba(0,0,0,0.3)',
-        shadowBlur: 10,
-        shadowOffset: { x: 3, y: 3 },
-        shadowOpacity: 0.5,
+        stroke: '#FFD843',
+        strokeWidth: 2,
         id:"bg-"+Math.random()
     });
     generateBackgroundEvents(background);
