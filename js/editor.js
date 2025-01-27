@@ -423,12 +423,6 @@ document.addEventListener("keydown", (e) => {
 
 $(document).ready(function () {
 
-    $(window).on("resize",function(){
-        $("body").height($(window).height());
-        stage.width($("#preview").width());
-        stage.height($("#preview").width());
-        fitStageIntoParentContainer();
-    });
     const $fontContainer = $("#font-select");
 
     fontFamilies.forEach(font => {
