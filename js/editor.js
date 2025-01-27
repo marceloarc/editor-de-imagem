@@ -315,6 +315,34 @@ $("#new-prompt").click(function () {
     }
 })
 
+$("#add-qr").click(function () {
+    var stagePosition = $(this).offset();
+    var widget = document.getElementById('widget-qr');
+    $("#widget-qr").fadeIn(100);
+    const adjustedTop = (stagePosition.top);
+    const adjustedLeft = (stagePosition.left);
+    widget.style.position = 'absolute';
+    widget.style.top = adjustedTop + "px";
+    widget.style.left = adjustedLeft + $(this).outerWidth() + 'px';
+    if ($(window).outerWidth() < 450) {
+        widget.style.top = "";
+        widget.style.bottom = "0px";
+        widget.style.left = "0px";
+    }
+})
+
+$("#add-qr-btn").click(function(){
+    var url = $("#qr-url").val();
+    var size = $("#qr-size").val();
+
+    if(url == ""){
+        alert("DIGITE UMA URL!");
+        return;
+    }
+
+    generateQrCode(size,url);
+})
+
 $("#undo").click(function () {
     undo();
 })
@@ -395,7 +423,12 @@ document.addEventListener("keydown", (e) => {
 
 $(document).ready(function () {
 
-
+    $(window).on("resize",function(){
+        $("body").height($(window).height());
+        stage.width($("#preview").width());
+        stage.height($("#preview").width());
+        fitStageIntoParentContainer();
+    });
     const $fontContainer = $("#font-select");
 
     fontFamilies.forEach(font => {
@@ -2531,6 +2564,22 @@ function getImages(search = "",containerId){
     });
 }
 
+function generateQrCode(size,data){
+
+    const PROXY_URL = `https://proxy-server-beta-brown.vercel.app/api/proxy?type=image&url=${encodeURIComponent(`https://api.qrserver.com/v1/create-qr-code/?size=${size}&data=${data}`)}`;
+    $.ajax({
+        url: PROXY_URL,
+        method: 'GET',
+        success: function (data) {
+            addImage(data);
+        },
+        error: function (xhr, status, error) {
+            console.error("Erro:", xhr.responseText);
+        }
+    });
+}
+
+
 function getIcons(search = "") {
     const apiKey = "Fa3z2ALdAgl61tZAXO2JZsCHRBXgv2kGWVfkGby1nJII9uuzFiFITYQagWa5PWYw";  // Sua chave da API Iconfinder
     const url = `https://proxy-server-beta-brown.vercel.app/api/proxy?url=${encodeURIComponent(`https://api.iconfinder.com/v4/icons/search?query=${search}&count=${countIcon}`)}`;
@@ -2989,7 +3038,7 @@ $(function () {
             stage.batchDraw();
         }
     });
-    $(window).on("resize",fitStageIntoParentContainer());
+
     stage.on('touchend', () => {
         isDraggingStage = false; // Finaliza o arrasto
     });
@@ -5200,6 +5249,7 @@ function saveImageOriginalScale() {
     fitStageIntoParentContainer();
 
 }
+
 $(document).on('mousedown touchstart', function (e) {
     // Lista de IDs ou classes dos elementos permitidos
     const allowedSelectors = [

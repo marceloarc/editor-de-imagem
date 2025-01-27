@@ -131,10 +131,10 @@ body {
     color: #FFD843;
 }
 
-select {
-    height: 30px;
-    padding: 3px;
-    font-size: 12px;
+.select-size-qr {
+    margin:10px 0px 10px 0px;
+    border-radius: 5px;
+
 }
 
 

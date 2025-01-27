@@ -9,8 +9,8 @@
     <script src="https://kit.fontawesome.com/f8abb678a6.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         type="text/css">
-    <link href="css/editor.css?ver=2.0.5" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="css/style.css?ver=2.0.5" />
+    <link href="css/editor.css?ver=2.0.3" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/style.css?ver=2.0.3" />
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-solid.css">
@@ -72,10 +72,10 @@
                         aria-hidden="true"></i><span class="btn-text">Pincel</span></button>
                 <button id="draw-line" title="Desenhar uma linha" id="btn-widget-draw-line"><i class="mdi mdi-vector-line"
                      aria-hidden="true"></i><span class="btn-text">Linha</span></button>
-                <button title="Em breve..." class="resize-stage-prompt-btn" id=""><i class="mdi mdi-resize" aria-hidden="true"></i><span
+                <button title="Adicionar QR code" id="add-qr"><i class="mdi mdi-qrcode-plus" aria-hidden="true"></i><span
+                        class="btn-text">Adicionar QR code</span></button>
+                <button title="Redimensionar canvas" class="resize-stage-prompt-btn" id=""><i class="mdi mdi-resize" aria-hidden="true"></i><span
                         class="btn-text">Redimensionar</span></button>
-                <button title="Em breve..." id=""><i class="mdi mdi-artboard" aria-hidden="true"></i><span
-                        class="btn-text">Soon</span></button>
 
             </div>
             <input id="currentLayer" style="display:none;" value="0">
@@ -595,6 +595,21 @@
         
     </div>
 
+    <div class="text-center widget-sm b-r widget-gray widget-fixed" id="widget-qr">       
+        <button type="button" class="close" id="close-edit" style="color:white; padding: 5px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>    
+        <input id="input-import" type="file" name="input-import" accept=".gproj" style="display: none;" />
+        <div class="widget-body">
+                <input type="text" id="qr-url" class="form-control" placeholder="cole o link aqui" aria-label="Largura">
+                <select id="qr-size" class="select-size-qr">
+                    <option value="150x150">150x150</option>
+                    <option value="300x300">300x300</option>
+                    <option value="500x500">500x500</option>
+                </select>
+                <button id="add-qr-btn" class="btn-confirm btn-yellow">Adicionar novo QR code</button>
+        </div>  
+    </div>
+
+
     <div class="text-center widget-sm b-r widget-gray widget-fixed" id="widget-new">       
         <button type="button" class="close" id="close-edit" style="color:white; padding: 5px; right:0; transform: translate(0,-80%); position: absolute; background: rgba(47, 51, 54, 1); font-size: 12px; border-radius: 3px 3px 0px 0px;">Fechar</button>    
         <input id="input-import" type="file" name="input-import" accept=".gproj" style="display: none;" />
@@ -667,7 +682,7 @@
 <script src="js/jquery.ui.touch-punch.min.js"></script>
 
 <script src="https://unpkg.com/konva@9.3.18/konva.min.js"></script>
-<script src="js/editor.js?ver=2.0.5"></script>
+<script src="js/editor.js?ver=2.0.3"></script>
 <script src="js/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script
 
